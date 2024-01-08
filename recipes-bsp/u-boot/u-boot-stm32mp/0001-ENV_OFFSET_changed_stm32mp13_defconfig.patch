@@ -1,0 +1,26 @@
+From bf697fdbac1e3bb4ba3e738c01f1002f22233833 Mon Sep 17 00:00:00 2001
+From: robo1340 <haines.todd@okstate.edu>
+Date: Fri, 22 Dec 2023 10:18:38 -0600
+Subject: [PATCH] ENV_OFFSET_changed_stm32mp13_defconfig
+
+---
+ configs/stm32mp13_defconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configs/stm32mp13_defconfig b/configs/stm32mp13_defconfig
+index d26bca1eef..f9388f6b51 100644
+--- a/configs/stm32mp13_defconfig
++++ b/configs/stm32mp13_defconfig
+@@ -2,10 +2,10 @@ CONFIG_ARM=y
+ CONFIG_ARCH_STM32MP=y
+ CONFIG_TFABOOT=y
+ CONFIG_SYS_MALLOC_F_LEN=0x180000
+-CONFIG_ENV_OFFSET=0x900000
++CONFIG_ENV_OFFSET=0x904400
+ CONFIG_ENV_SECT_SIZE=0x40000
+ CONFIG_DEFAULT_DEVICE_TREE="stm32mp135f-dk"
+-CONFIG_SYS_PROMPT="STM32MP> "
++CONFIG_SYS_PROMPT="STM32MP13> "
+ CONFIG_STM32MP13X=y
+ CONFIG_DDR_CACHEABLE_SIZE=0x8000000
+ CONFIG_CMD_STM32KEY=y

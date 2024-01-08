@@ -1,0 +1,19 @@
+From bc998526bd2afdda83d3b9cc51d1d68936eabb05 Mon Sep 17 00:00:00 2001
+From: robo1340 <haines.todd@okstate.edu>
+Date: Sun, 7 Jan 2024 20:43:27 -0600
+Subject: [PATCH] modified -march=armv7
+
+---
+ src/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 6c83b48..d8199b0 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1,4 +1,4 @@
+-AM_CFLAGS = -Wall -march=native -fvisibility=hidden -I$(top_srcdir)/include
++AM_CFLAGS = -Wall -march=armv7 -fvisibility=hidden -I$(top_srcdir)/include
+ 
+ lib_LTLIBRARIES = libturbofec.la
+ 
