@@ -1,0 +1,21 @@
+From 633087816a8e1a84ccc9b153e2f2134c4ebe3467 Mon Sep 17 00:00:00 2001
+From: robo1340 <haines.todd@okstate.edu>
+Date: Tue, 9 Jan 2024 19:36:06 -0600
+Subject: [PATCH] modified conv_gen.h
+
+---
+ src/conv_gen.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/conv_gen.h b/src/conv_gen.h
+index 0a0ac34..2463a9a 100644
+--- a/src/conv_gen.h
++++ b/src/conv_gen.h
+@@ -18,6 +18,7 @@
+  *
+  * Author: Tom Tsou <tom.tsou@ettus.com>
+  */
++#define HAVE_SSE3
+ 
+ #ifndef HAVE_SSE3
+ #include <stdint.h>

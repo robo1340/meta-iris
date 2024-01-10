@@ -1,0 +1,73 @@
+From 8f5f10693f97ea4a7f702cfeea06ee36e910bd4e Mon Sep 17 00:00:00 2001
+From: robo1340 <haines.todd@okstate.edu>
+Date: Tue, 9 Jan 2024 19:20:03 -0600
+Subject: [PATCH] included sse2neon.h, removed includes for *mmintrin.h
+
+---
+ src/conv_sse.h  | 11 +++++++----
+ src/turbo_sse.h | 13 ++++++++-----
+ 2 files changed, 15 insertions(+), 9 deletions(-)
+
+diff --git a/src/conv_sse.h b/src/conv_sse.h
+index 0df9bf7..5c4a790 100644
+--- a/src/conv_sse.h
++++ b/src/conv_sse.h
+@@ -19,17 +19,20 @@
+  * Author: Tom Tsou <tom.tsou@ettus.com>
+  */
+ 
++#define HAVE_SSE3
++#include "sse2neon.h"
++
+ #ifdef HAVE_SSE3
+ #include <stdint.h>
+-#include <emmintrin.h>
+-#include <tmmintrin.h>
++//#include <emmintrin.h>
++//#include <tmmintrin.h>
+ 
+ #if defined(HAVE_SSE4_1) || defined(HAVE_SSE41)
+-#include <smmintrin.h>
++//#include <smmintrin.h>
+ #endif
+ 
+ #ifdef HAVE_AVX2
+-#include <immintrin.h>
++//#include <immintrin.h>
+ #endif
+ 
+ #if defined(__MACH__)
+diff --git a/src/turbo_sse.h b/src/turbo_sse.h
+index 23c9f9c..f4476d3 100644
+--- a/src/turbo_sse.h
++++ b/src/turbo_sse.h
+@@ -19,21 +19,24 @@
+  * Author: Tom Tsou <tom.tsou@ettus.com>
+  */
+ 
++#define HAVE_SSE3
++#include "sse2neon.h"
++
+ #ifdef HAVE_SSE3
+ #include <stdint.h>
+ #include <math.h>
+ #if !defined(__MACH__)
+ #include <malloc.h>
+ #endif
+-#include <emmintrin.h>
+-#include <tmmintrin.h>
+-#include <immintrin.h>
++//#include <emmintrin.h>
++//#include <tmmintrin.h>
++//#include <immintrin.h>
+ 
+ #if defined(HAVE_SSE4_1) || defined(HAVE_SSE41)
+ #ifdef HAVE_AVX2
+-#include <immintrin.h>
++//#include <immintrin.h>
+ #endif
+-#include <smmintrin.h>
++//#include <smmintrin.h>
+ #define MAXPOS(M0,M1,M2) \
+ { \
+ 	M1 = _mm_set1_epi16(32767); \

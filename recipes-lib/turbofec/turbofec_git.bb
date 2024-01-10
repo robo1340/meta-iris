@@ -15,6 +15,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=51b35d652c070d136bf20244494be2d3"
 SRC_URI = "git://github.com/ttsou/turbofec.git;protocol=https;branch=master \
            file://0001-added-extern-to-codes.h.patch \
            file://0002-modified-march-armv7.patch \
+           file://0001-added-mpfu-neon-to-Makefile.patch \
+           file://0002-added-sse2neon.h.patch \
+           file://0003-included-sse2neon.h-removed-includes-for-mmintrin.h.patch \
+           file://0004-modified-conv_gen.h.patch \
            "
 
 # Modify these as desired
