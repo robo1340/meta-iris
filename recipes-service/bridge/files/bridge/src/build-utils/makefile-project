@@ -1,0 +1,93 @@
+# Filename: makefile-project
+# Makefile to build a project from components. This makefile is to be
+# invoked in the project directory.
+#
+# Each component will be built to a library archive with a sub-makefile. These
+# archives will be linked to produce the target.
+#
+
+
+.SUFFIXES:				# remove all default suffix rules
+
+# CFLAGS = -g -march=i486 -mtune=i486
+# profiler flag -pg
+
+# source root directory where all components and project directory reside
+ifndef SOURCE_ROOT
+SOURCE_ROOT = ..
+endif
+
+# build directory; use current directory unless specified otherwise
+ifndef BUILDDIR
+BUILDDIR = $(shell pwd)
+endif
+
+# installation directory
+ifndef INSTALLDIR
+INSTALLDIR = $(BUILDDIR)
+endif
+
+# Project Name (project directory)
+ifndef PROJECT
+PROJECT=prj-$PROJECT_NAME
+# should output an error message instead
+endif
+
+# make options as well as TARGET definition
+include $(SOURCE_ROOT)/$(PROJECT)/makefile-options
+
+# Project components - read component list from the file "DEPEND"
+COMPONENTS  = $(shell cat $(SOURCE_ROOT)/$(PROJECT)/DEPEND)
+# add the project to the component list
+COMPONENTS +=$(PROJECT)
+# archive of all object files for the project
+PROJECT_AR = $(BUILDDIR)/$(TARGET).a
+# component archival markers
+COMPONENTS_AR = $(patsubst %,$(BUILDDIR)/%.ar,$(COMPONENTS))
+# binary
+#
+
+# Temp/backup files created by text editors
+TMPFILES = $(shell find $(SOURCE_ROOT) -type f -name "*~")
+
+# Compiled binary
+#EXECUTABLE=$(TARGET)-$(ARES_APP_VER)
+EXECUTABLE=$(TARGET)
+
+###### IN THE PROJECT DIRECTORY...
+
+# application version
+include $(SOURCE_ROOT)/$(PROJECT)/version
+
+# TARGET
+all: install
+
+#$(BUILDDIR)/$(TARGET)-$(ARES_APP_VER): $(COMPONENTS_AR)
+$(BUILDDIR)/$(TARGET): $(COMPONENTS_AR)
+	$(CC) $(CFLAGS) $(PROJECT_AR) $(LIBS) -o $@ -Xlinker -M=link-map
+
+# compiling each component into an archive using a sub-makefile
+$(COMPONENTS_AR):
+	$(MAKE) -C $(SOURCE_ROOT)/$(patsubst %.ar,%,$(@F)) \
+	  -f $(SOURCE_ROOT)/build-utils/makefile-component  \
+		TARGET=$(PROJECT_AR)          \
+		ARES_APP_VER=$(ARES_APP_VER)  \
+		CFLAGS='$(CFLAGS)'        &&  \
+	touch $@
+
+# install targets to INSTALLDIR
+#$(INSTALLDIR)/$(TARGET): $(BUILDDIR)/$(TARGET)-$(ARES_APP_VER)
+$(INSTALLDIR)/$(TARGET): $(BUILDDIR)/$(TARGET)
+#ifneq ($(BUILDDIR),$(INSTALLDIR))
+#	test -d $(INSTALLDIR) || mkdir -p $(INSTALLDIR)
+#	cp -pu $< $(INSTALLDIR)
+#endif
+#	ln -sf $(INSTALLDIR)/$(TARGET) $(INSTALLDIR)/$(TARGET)
+#
+install: $(INSTALLDIR)/$(TARGET)
+
+.PHONY : all install clean
+
+clean:
+	$(RM) $(COMPONENTS_AR) $(PROJECT_AR) $(TMPFILES) $(EXECUTABLE) link-map
+  $(info $$TMPFILES is [${TMPFILES}])

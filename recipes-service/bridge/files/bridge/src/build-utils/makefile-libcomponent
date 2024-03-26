@@ -1,0 +1,45 @@
+# Filename: makefile-component
+# Makefile for compiling a component into an archive (library).
+#
+# This Makefile is to be invoked in a component directory that contains a file
+# "DEPEND" and subdirectories INC_DIR and SRC_DIR:
+# 
+# COMPONENT_DIR
+#   + INC_DIR               - public interface to this component
+#   + SRC_DIR               - implementation of this component
+#   DEPEND                  - list of dependent components
+#   makefile-options
+#
+
+# remove all default suffix rules
+.SUFFIXES:
+
+ifndef TARGET
+TARGET = lib.a
+endif
+
+# subdirectories
+INC_DIR = inc
+SRC_DIR = src
+
+# extra options
+-include makefile-options
+
+# read compile-dependencies components from file "DEPEND"
+DEPENDENCIES = $(shell cat DEPEND)
+
+# extract the dependencies and object names
+INCLUDES = -I$(INC_DIR) $(patsubst %,-I../%/$(INC_DIR),$(DEPENDENCIES))
+OBJECTS := $(patsubst %.c,%.o,$(notdir $(wildcard $(SRC_DIR)/*.c)))
+
+# rule to compile .c files into .o files
+%.o: $(SRC_DIR)/%.c
+	$(CC) -fPIC -Wall -c $(INCLUDES) $(CPPFLAGS) $(CFLAGS) -o $@ $<  && \
+	#$(CC) -fPIC -g -c $(INCLUDES) $(CPPFLAGS) $(CFLAGS) -o $@ $<  && \
+	$(AR) -rcsv $(TARGET) $@                             && \
+	$(RM) -v $@
+
+all: $(OBJECTS)
+
+.PHONY: all
+

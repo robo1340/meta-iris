@@ -1,0 +1,10 @@
+# to be included in Makefile
+
+override CFLAGS += -Wall
+#override CFLAGS += -Wall -Wextra -pedantic
+#Aggressive error checking flags below cause compile error on GE code.
+#override CFLAGS += -Wall -Wextra -pedantic -O0 -pedantic-errors -ansi -Winit-self -Wuninitialized -Wmissing-declarations -Winit-self 
+
+# Project Target
+TARGET = test
+

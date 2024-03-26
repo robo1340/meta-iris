@@ -1,0 +1,1205 @@
+Archive member included to satisfy reference by file (symbol)
+
+/bridge/src/test-tx-radio/test.a(main.o)
+                              /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o (main)
+/bridge/src/test-tx-radio/test.a(radio.o)
+                              /bridge/src/test-tx-radio/test.a(main.o) (radio_print_part_info)
+/bridge/src/test-tx-radio/test.a(radio_hal.o)
+                              /bridge/src/test-tx-radio/test.a(radio.o) (radio_hal_init)
+/bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+                              /bridge/src/test-tx-radio/test.a(radio.o) (Si446xCmd)
+/bridge/src/test-tx-radio/test.a(spidev.o)
+                              /bridge/src/test-tx-radio/test.a(radio_hal.o) (spi_open)
+/bridge/src/test-tx-radio/test.a(beacon.o)
+                              /bridge/src/test-tx-radio/test.a(main.o) (beacon_init)
+/bridge/src/test-tx-radio/test.a(bridge.o)
+                              /bridge/src/test-tx-radio/test.a(main.o) (bridge_create)
+/bridge/src/test-tx-radio/test.a(radio_events.o)
+                              /bridge/src/test-tx-radio/test.a(bridge.o) (radio_event_callback)
+/bridge/src/test-tx-radio/test.a(state.o)
+                              /bridge/src/test-tx-radio/test.a(bridge.o) (state)
+/bridge/src/test-tx-radio/test.a(timer.o)
+                              /bridge/src/test-tx-radio/test.a(state.o) (timer_init)
+/bridge/src/test-tx-radio/test.a(slip.o)
+                              /bridge/src/test-tx-radio/test.a(state.o) (slip_encode)
+/bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+                              /bridge/src/test-tx-radio/test.a(state.o) (turbo_wrapper_encode)
+/bridge/src/test-tx-radio/test.a(serial.o)
+                              /bridge/src/test-tx-radio/test.a(bridge.o) (serial_open)
+/bridge/src/test-tx-radio/test.a(os_signal.o)
+                              /bridge/src/test-tx-radio/test.a(bridge.o) (os_interrupted)
+/bridge/src/test-tx-radio/test.a(print_util.o)
+                              /bridge/src/test-tx-radio/test.a(radio_events.o) (printArrHex)
+/bridge/src/test-tx-radio/test.a(radio_comm.o)
+                              /bridge/src/test-tx-radio/test.a(si446x_api_lib.o) (radio_comm_SendCmd)
+/bridge/src/test-tx-radio/test.a(gpio.o)
+                              /bridge/src/test-tx-radio/test.a(bridge.o) (gpio_init)
+/bridge/src/test-tx-radio/test.a(ipv4.o)
+                              /bridge/src/test-tx-radio/test.a(state.o) (ipv4_check_dst)
+/bridge/src/test-tx-radio/test.a(json_util.o)
+                              /bridge/src/test-tx-radio/test.a(state.o) (read_json_str)
+
+Discarded input sections
+
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(main.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(radio.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(radio_hal.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(spidev.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(beacon.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(bridge.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(radio_events.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(state.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(timer.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(slip.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(serial.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(os_signal.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(print_util.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(radio_comm.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(gpio.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(ipv4.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-tx-radio/test.a(json_util.o)
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+LOAD /bridge/src/test-tx-radio/test.a
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libz.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libserialport.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libzmq.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libczmq.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libgpiod.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libm.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libturbofec.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libpthread.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+LOAD /lib/libgcc_s.so
+START GROUP
+LOAD /lib/libgcc_s.so.1
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+END GROUP
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libc.so
+START GROUP
+LOAD /lib/libc.so.6
+LOAD /usr/lib/libc_nonshared.a
+LOAD /lib/ld-linux-armhf.so.3
+END GROUP
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+LOAD /lib/libgcc_s.so
+START GROUP
+LOAD /lib/libgcc_s.so.1
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+END GROUP
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                [!provide]                        PROVIDE (__executable_start = SEGMENT_START ("text-segment", 0x10000))
+                0x00010154                        . = (SEGMENT_START ("text-segment", 0x10000) + SIZEOF_HEADERS)
+
+.interp         0x00010154       0x19
+ *(.interp)
+ .interp        0x00010154       0x19 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.note.gnu.build-id
+                0x00010170       0x24
+ *(.note.gnu.build-id)
+ .note.gnu.build-id
+                0x00010170       0x24 linker stubs
+
+.note.ABI-tag   0x00010194       0x20
+ .note.ABI-tag  0x00010194       0x20 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.hash
+ *(.hash)
+
+.gnu.hash       0x000101b4      0x3dc
+ *(.gnu.hash)
+ .gnu.hash      0x000101b4      0x3dc /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.dynsym         0x00010590      0x760
+ *(.dynsym)
+ .dynsym        0x00010590      0x760 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.dynstr         0x00010cf0      0x788
+ *(.dynstr)
+ .dynstr        0x00010cf0      0x788 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.gnu.version    0x00011478       0xec
+ *(.gnu.version)
+ .gnu.version   0x00011478       0xec /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.gnu.version_d  0x00011564        0x0
+ *(.gnu.version_d)
+ .gnu.version_d
+                0x00011564        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.gnu.version_r  0x00011564       0x40
+ *(.gnu.version_r)
+ .gnu.version_r
+                0x00011564       0x40 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.rel.dyn        0x000115a4        0x8
+ *(.rel.init)
+ *(.rel.text .rel.text.* .rel.gnu.linkonce.t.*)
+ *(.rel.fini)
+ *(.rel.rodata .rel.rodata.* .rel.gnu.linkonce.r.*)
+ *(.rel.data.rel.ro .rel.data.rel.ro.* .rel.gnu.linkonce.d.rel.ro.*)
+ .rel.data.rel.ro
+                0x000115a4        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.rel.data .rel.data.* .rel.gnu.linkonce.d.*)
+ *(.rel.tdata .rel.tdata.* .rel.gnu.linkonce.td.*)
+ *(.rel.tbss .rel.tbss.* .rel.gnu.linkonce.tb.*)
+ *(.rel.ctors)
+ *(.rel.dtors)
+ *(.rel.got)
+ .rel.got       0x000115a4        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*)
+ .rel.bss       0x000115ac        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                [!provide]                        PROVIDE (__rel_iplt_start = .)
+ *(.rel.iplt)
+ .rel.iplt      0x000115ac        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                [!provide]                        PROVIDE (__rel_iplt_end = .)
+
+.rela.dyn       0x000115ac        0x0
+ *(.rela.init)
+ *(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)
+ *(.rela.fini)
+ *(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r.*)
+ *(.rela.data .rela.data.* .rela.gnu.linkonce.d.*)
+ *(.rela.tdata .rela.tdata.* .rela.gnu.linkonce.td.*)
+ *(.rela.tbss .rela.tbss.* .rela.gnu.linkonce.tb.*)
+ *(.rela.ctors)
+ *(.rela.dtors)
+ *(.rela.got)
+ *(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*)
+                [!provide]                        PROVIDE (__rela_iplt_start = .)
+ *(.rela.iplt)
+                [!provide]                        PROVIDE (__rela_iplt_end = .)
+
+.rel.plt        0x000115ac      0x398
+ *(.rel.plt)
+ .rel.plt       0x000115ac      0x398 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.rela.plt
+ *(.rela.plt)
+
+.init           0x00011944        0xc
+ *(SORT_NONE(.init))
+ .init          0x00011944        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x00011944                _init
+ .init          0x0001194c        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.plt            0x00011950      0x578
+ *(.plt)
+ .plt           0x00011950      0x578 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00011964                zlistx_add_start
+                0x00011970                rand@@GLIBC_2.4
+                0x0001197c                zhashx_rename
+                0x00011988                cfsetospeed@@GLIBC_2.4
+                0x00011994                strnlen@@GLIBC_2.4
+                0x000119a0                free@@GLIBC_2.4
+                0x000119ac                gpiod_request_config_set_consumer
+                0x000119b8                zhashx_insert
+                0x000119c4                zlistx_destroy
+                0x000119d0                zclock_sleep
+                0x000119dc                gpiod_request_config_free
+                0x000119e8                zclock_mono
+                0x000119f4                gpiod_line_config_reset
+                0x00011a00                zpoller_expired
+                0x00011a0c                strncmp@@GLIBC_2.4
+                0x00011a18                zpoller_add
+                0x00011a24                gpiod_chip_close
+                0x00011a30                lte_turbo_encode
+                0x00011a3c                zchunk_new
+                0x00011a48                gpiod_line_request_read_edge_events
+                0x00011a54                printf@@GLIBC_2.4
+                0x00011a60                strerror@@GLIBC_2.4
+                0x00011a6c                zlistx_add_end
+                0x00011a78                zpoller_destroy
+                0x00011a84                zhashx_new
+                0x00011a90                puts@@GLIBC_2.4
+                0x00011a9c                gpiod_line_settings_set_direction
+                0x00011aa8                zpoller_terminated
+                0x00011ab4                zmq_bind
+                0x00011ac0                putchar@@GLIBC_2.4
+                0x00011acc                zsock_new_sub_checked
+                0x00011ad8                memset@@GLIBC_2.4
+                0x00011ae4                gpiod_line_settings_set_edge_detection
+                0x00011af0                crc32
+                0x00011afc                gpiod_line_settings_free
+                0x00011b08                __libc_start_main@@GLIBC_2.34
+                0x00011b14                zpoller_wait
+                0x00011b20                cfsetispeed@@GLIBC_2.4
+                0x00011b2c                snprintf@@GLIBC_2.4
+                0x00011b38                gpiod_edge_event_buffer_get_event
+                0x00011b44                gpiod_line_settings_set_event_clock
+                0x00011b50                close@@GLIBC_2.4
+                0x00011b5c                fopen@@GLIBC_2.4
+                0x00011b68                zlistx_first
+                0x00011b74                read@@GLIBC_2.4
+                0x00011b80                abort@@GLIBC_2.4
+                0x00011b8c                gpiod_line_request_wait_edge_events
+                0x00011b98                zchunk_size
+                0x00011ba4                memmove@@GLIBC_2.4
+                0x00011bb0                zlistx_size
+                0x00011bbc                ioctl@@GLIBC_2.4
+                0x00011bc8                system@@GLIBC_2.4
+                0x00011bd4                zsys_file_exists
+                0x00011be0                zlistx_set_destructor
+                0x00011bec                __assert_fail@@GLIBC_2.4
+                0x00011bf8                gpiod_request_config_new
+                0x00011c04                alloc_tdec
+                0x00011c10                zmq_connect
+                0x00011c1c                __isoc99_sscanf@@GLIBC_2.7
+                0x00011c28                zmq_send
+                0x00011c34                gpiod_edge_event_buffer_free
+                0x00011c40                open@@GLIBC_2.4
+                0x00011c4c                gpiod_line_config_new
+                0x00011c58                gpiod_line_settings_new
+                0x00011c64                tcsetattr@@GLIBC_2.4
+                0x00011c70                gpiod_line_config_add_line_settings
+                0x00011c7c                lte_turbo_decode_unpack
+                0x00011c88                gpiod_edge_event_buffer_new
+                0x00011c94                gpiod_chip_request_lines
+                0x00011ca0                ntohs@@GLIBC_2.4
+                0x00011cac                gpiod_line_config_free
+                0x00011cb8                zhashx_destroy
+                0x00011cc4                zchunk_destroy
+                0x00011cd0                zpoller_new
+                0x00011cdc                sigaction@@GLIBC_2.4
+                0x00011ce8                zchunk_append
+                0x00011cf4                free_tdec
+                0x00011d00                zmq_recv
+                0x00011d0c                gpiod_line_request_release
+                0x00011d18                zlistx_detach_cur
+                0x00011d24                gpiod_line_request_get_value
+                0x00011d30                gpiod_line_settings_set_bias
+                0x00011d3c                gpiod_chip_open
+                0x00011d48                zsys_file_delete
+                0x00011d54                zhashx_set_key_duplicator
+                0x00011d60                fgets@@GLIBC_2.4
+                0x00011d6c                fputc@@GLIBC_2.4
+                0x00011d78                zmq_close
+                0x00011d84                gpiod_line_settings_set_active_low
+                0x00011d90                memcpy@@GLIBC_2.4
+                0x00011d9c                htons@@GLIBC_2.4
+                0x00011da8                gpiod_edge_event_get_event_type
+                0x00011db4                malloc@@GLIBC_2.4
+                0x00011dc0                fclose@@GLIBC_2.4
+                0x00011dcc                write@@GLIBC_2.4
+                0x00011dd8                zlistx_next
+                0x00011de4                zlistx_new
+                0x00011df0                zstr_free
+                0x00011dfc                zhashx_set_key_destructor
+                0x00011e08                zmq_ctx_destroy
+                0x00011e14                zsock_destroy_checked
+                0x00011e20                zmq_ctx_new
+                0x00011e2c                time@@GLIBC_2.4
+                0x00011e38                tcgetattr@@GLIBC_2.4
+                0x00011e44                __errno_location@@GLIBC_2.4
+                0x00011e50                strncpy@@GLIBC_2.4
+                0x00011e5c                memcmp@@GLIBC_2.4
+                0x00011e68                zmq_socket
+                0x00011e74                sigemptyset@@GLIBC_2.4
+                0x00011e80                pthread_create@@GLIBC_2.34
+                0x00011e8c                fputs@@GLIBC_2.4
+                0x00011e98                zchunk_data
+                0x00011eb0                srand@@GLIBC_2.4
+                0x00011ebc                strdup@@GLIBC_2.4
+
+.iplt           0x00011ec8        0x0
+ *(.iplt)
+ .iplt          0x00011ec8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.text           0x00011ec8     0x95dc
+ *(.text.unlikely .text.*_unlikely .text.unlikely.*)
+ *(.text.exit .text.exit.*)
+ *(.text.startup .text.startup.*)
+ *(.text.hot .text.hot.*)
+ *(SORT_BY_NAME(.text.sorted.*))
+ *(.text .stub .text.* .gnu.linkonce.t.*)
+ .text          0x00011ec8       0x34 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00011ec8                _start
+ .text          0x00011efc       0x24 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .text          0x00011f20       0x6c /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .text          0x00011f8c      0x130 /bridge/src/test-tx-radio/test.a(main.o)
+                0x00011f8c                main
+ .text          0x000120bc      0x578 /bridge/src/test-tx-radio/test.a(radio.o)
+                0x000120ec                radio_init
+                0x00012190                radio_print_part_info
+                0x00012228                radio_print_func_info
+                0x000122c4                radio_get_state_string
+                0x00012428                radio_print_state
+                0x000124f4                radio_print_modem_status
+                0x000125bc                radio_get_modem_state
+                0x000125e0                radio_start_rx
+ .text          0x00012634      0x1ec /bridge/src/test-tx-radio/test.a(radio_hal.o)
+                0x00012634                radio_hal_init
+                0x000126a4                radio_hal_deinit
+                0x000126dc                radio_hal_AssertShutdown
+                0x000126f4                radio_hal_DeassertShutdown
+                0x0001270c                radio_hal_NirqLevel
+                0x0001274c                radio_hal_SpiWriteData
+                0x0001278c                radio_hal_SpiReadData
+                0x000127cc                radio_hal_transfer
+ .text          0x00012820     0x1eb4 /bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+                0x00012820                si446x_reset
+                0x0001288c                si446x_power_up
+                0x00012954                si446x_configuration_init
+                0x00012a98                si446x_apply_patch
+                0x00012bdc                si446x_part_info
+                0x00012d08                si446x_start_tx
+                0x00012dc0                si446x_start_rx
+                0x00012e94                si446x_get_int_status
+                0x00012fe0                si446x_gpio_pin_cfg
+                0x0001316c                si446x_set_property
+                0x00013250                si446x_change_state
+                0x000132a0                si446x_nop
+                0x000132d0                si446x_fifo_info
+                0x0001335c                si446x_write_tx_fifo
+                0x00013394                si446x_read_rx_fifo
+                0x000133cc                si446x_get_property
+                0x000135e0                si446x_func_info
+                0x0001367c                si446x_frr_a_read
+                0x00013714                si446x_frr_b_read
+                0x000137ac                si446x_frr_c_read
+                0x00013844                si446x_frr_d_read
+                0x000138dc                si446x_get_adc_reading
+                0x00013a10                si446x_get_packet_info
+                0x00013b14                si446x_get_ph_status
+                0x00013ba0                si446x_get_modem_status
+                0x00013cd4                si446x_get_chip_status
+                0x00013d78                si446x_ircal
+                0x00013e20                si446x_ircal_manual
+                0x00013ec8                si446x_request_device_state
+                0x00013f34                si446x_tx_hop
+                0x0001401c                si446x_rx_hop
+                0x000140e4                si446x_start_tx_fast
+                0x00014114                si446x_start_rx_fast
+                0x00014144                si446x_get_int_status_fast_clear
+                0x00014174                si446x_get_int_status_fast_clear_read
+                0x00014270                si446x_gpio_pin_cfg_fast
+                0x00014354                si446x_get_ph_status_fast_clear
+                0x00014394                si446x_get_ph_status_fast_clear_read
+                0x00014400                si446x_get_modem_status_fast_clear
+                0x00014440                si446x_get_modem_status_fast_clear_read
+                0x00014554                si446x_get_chip_status_fast_clear
+                0x00014594                si446x_get_chip_status_fast_clear_read
+                0x00014618                si446x_fifo_info_fast_reset
+                0x00014668                si446x_fifo_info_fast_read
+ .text          0x000146d4      0x300 /bridge/src/test-tx-radio/test.a(spidev.o)
+                0x000146d4                spi_open
+                0x00014838                spi_close
+                0x00014860                spi_xfer
+                0x000148ec                spi_read
+                0x00014960                spi_write
+ .text          0x000149d4      0x1e4 /bridge/src/test-tx-radio/test.a(beacon.o)
+                0x000149d4                beacon_init
+                0x00014a6c                handle_beacon
+                0x00014b64                beacon_ttl_decrement
+ .text          0x00014bb8      0xaa8 /bridge/src/test-tx-radio/test.a(bridge.o)
+                0x00014bb8                bridge_main
+                0x00014ee8                bridge_create
+                0x000151dc                bridge_slip_run
+                0x00015328                bridge_zmq_run
+                0x00015488                bridge_interrupted
+                0x000154e0                bridge_destroy
+ .text          0x00015660      0x878 /bridge/src/test-tx-radio/test.a(radio_events.o)
+                0x00015660                radio_preamble_detect_callback
+                0x00015684                radio_sync_cb
+                0x0001571c                radio_receive_pending_callback
+                0x00015884                radio_receive_fifo_almost_full_callback
+                0x00015970                radio_transmit_complete_callback
+                0x00015a20                radio_transmit_fifo_almost_full_callback
+                0x00015b00                radio_state_change_callback
+                0x00015b80                radio_cmd_err_cb
+                0x00015bac                radio_event_callback
+ .text          0x00015ed8     0x2870 /bridge/src/test-tx-radio/test.a(state.o)
+                0x00015ed8                state
+                0x00016224                state_process_receive_frame
+                0x000165a4                state_update_peers_new_header
+                0x00016710                state_update_peers_new_beacon
+                0x000169c0                state_loading_dock_run
+                0x00016b20                state_append_loading_dock
+                0x00016c88                state_add_frame_to_send_queue
+                0x00016cf4                state_get_next_frame_to_transmit
+                0x00016d50                state_run
+                0x00016fc4                state_generate_random_ip
+                0x000170e0                state_read_ip
+                0x000171a4                state_write_ip
+                0x000171ec                state_ip_changed_callback
+                0x00017214                state_read_mac
+                0x000173b0                state_write_mac
+                0x000173f8                state_read_callsign
+                0x000174f8                state_write_callsign
+                0x00017540                state_destroy
+                0x000175f4                tlv
+                0x000176c0                tlv_len
+                0x000176ec                tlv_destroy
+                0x0001774c                frame_header_print
+                0x000177cc                frame_empty
+                0x0001784c                frame
+                0x000178e4                frame_append
+                0x000179b4                frame_len
+                0x00017a30                frame_pack
+                0x00017b80                frame_destroy
+                0x00017c20                packed_frame_encode
+                0x00017ce8                packed_frame_unpack
+                0x00017e5c                packed_frame_verify_crc
+                0x00017efc                packed_frame_destroy
+                0x00017f34                radio_frame
+                0x00017fdc                radio_frame_bytes_remaining
+                0x00018040                radio_frame_transmit_start
+                0x00018138                radio_frame_receive_start
+                0x0001819c                radio_frame_decode
+                0x0001827c                radio_frame_destroy
+                0x000182dc                create_peer_from_beacon
+                0x0001833c                create_peer_from_header
+                0x0001839c                peer_update_beacon
+                0x00018424                peer_update_header
+                0x000184ac                peer_check_stale
+                0x000184f8                peer_print
+                0x000185d8                peer_ip_str
+                0x00018650                peer_mac_str
+                0x000186e8                peer_ip_set
+                0x00018710                peer_destroy
+ .text          0x00018748       0xfc /bridge/src/test-tx-radio/test.a(timer.o)
+                0x00018748                timer_init
+                0x0001879c                timer_run
+                0x00018810                timer_reset
+ .text          0x00018844      0x638 /bridge/src/test-tx-radio/test.a(slip.o)
+                0x00018844                slip_encode
+                0x00018b50                slip_decoder_feed
+ .text          0x00018e7c      0x524 /bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+                0x00018e7c                bytes2bits
+                0x00018f44                bytes2bits_ranged
+                0x00019020                bits2bytes
+                0x0001911c                turbo_wrapper_encode
+                0x00019200                turbo_wrapper_init
+                0x00019274                turbo_wrapper_deinit
+                0x000192b0                turbo_wrapper_decode
+ .text          0x000193a0      0x27c /bridge/src/test-tx-radio/test.a(serial.o)
+                0x000193a0                serial_open
+                0x00019588                serial_write
+                0x000195c0                serial_read
+                0x000195f8                serial_close
+ .text          0x0001961c       0x94 /bridge/src/test-tx-radio/test.a(os_signal.o)
+                0x0001964c                os_catch_signals
+ .text          0x000196b0      0x2a0 /bridge/src/test-tx-radio/test.a(print_util.o)
+                0x000196b0                printArrHex
+                0x0001974c                printArrHex_no_new_line
+                0x000197e4                print_uint32_arr
+                0x00019880                snprintArrHex
+ .text          0x00019950      0x3b8 /bridge/src/test-tx-radio/test.a(radio_comm.o)
+                0x00019950                radio_comm_GetResp
+                0x00019a28                radio_comm_SendCmd
+                0x00019a78                radio_comm_ReadData
+                0x00019b5c                radio_comm_WriteData
+                0x00019c00                radio_comm_PollCTS
+                0x00019cac                radio_comm_SendCmdGetResp
+ .text          0x00019d08      0x6c8 /bridge/src/test-tx-radio/test.a(gpio.o)
+                0x0001a2b0                gpio_init
+                0x0001a370                gpio_deinit
+ .text          0x0001a3d0      0x124 /bridge/src/test-tx-radio/test.a(ipv4.o)
+                0x0001a3d0                ipv4_check_dst
+                0x0001a41c                ipv4_ttl_decrement
+ .text          0x0001a4f4      0xfb0 /bridge/src/test-tx-radio/test.a(json_util.o)
+                0x0001ab30                jsmn_parse
+                0x0001b158                jsmn_init
+                0x0001b19c                read_json_str
+                0x0001b340                write_json_str
+ .text          0x0001b4a4        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .text          0x0001b4a4        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ *(.gnu.warning)
+ *(.glue_7t)
+ .glue_7t       0x0001b4a4        0x0 linker stubs
+ *(.glue_7)
+ .glue_7        0x0001b4a4        0x0 linker stubs
+ *(.vfp11_veneer)
+ .vfp11_veneer  0x0001b4a4        0x0 linker stubs
+ *(.v4_bx)
+ .v4_bx         0x0001b4a4        0x0 linker stubs
+
+.fini           0x0001b4a4        0x8
+ *(SORT_NONE(.fini))
+ .fini          0x0001b4a4        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x0001b4a4                _fini
+ .fini          0x0001b4a8        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                [!provide]                        PROVIDE (__etext = .)
+                [!provide]                        PROVIDE (_etext = .)
+                [!provide]                        PROVIDE (etext = .)
+
+.rodata         0x0001b4ac     0x14c4
+ *(.rodata .rodata.* .gnu.linkonce.r.*)
+ .rodata.cst4   0x0001b4ac        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x0001b4ac                _IO_stdin_used
+ .rodata        0x0001b4b0       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .rodata        0x0001b540       0x8d /bridge/src/test-tx-radio/test.a(main.o)
+ *fill*         0x0001b5cd        0x3 
+ .rodata        0x0001b5d0      0x19b /bridge/src/test-tx-radio/test.a(radio.o)
+ *fill*         0x0001b76b        0x1 
+ .rodata        0x0001b76c       0x1c /bridge/src/test-tx-radio/test.a(radio_hal.o)
+ .rodata        0x0001b788      0x113 /bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+ *fill*         0x0001b89b        0x1 
+ .rodata        0x0001b89c       0x6a /bridge/src/test-tx-radio/test.a(beacon.o)
+ *fill*         0x0001b906        0x2 
+ .rodata        0x0001b908      0x262 /bridge/src/test-tx-radio/test.a(bridge.o)
+ *fill*         0x0001bb6a        0x2 
+ .rodata        0x0001bb6c      0x23a /bridge/src/test-tx-radio/test.a(radio_events.o)
+ *fill*         0x0001bda6        0x2 
+ .rodata        0x0001bda8      0x706 /bridge/src/test-tx-radio/test.a(state.o)
+ *fill*         0x0001c4ae        0x2 
+ .rodata        0x0001c4b0       0xc5 /bridge/src/test-tx-radio/test.a(slip.o)
+ *fill*         0x0001c575        0x3 
+ .rodata        0x0001c578       0x52 /bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+                0x0001c578                lte_turbo
+ *fill*         0x0001c5ca        0x2 
+ .rodata        0x0001c5cc       0x3e /bridge/src/test-tx-radio/test.a(serial.o)
+ *fill*         0x0001c60a        0x2 
+ .rodata        0x0001c60c       0x15 /bridge/src/test-tx-radio/test.a(print_util.o)
+ *fill*         0x0001c621        0x3 
+ .rodata        0x0001c624       0x3d /bridge/src/test-tx-radio/test.a(radio_comm.o)
+ *fill*         0x0001c661        0x3 
+ .rodata        0x0001c664      0x19e /bridge/src/test-tx-radio/test.a(gpio.o)
+ *fill*         0x0001c802        0x2 
+ .rodata        0x0001c804       0xdb /bridge/src/test-tx-radio/test.a(json_util.o)
+ *fill*         0x0001c8df        0x1 
+ .rodata        0x0001c8e0       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+
+.rodata1
+ *(.rodata1)
+
+.ARM.extab      0x0001c970        0x0
+ *(.ARM.extab* .gnu.linkonce.armextab.*)
+ .ARM.extab     0x0001c970        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.ARM.exidx      0x0001c970        0x8
+                [!provide]                        PROVIDE (__exidx_start = .)
+ *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+ .ARM.exidx     0x0001c970        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                [!provide]                        PROVIDE (__exidx_end = .)
+
+.eh_frame_hdr
+ *(.eh_frame_hdr)
+ *(.eh_frame_entry .eh_frame_entry.*)
+
+.eh_frame       0x0001c978        0x4
+ *(.eh_frame)
+ .eh_frame      0x0001c978        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ *(.eh_frame.*)
+
+.sframe
+ *(.sframe)
+ *(.sframe.*)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.gnu_extab
+ *(.gnu_extab*)
+
+.exception_ranges
+ *(.exception_ranges*)
+                0x0001ded0                        . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
+
+.eh_frame
+ *(.eh_frame)
+ *(.eh_frame.*)
+
+.sframe
+ *(.sframe)
+ *(.sframe.*)
+
+.gnu_extab
+ *(.gnu_extab)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.exception_ranges
+ *(.exception_ranges*)
+
+.tdata          0x0001ded0        0x0
+                [!provide]                        PROVIDE (__tdata_start = .)
+ *(.tdata .tdata.* .gnu.linkonce.td.*)
+
+.tbss
+ *(.tbss .tbss.* .gnu.linkonce.tb.*)
+ *(.tcommon)
+
+.preinit_array  0x0001ded0        0x0
+                [!provide]                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array)
+                [!provide]                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x0001ded0        0x4
+                [!provide]                        PROVIDE (__init_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
+ *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
+ .init_array    0x0001ded0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                [!provide]                        PROVIDE (__init_array_end = .)
+
+.fini_array     0x0001ded4        0x4
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
+ *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
+ .fini_array    0x0001ded4        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                [!provide]                        PROVIDE (__fini_array_end = .)
+
+.ctors
+ *crtbegin.o(.ctors)
+ *crtbegin?.o(.ctors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+ *(SORT_BY_NAME(.ctors.*))
+ *(.ctors)
+
+.dtors
+ *crtbegin.o(.dtors)
+ *crtbegin?.o(.dtors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+ *(SORT_BY_NAME(.dtors.*))
+ *(.dtors)
+
+.jcr
+ *(.jcr)
+
+.data.rel.ro    0x0001ded8        0x0
+ *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
+ *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
+ .data.rel.ro   0x0001ded8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.dynamic        0x0001ded8      0x128
+ *(.dynamic)
+ .dynamic       0x0001ded8      0x128 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x0001ded8                _DYNAMIC
+                0x0001e000                        . = DATA_SEGMENT_RELRO_END (., 0x0)
+
+.got            0x0001e000      0x1e0
+ *(.got.plt)
+ .got.plt       0x0001e000      0x1d8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x0001e000                _GLOBAL_OFFSET_TABLE_
+ *(.igot.plt)
+ .igot.plt      0x0001e1d8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.got)
+ .got           0x0001e1d8        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.igot)
+
+.data           0x0001e1e0      0x9fc
+                [!provide]                        PROVIDE (__data_start = .)
+ *(.data .data.* .gnu.linkonce.d.*)
+ .data          0x0001e1e0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x0001e1e0                data_start
+                0x0001e1e0                __data_start
+ .data          0x0001e1e4        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .data          0x0001e1e4        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                0x0001e1e4                __dso_handle
+ .data          0x0001e1e8        0x0 /bridge/src/test-tx-radio/test.a(main.o)
+ .data          0x0001e1e8      0x178 /bridge/src/test-tx-radio/test.a(radio.o)
+                0x0001e1e8                Radio_Configuration_Data_Array
+                0x0001e350                RadioConfiguration
+                0x0001e35c                radio_config_ptr
+ .data          0x0001e360        0x0 /bridge/src/test-tx-radio/test.a(radio_hal.o)
+ .data          0x0001e360      0x848 /bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+                0x0001e360                Si446xPatchCommands
+ .data          0x0001eba8        0x0 /bridge/src/test-tx-radio/test.a(spidev.o)
+ .data          0x0001eba8        0x0 /bridge/src/test-tx-radio/test.a(beacon.o)
+ .data          0x0001eba8        0x0 /bridge/src/test-tx-radio/test.a(bridge.o)
+ .data          0x0001eba8        0x0 /bridge/src/test-tx-radio/test.a(radio_events.o)
+ .data          0x0001eba8       0x30 /bridge/src/test-tx-radio/test.a(state.o)
+ .data          0x0001ebd8        0x0 /bridge/src/test-tx-radio/test.a(timer.o)
+ .data          0x0001ebd8        0x0 /bridge/src/test-tx-radio/test.a(slip.o)
+ .data          0x0001ebd8        0x4 /bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+ .data          0x0001ebdc        0x0 /bridge/src/test-tx-radio/test.a(serial.o)
+ .data          0x0001ebdc        0x0 /bridge/src/test-tx-radio/test.a(os_signal.o)
+ .data          0x0001ebdc        0x0 /bridge/src/test-tx-radio/test.a(print_util.o)
+ .data          0x0001ebdc        0x0 /bridge/src/test-tx-radio/test.a(radio_comm.o)
+ .data          0x0001ebdc        0x0 /bridge/src/test-tx-radio/test.a(gpio.o)
+ .data          0x0001ebdc        0x0 /bridge/src/test-tx-radio/test.a(ipv4.o)
+ .data          0x0001ebdc        0x0 /bridge/src/test-tx-radio/test.a(json_util.o)
+ .data          0x0001ebdc        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .data          0x0001ebdc        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.tm_clone_table
+                0x0001ebdc        0x0
+ .tm_clone_table
+                0x0001ebdc        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .tm_clone_table
+                0x0001ebdc        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+
+.data1
+ *(.data1)
+                0x0001ebdc                        _edata = .
+                [!provide]                        PROVIDE (edata = .)
+                0x0001ebdc                        . = .
+                0x0001ebdc                        __bss_start = .
+                0x0001ebdc                        __bss_start__ = .
+
+.bss            0x0001ebdc     0x74ec
+ *(.dynbss)
+ .dynbss        0x0001ebdc        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.bss .bss.* .gnu.linkonce.b.*)
+ .bss           0x0001ebdc        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .bss           0x0001ebdc        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .bss           0x0001ebdc        0x1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .bss           0x0001ebdd        0x0 /bridge/src/test-tx-radio/test.a(main.o)
+ *fill*         0x0001ebdd        0x3 
+ .bss           0x0001ebe0        0xe /bridge/src/test-tx-radio/test.a(radio.o)
+ *fill*         0x0001ebee        0x2 
+ .bss           0x0001ebf0        0x4 /bridge/src/test-tx-radio/test.a(radio_hal.o)
+                0x0001ebf0                si4463_spi_fd
+ .bss           0x0001ebf4       0x24 /bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+                0x0001ebf4                Si446xCmd
+                0x0001ec08                Pro2Cmd
+ .bss           0x0001ec18        0x0 /bridge/src/test-tx-radio/test.a(spidev.o)
+ .bss           0x0001ec18        0x0 /bridge/src/test-tx-radio/test.a(beacon.o)
+ .bss           0x0001ec18      0x600 /bridge/src/test-tx-radio/test.a(bridge.o)
+                0x0001ec18                slip_port
+                0x0001ec1c                zmq_ctx
+                0x0001ec20                gpio_event_sock
+                0x0001ec24                my_state
+                0x0001ec28                incoming
+                0x0001ec2c                poller
+ .bss           0x0001f218        0x0 /bridge/src/test-tx-radio/test.a(radio_events.o)
+ .bss           0x0001f218      0x624 /bridge/src/test-tx-radio/test.a(state.o)
+                0x0001f218                global_state
+ .bss           0x0001f83c        0x0 /bridge/src/test-tx-radio/test.a(timer.o)
+ .bss           0x0001f83c      0x7e0 /bridge/src/test-tx-radio/test.a(slip.o)
+ .bss           0x0002001c     0x6018 /bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+ .bss           0x00026034        0x0 /bridge/src/test-tx-radio/test.a(serial.o)
+ .bss           0x00026034        0x4 /bridge/src/test-tx-radio/test.a(os_signal.o)
+                0x00026034                os_interrupted
+ .bss           0x00026038        0x0 /bridge/src/test-tx-radio/test.a(print_util.o)
+ .bss           0x00026038       0x80 /bridge/src/test-tx-radio/test.a(radio_comm.o)
+                0x00026038                tx
+                0x00026078                rx
+ .bss           0x000260b8       0x10 /bridge/src/test-tx-radio/test.a(gpio.o)
+ .bss           0x000260c8        0x0 /bridge/src/test-tx-radio/test.a(ipv4.o)
+ .bss           0x000260c8        0x0 /bridge/src/test-tx-radio/test.a(json_util.o)
+ .bss           0x000260c8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .bss           0x000260c8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ *(COMMON)
+                0x000260c8                        . = ALIGN ((. != 0x0)?0x4:0x1)
+                0x000260c8                        _bss_end__ = .
+                0x000260c8                        __bss_end__ = .
+                0x000260c8                        . = ALIGN (0x4)
+                0x000260c8                        . = SEGMENT_START ("ldata-segment", .)
+                0x000260c8                        . = ALIGN (0x4)
+                0x000260c8                        __end__ = .
+                0x000260c8                        _end = .
+                [!provide]                        PROVIDE (end = .)
+                0x000260c8                        . = DATA_SEGMENT_END (.)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x00000000       0x12
+ *(.comment)
+ .comment       0x00000000       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                                 0x39 (size before relaxing)
+ .comment       0x00000012       0x13 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(main.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(radio.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(radio_hal.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(spidev.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(beacon.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(bridge.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(radio_events.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(state.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(timer.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(slip.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(serial.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(os_signal.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(print_util.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(radio_comm.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(gpio.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(ipv4.o)
+ .comment       0x00000012       0x13 /bridge/src/test-tx-radio/test.a(json_util.o)
+ .comment       0x00000012       0x13 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+
+.ARM.attributes
+                0x00000000       0x3b
+ .ARM.attributes
+                0x00000000       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .ARM.attributes
+                0x0000003b       0x2b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .ARM.attributes
+                0x00000066       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .ARM.attributes
+                0x000000a1       0x39 /bridge/src/test-tx-radio/test.a(main.o)
+ .ARM.attributes
+                0x000000da       0x39 /bridge/src/test-tx-radio/test.a(radio.o)
+ .ARM.attributes
+                0x00000113       0x39 /bridge/src/test-tx-radio/test.a(radio_hal.o)
+ .ARM.attributes
+                0x0000014c       0x39 /bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+ .ARM.attributes
+                0x00000185       0x39 /bridge/src/test-tx-radio/test.a(spidev.o)
+ .ARM.attributes
+                0x000001be       0x39 /bridge/src/test-tx-radio/test.a(beacon.o)
+ .ARM.attributes
+                0x000001f7       0x39 /bridge/src/test-tx-radio/test.a(bridge.o)
+ .ARM.attributes
+                0x00000230       0x39 /bridge/src/test-tx-radio/test.a(radio_events.o)
+ .ARM.attributes
+                0x00000269       0x39 /bridge/src/test-tx-radio/test.a(state.o)
+ .ARM.attributes
+                0x000002a2       0x39 /bridge/src/test-tx-radio/test.a(timer.o)
+ .ARM.attributes
+                0x000002db       0x39 /bridge/src/test-tx-radio/test.a(slip.o)
+ .ARM.attributes
+                0x00000314       0x39 /bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+ .ARM.attributes
+                0x0000034d       0x39 /bridge/src/test-tx-radio/test.a(serial.o)
+ .ARM.attributes
+                0x00000386       0x39 /bridge/src/test-tx-radio/test.a(os_signal.o)
+ .ARM.attributes
+                0x000003bf       0x39 /bridge/src/test-tx-radio/test.a(print_util.o)
+ .ARM.attributes
+                0x000003f8       0x39 /bridge/src/test-tx-radio/test.a(radio_comm.o)
+ .ARM.attributes
+                0x00000431       0x39 /bridge/src/test-tx-radio/test.a(gpio.o)
+ .ARM.attributes
+                0x0000046a       0x39 /bridge/src/test-tx-radio/test.a(ipv4.o)
+ .ARM.attributes
+                0x000004a3       0x39 /bridge/src/test-tx-radio/test.a(json_util.o)
+ .ARM.attributes
+                0x000004dc       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .ARM.attributes
+                0x00000517       0x2b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.gnu.build.attributes
+ *(.gnu.build.attributes .gnu.build.attributes.*)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x00000000      0x308
+ *(.debug_aranges)
+ .debug_aranges
+                0x00000000       0x50 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_aranges
+                0x00000050       0x30 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_aranges
+                0x00000080       0x20 /bridge/src/test-tx-radio/test.a(main.o)
+ .debug_aranges
+                0x000000a0       0x20 /bridge/src/test-tx-radio/test.a(radio.o)
+ .debug_aranges
+                0x000000c0       0x20 /bridge/src/test-tx-radio/test.a(radio_hal.o)
+ .debug_aranges
+                0x000000e0       0x20 /bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+ .debug_aranges
+                0x00000100       0x20 /bridge/src/test-tx-radio/test.a(spidev.o)
+ .debug_aranges
+                0x00000120       0x20 /bridge/src/test-tx-radio/test.a(beacon.o)
+ .debug_aranges
+                0x00000140       0x20 /bridge/src/test-tx-radio/test.a(bridge.o)
+ .debug_aranges
+                0x00000160       0x20 /bridge/src/test-tx-radio/test.a(radio_events.o)
+ .debug_aranges
+                0x00000180       0x20 /bridge/src/test-tx-radio/test.a(state.o)
+ .debug_aranges
+                0x000001a0       0x20 /bridge/src/test-tx-radio/test.a(timer.o)
+ .debug_aranges
+                0x000001c0       0x20 /bridge/src/test-tx-radio/test.a(slip.o)
+ .debug_aranges
+                0x000001e0       0x20 /bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+ .debug_aranges
+                0x00000200       0x20 /bridge/src/test-tx-radio/test.a(serial.o)
+ .debug_aranges
+                0x00000220       0x20 /bridge/src/test-tx-radio/test.a(os_signal.o)
+ .debug_aranges
+                0x00000240       0x20 /bridge/src/test-tx-radio/test.a(print_util.o)
+ .debug_aranges
+                0x00000260       0x20 /bridge/src/test-tx-radio/test.a(radio_comm.o)
+ .debug_aranges
+                0x00000280       0x20 /bridge/src/test-tx-radio/test.a(gpio.o)
+ .debug_aranges
+                0x000002a0       0x20 /bridge/src/test-tx-radio/test.a(ipv4.o)
+ .debug_aranges
+                0x000002c0       0x20 /bridge/src/test-tx-radio/test.a(json_util.o)
+ .debug_aranges
+                0x000002e0       0x28 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info     0x00000000     0x9283
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x00000000      0x51e /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_info    0x0000051e       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_info    0x00000541      0x660 /bridge/src/test-tx-radio/test.a(main.o)
+ .debug_info    0x00000ba1      0x9fb /bridge/src/test-tx-radio/test.a(radio.o)
+ .debug_info    0x0000159c      0x330 /bridge/src/test-tx-radio/test.a(radio_hal.o)
+ .debug_info    0x000018cc      0xf34 /bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+ .debug_info    0x00002800      0x3e4 /bridge/src/test-tx-radio/test.a(spidev.o)
+ .debug_info    0x00002be4      0x57b /bridge/src/test-tx-radio/test.a(beacon.o)
+ .debug_info    0x0000315f      0xb75 /bridge/src/test-tx-radio/test.a(bridge.o)
+ .debug_info    0x00003cd4      0xd57 /bridge/src/test-tx-radio/test.a(radio_events.o)
+ .debug_info    0x00004a2b     0x1903 /bridge/src/test-tx-radio/test.a(state.o)
+ .debug_info    0x0000632e      0x19b /bridge/src/test-tx-radio/test.a(timer.o)
+ .debug_info    0x000064c9      0x3e7 /bridge/src/test-tx-radio/test.a(slip.o)
+ .debug_info    0x000068b0      0x507 /bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+ .debug_info    0x00006db7      0x38e /bridge/src/test-tx-radio/test.a(serial.o)
+ .debug_info    0x00007145      0x4d0 /bridge/src/test-tx-radio/test.a(os_signal.o)
+ .debug_info    0x00007615      0x22a /bridge/src/test-tx-radio/test.a(print_util.o)
+ .debug_info    0x0000783f      0x2f1 /bridge/src/test-tx-radio/test.a(radio_comm.o)
+ .debug_info    0x00007b30      0x87d /bridge/src/test-tx-radio/test.a(gpio.o)
+ .debug_info    0x000083ad      0x578 /bridge/src/test-tx-radio/test.a(ipv4.o)
+ .debug_info    0x00008925      0x93b /bridge/src/test-tx-radio/test.a(json_util.o)
+ .debug_info    0x00009260       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_abbrev   0x00000000     0x2384
+ *(.debug_abbrev)
+ .debug_abbrev  0x00000000      0x174 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_abbrev  0x00000174       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_abbrev  0x00000186      0x14e /bridge/src/test-tx-radio/test.a(main.o)
+ .debug_abbrev  0x000002d4      0x230 /bridge/src/test-tx-radio/test.a(radio.o)
+ .debug_abbrev  0x00000504      0x160 /bridge/src/test-tx-radio/test.a(radio_hal.o)
+ .debug_abbrev  0x00000664      0x2da /bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+ .debug_abbrev  0x0000093e      0x162 /bridge/src/test-tx-radio/test.a(spidev.o)
+ .debug_abbrev  0x00000aa0      0x158 /bridge/src/test-tx-radio/test.a(beacon.o)
+ .debug_abbrev  0x00000bf8      0x279 /bridge/src/test-tx-radio/test.a(bridge.o)
+ .debug_abbrev  0x00000e71      0x205 /bridge/src/test-tx-radio/test.a(radio_events.o)
+ .debug_abbrev  0x00001076      0x36e /bridge/src/test-tx-radio/test.a(state.o)
+ .debug_abbrev  0x000013e4       0xc4 /bridge/src/test-tx-radio/test.a(timer.o)
+ .debug_abbrev  0x000014a8      0x19e /bridge/src/test-tx-radio/test.a(slip.o)
+ .debug_abbrev  0x00001646      0x1d1 /bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+ .debug_abbrev  0x00001817      0x176 /bridge/src/test-tx-radio/test.a(serial.o)
+ .debug_abbrev  0x0000198d      0x17f /bridge/src/test-tx-radio/test.a(os_signal.o)
+ .debug_abbrev  0x00001b0c      0x10a /bridge/src/test-tx-radio/test.a(print_util.o)
+ .debug_abbrev  0x00001c16      0x15e /bridge/src/test-tx-radio/test.a(radio_comm.o)
+ .debug_abbrev  0x00001d74      0x22a /bridge/src/test-tx-radio/test.a(gpio.o)
+ .debug_abbrev  0x00001f9e      0x13b /bridge/src/test-tx-radio/test.a(ipv4.o)
+ .debug_abbrev  0x000020d9      0x299 /bridge/src/test-tx-radio/test.a(json_util.o)
+ .debug_abbrev  0x00002372       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_line     0x00000000     0x425e
+ *(.debug_line .debug_line.* .debug_line_end)
+ .debug_line    0x00000000      0x1f1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_line    0x000001f1       0x70 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_line    0x00000261      0x178 /bridge/src/test-tx-radio/test.a(main.o)
+ .debug_line    0x000003d9      0x298 /bridge/src/test-tx-radio/test.a(radio.o)
+ .debug_line    0x00000671      0x14c /bridge/src/test-tx-radio/test.a(radio_hal.o)
+ .debug_line    0x000007bd      0x7cb /bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+ .debug_line    0x00000f88      0x1e5 /bridge/src/test-tx-radio/test.a(spidev.o)
+ .debug_line    0x0000116d      0x1a8 /bridge/src/test-tx-radio/test.a(beacon.o)
+ .debug_line    0x00001315      0x54b /bridge/src/test-tx-radio/test.a(bridge.o)
+ .debug_line    0x00001860      0x436 /bridge/src/test-tx-radio/test.a(radio_events.o)
+ .debug_line    0x00001c96      0xd59 /bridge/src/test-tx-radio/test.a(state.o)
+ .debug_line    0x000029ef       0xdf /bridge/src/test-tx-radio/test.a(timer.o)
+ .debug_line    0x00002ace      0x29d /bridge/src/test-tx-radio/test.a(slip.o)
+ .debug_line    0x00002d6b      0x2fd /bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+ .debug_line    0x00003068      0x1fe /bridge/src/test-tx-radio/test.a(serial.o)
+ .debug_line    0x00003266      0x103 /bridge/src/test-tx-radio/test.a(os_signal.o)
+ .debug_line    0x00003369      0x1c3 /bridge/src/test-tx-radio/test.a(print_util.o)
+ .debug_line    0x0000352c      0x1ad /bridge/src/test-tx-radio/test.a(radio_comm.o)
+ .debug_line    0x000036d9      0x2b2 /bridge/src/test-tx-radio/test.a(gpio.o)
+ .debug_line    0x0000398b      0x163 /bridge/src/test-tx-radio/test.a(ipv4.o)
+ .debug_line    0x00003aee      0x718 /bridge/src/test-tx-radio/test.a(json_util.o)
+ .debug_line    0x00004206       0x58 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_frame    0x00000000     0x1848
+ *(.debug_frame)
+ .debug_frame   0x00000000       0x30 /bridge/src/test-tx-radio/test.a(main.o)
+ .debug_frame   0x00000030      0x124 /bridge/src/test-tx-radio/test.a(radio.o)
+ .debug_frame   0x00000154      0x108 /bridge/src/test-tx-radio/test.a(radio_hal.o)
+ .debug_frame   0x0000025c      0x568 /bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+ .debug_frame   0x000007c4       0xc0 /bridge/src/test-tx-radio/test.a(spidev.o)
+ .debug_frame   0x00000884       0x70 /bridge/src/test-tx-radio/test.a(beacon.o)
+ .debug_frame   0x000008f4      0x100 /bridge/src/test-tx-radio/test.a(bridge.o)
+ .debug_frame   0x000009f4      0x134 /bridge/src/test-tx-radio/test.a(radio_events.o)
+ .debug_frame   0x00000b28      0x690 /bridge/src/test-tx-radio/test.a(state.o)
+ .debug_frame   0x000011b8       0x78 /bridge/src/test-tx-radio/test.a(timer.o)
+ .debug_frame   0x00001230       0xb4 /bridge/src/test-tx-radio/test.a(slip.o)
+ .debug_frame   0x000012e4       0xec /bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+ .debug_frame   0x000013d0       0x94 /bridge/src/test-tx-radio/test.a(serial.o)
+ .debug_frame   0x00001464       0x50 /bridge/src/test-tx-radio/test.a(os_signal.o)
+ .debug_frame   0x000014b4       0x90 /bridge/src/test-tx-radio/test.a(print_util.o)
+ .debug_frame   0x00001544       0xcc /bridge/src/test-tx-radio/test.a(radio_comm.o)
+ .debug_frame   0x00001610       0xd0 /bridge/src/test-tx-radio/test.a(gpio.o)
+ .debug_frame   0x000016e0       0x50 /bridge/src/test-tx-radio/test.a(ipv4.o)
+ .debug_frame   0x00001730      0x118 /bridge/src/test-tx-radio/test.a(json_util.o)
+
+.debug_str      0x00000000     0x3234
+ *(.debug_str)
+ .debug_str     0x00000000      0x454 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                                0x76c (size before relaxing)
+ .debug_str     0x00000454       0x16 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                                 0x43 (size before relaxing)
+ .debug_str     0x0000046a      0x36b /bridge/src/test-tx-radio/test.a(main.o)
+                                0x4de (size before relaxing)
+ .debug_str     0x000007d5      0x7ff /bridge/src/test-tx-radio/test.a(radio.o)
+                                0x9a8 (size before relaxing)
+ .debug_str     0x00000fd4      0x144 /bridge/src/test-tx-radio/test.a(radio_hal.o)
+                                0x2ac (size before relaxing)
+ .debug_str     0x00001118      0x586 /bridge/src/test-tx-radio/test.a(si446x_api_lib.o)
+                                0xd7f (size before relaxing)
+ .debug_str     0x0000169e       0xbc /bridge/src/test-tx-radio/test.a(spidev.o)
+                                0x25a (size before relaxing)
+ .debug_str     0x0000175a       0x76 /bridge/src/test-tx-radio/test.a(beacon.o)
+                                0x406 (size before relaxing)
+ .debug_str     0x000017d0      0x28f /bridge/src/test-tx-radio/test.a(bridge.o)
+                                0x72b (size before relaxing)
+ .debug_str     0x00001a5f      0x20f /bridge/src/test-tx-radio/test.a(radio_events.o)
+                                0xb5e (size before relaxing)
+ .debug_str     0x00001c6e      0x640 /bridge/src/test-tx-radio/test.a(state.o)
+                                0xc88 (size before relaxing)
+ .debug_str     0x000022ae        0xc /bridge/src/test-tx-radio/test.a(timer.o)
+                                0x19f (size before relaxing)
+ .debug_str     0x000022ba       0xf0 /bridge/src/test-tx-radio/test.a(slip.o)
+                                0x27f (size before relaxing)
+ .debug_str     0x000023aa       0xf6 /bridge/src/test-tx-radio/test.a(turbo_wrapper.o)
+                                0x2e6 (size before relaxing)
+ .debug_str     0x000024a0       0xc8 /bridge/src/test-tx-radio/test.a(serial.o)
+                                0x222 (size before relaxing)
+ .debug_str     0x00002568      0x1fb /bridge/src/test-tx-radio/test.a(os_signal.o)
+                                0x31d (size before relaxing)
+ .debug_str     0x00002763       0x6f /bridge/src/test-tx-radio/test.a(print_util.o)
+                                0x198 (size before relaxing)
+ .debug_str     0x000027d2       0x5f /bridge/src/test-tx-radio/test.a(radio_comm.o)
+                                0x22b (size before relaxing)
+ .debug_str     0x00002831      0x6d8 /bridge/src/test-tx-radio/test.a(gpio.o)
+                                0x8bc (size before relaxing)
+ .debug_str     0x00002f09       0x1c /bridge/src/test-tx-radio/test.a(ipv4.o)
+                                0x430 (size before relaxing)
+ .debug_str     0x00002f25      0x2f9 /bridge/src/test-tx-radio/test.a(json_util.o)
+                                0x4a5 (size before relaxing)
+ .debug_str     0x0000321e       0x16 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                                 0x43 (size before relaxing)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges
+ *(.debug_ranges)
+
+.debug_addr
+ *(.debug_addr)
+
+.debug_line_str
+                0x00000000       0x46
+ *(.debug_line_str)
+ .debug_line_str
+                0x00000000       0x38 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_line_str
+                0x00000038        0x7 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                                 0x37 (size before relaxing)
+ .debug_line_str
+                0x0000003f        0x7 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                                 0x37 (size before relaxing)
+
+.debug_loclists
+ *(.debug_loclists)
+
+.debug_macro
+ *(.debug_macro)
+
+.debug_names
+ *(.debug_names)
+
+.debug_rnglists
+                0x00000000       0x38
+ *(.debug_rnglists)
+ .debug_rnglists
+                0x00000000       0x1f /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_rnglists
+                0x0000001f       0x19 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_str_offsets
+ *(.debug_str_offsets)
+
+.debug_sup
+ *(.debug_sup)
+
+.gnu.attributes
+ *(.gnu.attributes)
+
+.note.gnu.arm.ident
+ *(.note.gnu.arm.ident)
+
+/DISCARD/
+ *(.note.GNU-stack)
+ *(.gnu_debuglink)
+ *(.gnu.lto_*)
+OUTPUT(/bridge/src/test-tx-radio/test elf32-littlearm)
+LOAD linker stubs

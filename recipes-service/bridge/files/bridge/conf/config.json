@@ -1,0 +1,21 @@
+{
+	"ttl_set" 		    : 64,	
+	"ttl_drop"		    : 60,   
+	"beacon_period_ms" 	    : 30000,
+	"beacon_period_variance_ms" : 3000, 
+	"beacon_ttl" 		    : 3,    
+	"transmit_queue_period_ms"  : 525,  
+	"transmit_queue_variance_ms": 475,  
+	"link_peer_period_ms" 	    : 60000,
+	"link_peer_variance_ms"     : 6000, 
+	"link_peer_ttl" 	    : 3,    
+	"link_peer_timeout_ms" 	    : 180000,
+	"user_period_ms" 	    : 60000, 
+	"user_variance_ms" 	    : 6000,  
+	"user_ttl" 		    : 3,     
+	"niceness"		    : 0,     
+	"max_loading_dock_idle_ms"  : 50,
+	"radio_default_channel"	    : 0,
+        "compress_ipv4"             : true,
+        "slip_mtu"                  : 500
+}
