@@ -1,0 +1,9 @@
+[Unit]
+Description=power cycle the ath9k device
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /root/wifi_reset.sh
