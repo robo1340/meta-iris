@@ -162,6 +162,8 @@ struct state_t_DEFINITION {
 
 state_t * state(void);
 
+bool state_restart_wifi_ap(state_t * state);
+
 /** @brief process a newly received frame using the current state as context
  *  @param state pointer to the state object
  *  @param received_frame double pointer to the received frame, will be destroyed when processed

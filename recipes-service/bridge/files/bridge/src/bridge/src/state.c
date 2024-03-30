@@ -111,6 +111,13 @@ static int slip_init(state_t * state, char * ip){
 	return to_return;
 }
 
+bool state_restart_wifi_ap(state_t * state){
+	char str[128];
+	snprintf(str, sizeof(str), "python3 /bridge/scripts/create_wifi_ap.py -ip %u.%u.%u.1", state->ip[0], state->ip[1], state->ip[2]);
+	system(str);
+	return true;
+}
+
 state_t * state(void){
 	state_t * to_return = (state_t*)malloc(sizeof(state_t));
 	if (to_return == NULL) {return NULL;}
@@ -591,9 +598,10 @@ void state_ip_changed_callback(state_t * state){
 	char cmd[128];
 	snprintf(cmd, sizeof(cmd), "python3 /bridge/scripts/create_slip.py -ip %s", state->ip_str);
 	system(cmd);
-	//////////////////////////////////////////
-	//need to send signal to DHCP server to reconfigure wlan0 ip address here
-	///////////////////////////////////////////
+	
+	if (!state_restart_wifi_ap(state)){ // reconfigure wifi AP here
+		printf("WARNING: failed to start wifi AP!\n");
+	}
 }
 
 bool state_read_mac(state_t * state, char * path){

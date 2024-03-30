@@ -74,6 +74,9 @@ bridge_t * bridge_create(bool no_slip, bool no_gpio_events, bool no_incoming_soc
 	srand(time(NULL));   // seed random number generator
 	br->my_state = state();
 	if (br->my_state == NULL){return NULL;}
+	if (!state_restart_wifi_ap(br->my_state)){
+		printf("WARNING: failed to start wifi AP!\n");
+	}
 
 	//init the turbo encoder
 	if (!turbo_wrapper_init(4)) {return NULL;}

@@ -10,9 +10,11 @@ prj="bridge"
 
 # Create dependency to library packages
 RDEPENDS:${PN} += " zeromq zeromq-dev czmq libczmq-dev "
-RDEPENDS:${PN} += " libgpiod libgpiod-dev libserialport "
-RDEPENDS:${PN} += " turbofec net-tools socat "
-DEPENDS = " zeromq czmq libgpiod turbofec libserialport net-tools socat "
+RDEPENDS:${PN} += " libgpiod  libgpiod-dev "
+RDEPENDS:${PN} += " libserialport libserialport-dev "
+RDEPENDS:${PN} += " libturbofec libturbofec-dev "
+RDEPENDS:${PN} += " net-tools socat hostapd dnsmasq wifi-reset "
+DEPENDS = " zeromq czmq libgpiod libturbofec libserialport net-tools socat "
 
 #src uri's for the source code and .service conf file
 SRC_URI +="file://bridge"
