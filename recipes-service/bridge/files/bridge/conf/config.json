@@ -17,5 +17,7 @@
 	"max_loading_dock_idle_ms"  : 50,
 	"radio_default_channel"	    : 0,
         "compress_ipv4"             : true,
-        "slip_mtu"                  : 500
+        "slip_mtu"                  : 500,
+	"wifi_ssid" : "{callsign}", 
+	"wifi_passphrase" : "diagnostics"
 }

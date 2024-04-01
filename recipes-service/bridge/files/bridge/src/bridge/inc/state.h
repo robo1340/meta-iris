@@ -35,6 +35,8 @@
 #define RADIO_DEFAULT_CHANNEL				  0     ///<the default radio channel to use
 #define DEFAULT_COMPRESS_IPV4				  true ///<set to true to compress ipv4 packets
 #define DEFAULT_SLIP_MTU					  500   ///<MTU for the slip interface
+#define DEFAULT_WIFI_SSID					  "irisnode"   ///<default SSID for the wifi AP
+#define DEFAULT_WIFI_PASSPHRASE				  "irisnode"   ///<default passphrase for the wifi AP
 
 //global state settings
 #define MAX_PACKET_LEN 747 ///<the maximum length of packet that can be transmitted over the radio
@@ -98,6 +100,8 @@ typedef struct timed_frame_DEFINITION {
 	"niceness"						: 0,      #the niceness value to apply to the program from -20 to 20
 	"compress_ipv4"					: true,	 #set to true to compress ipv4 packets
 	"slip_mtu"						: 500,	#MTU for the slip interface 
+	"wifi_ssid"						: "irisnode",
+	"wifi_passphrase"				: "irisnode"
 }
 */
 
@@ -131,6 +135,8 @@ struct state_t_DEFINITION {
 	uint8_t  current_channel;			///<the currently selected radio channel, defaults to RADIO_DEFAULT_CHANNEL
 	bool     compress_ipv4;				///<set to true to compress ipv4 packets
 	uint16_t slip_mtu;					///<MTU for the slip interface 
+	char wifi_ssid[64];					///<wifi AP SSID
+	char wifi_passphrase[64];			///<wifi AP passphrase
 
 	//settings derives from config contents
 	uint8_t tx_backoff_min_ms;

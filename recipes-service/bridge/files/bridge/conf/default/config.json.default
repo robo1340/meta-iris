@@ -18,4 +18,6 @@
 	"radio_default_channel"	    : 0,
         "compress_ipv4"             : true,
         "slip_mtu"                  : 500
+	"wifi_ssid"		    : "{callsign}",
+	"wifi_passphrase"	    : "irisnode"
 }

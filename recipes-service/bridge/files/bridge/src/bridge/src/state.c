@@ -112,8 +112,8 @@ static int slip_init(state_t * state, char * ip){
 }
 
 bool state_restart_wifi_ap(state_t * state){
-	char str[128];
-	snprintf(str, sizeof(str), "python3 /bridge/scripts/create_wifi_ap.py -ip %u.%u.%u.1", state->ip[0], state->ip[1], state->ip[2]);
+	char str[256];
+	snprintf(str, sizeof(str), "python3 /bridge/scripts/create_wifi_ap.py -ip %u.%u.%u.1 -s %s -p %s", state->ip[0], state->ip[1], state->ip[2], state->wifi_ssid, state->wifi_passphrase);
 	system(str);
 	return true;
 }
@@ -734,8 +734,18 @@ static bool state_read_config_settings(state_t * state, char * path){
 	state->compress_ipv4					= (val != NULL) ? (memcmp(val,"true",4)==0) : DEFAULT_COMPRESS_IPV4;
 	val = jsmn_json_lookup(tokens, num_toks, json_str, "slip_mtu");
 	state->slip_mtu							= (val != NULL) ? strtol(val, NULL, 10) : false;
-	
-	
+	val = jsmn_json_lookup(tokens, num_toks, json_str, "wifi_ssid");
+	if (val == NULL){
+		strncpy(state->wifi_ssid, DEFAULT_WIFI_SSID, sizeof(state->wifi_ssid));
+	} else if (memcmp(val,"{callsign}",10)==0) {
+		strncpy(state->wifi_ssid, "callsign_", sizeof(state->wifi_ssid));
+		strncat(state->wifi_ssid, state->callsign, strlen(state->wifi_ssid)+sizeof(state->callsign));
+	} else {
+		strncpy(state->wifi_ssid, val, sizeof(state->wifi_ssid));
+	}	
+	val = jsmn_json_lookup(tokens, num_toks, json_str, "wifi_passphrase");
+	strncpy(state->wifi_passphrase, ((val != NULL) ? val : DEFAULT_WIFI_PASSPHRASE), sizeof(state->wifi_passphrase));
+	printf("INFO: wifi ssid \"%s\", passphrase \"%s\"\n", state->wifi_ssid, state->wifi_passphrase);
 	
 	if (read_failed == true){
 		char cmd[256];
