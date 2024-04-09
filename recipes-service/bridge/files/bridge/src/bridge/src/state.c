@@ -22,7 +22,6 @@
 #include <czmq.h>
 #include <zlib.h>
 #include <libserialport.h>
-#include <zlib.h>
 
 #include "radio.h"
 
@@ -627,7 +626,7 @@ bool state_read_callsign(state_t * state, char * path){
 		printf("WARNING: failed to read callsign from \'%s\', generating new one\n", state->callsign);
 		snprintf(state->callsign, sizeof(state->callsign), CALLSIGN_FMT_STR, RANDINT(0,255), RANDINT(0,255));
 		if (!state_write_callsign(state, path, state->callsign)){
-			("ERROR: failed to write to \'%s\'\n", path);
+			printf("ERROR: failed to write to \'%s\'\n", path);
 			return false;
 		}
 	}

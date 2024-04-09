@@ -31,26 +31,34 @@ static void radio_power_up(void){
 	zclock_sleep(RADIO_CONFIGURATION_DATA_RADIO_DELAY_CNT_AFTER_RESET/1000); // Wait until reset timeout
 }
 
+static bool radio_init_meta(void){
+	radio_power_up();
+	
+	radio_print_part_info();
+	radio_print_func_info();
+	
+	if (SI446X_SUCCESS != si446x_apply_patch()){
+		return false;
+	}
+	
+	// Load radio configuration
+	if (SI446X_SUCCESS != si446x_configuration_init(radio_config_ptr->Radio_ConfigurationArray)){
+		return false;
+	}
+	si446x_get_int_status(0u, 0u, 0u); // Read ITs, clear pending ones
+	return true;	
+}
+
 bool radio_init(void){
 	printf("INFO radio_init()\n");
 	if (!radio_hal_init("/dev/spidev0.0")){
 		printf("ERROR: radio_hal_init() failed!\n");
 	}
-	radio_power_up();
 	
-	///////////////////////////////////////////
-	//NEED TO IMPLEMENT si446x_apply_patch
-	///////////////////////////////////////////
-	while(SI446X_SUCCESS != si446x_apply_patch()){
-		radio_power_up();
+	bool rc = false;
+	while (!rc){
+		rc = radio_init_meta();
 	}
-
-	// Load radio configuration
-	while (SI446X_SUCCESS != si446x_configuration_init(radio_config_ptr->Radio_ConfigurationArray)){
-		radio_power_up(); // Power Up the radio chip
-	}
-	si446x_get_int_status(0u, 0u, 0u); // Read ITs, clear pending ones
-	
 	return true;
 }
 

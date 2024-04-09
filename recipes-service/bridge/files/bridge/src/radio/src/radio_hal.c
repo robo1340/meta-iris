@@ -37,15 +37,11 @@ bool radio_hal_deinit(void){
 
 
 void radio_hal_AssertShutdown(void){
-//////////////////////////////////
-	//libgpio command here
-//////////////////////////////////
+	gpio_set_shutdown(true);
 }
 
 void radio_hal_DeassertShutdown(void){
-//////////////////////////////////
-	//libgpio command here
-//////////////////////////////////
+	gpio_set_shutdown(false);
 }
 
 //void radio_hal_ClearNsel(void){}

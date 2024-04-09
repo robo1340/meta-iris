@@ -20,6 +20,9 @@ bool gpio_poll(void);
 //returns true when IRQ is asserted
 bool gpio_get(void);
 
+//set the state of the shutdown pin
+bool gpio_set_shutdown(bool value);
+
 void gpio_deinit(void);
 
 #endif 

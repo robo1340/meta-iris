@@ -31,16 +31,12 @@ uint8_t Si446xPatchCommands[][8] = {SI446X_PATCH_CMDS};
  * can check if POR has completed by waiting 4 ms or by polling GPIO 0, 2, or 3.
  * When these GPIOs are high, it is safe to call @ref si446x_boot.
  */
-void si446x_reset(void)
-{
-    U8 loopCount;
-
-    /* Put radio in shutdown, wait then release */
+void si446x_reset(void) {
+    // Put radio in shutdown, wait then release
     radio_hal_AssertShutdown();
-    //! @todo this needs to be a better delay function.
-    for (loopCount = 255; loopCount != 0; loopCount--);
+    zclock_sleep(25);
     radio_hal_DeassertShutdown();
-    for (loopCount = 255; loopCount != 0; loopCount--);
+    zclock_sleep(25);
 }
 
 /*!
@@ -94,7 +90,7 @@ uint8_t si446x_configuration_init(const uint8_t * pSetPropCmd){
 		}
 
 		if (radio_hal_NirqLevel() == 0){
-			printf("ERROR: Get and clear all interrupts.  An error has occured...\n");
+			printf("ERROR: Get and clear all interrupts.  An error has occured in si446x_configuration_init()\n");
 			si446x_get_int_status(0, 0, 0);
 			if (Si446xCmd.GET_INT_STATUS.CHIP_PEND & SI446X_CMD_GET_CHIP_STATUS_REP_CHIP_PEND_CMD_ERROR_PEND_MASK){
 				return SI446X_COMMAND_ERROR;
@@ -121,6 +117,7 @@ U8 si446x_apply_patch(void) {
 	// Check if patch is needed.
 	si446x_part_info();
 	uint8_t msb = (Si446xCmd.PART_INFO.ID>>8);
+	//printf("%x %x\n", Si446xCmd.PART_INFO.ROMID, msb);
 	if ((Si446xCmd.PART_INFO.ROMID == SI446X_PATCH_ROMID) && (msb < SI446X_PATCH_ID)) {
 		printf("INFO: applying patch...\n");
 		for (line=0; line<(sizeof(Si446xPatchCommands)/8u); line++){
@@ -136,6 +133,8 @@ U8 si446x_apply_patch(void) {
 				return SI446X_PATCH_FAIL;
 			}
 		}
+	} else {
+		printf("WARNING: patch rev does not match radio rev\n");
 	}
 	printf("INFO: si446x_apply_patch() SUCCESS\n");
 	return SI446X_SUCCESS;
