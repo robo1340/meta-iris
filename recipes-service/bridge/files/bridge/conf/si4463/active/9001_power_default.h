@@ -1,1 +1,0 @@
-../all/power/default.h

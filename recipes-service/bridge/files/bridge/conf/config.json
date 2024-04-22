@@ -1,8 +1,8 @@
 {
 	"ttl_set" 		    : 64,	
 	"ttl_drop"		    : 60,   
-	"beacon_period_ms" 	    : 30000,
-	"beacon_period_variance_ms" : 3000, 
+	"beacon_period_ms" 	    : 5000,
+	"beacon_period_variance_ms" : 2000, 
 	"beacon_ttl" 		    : 3,    
 	"transmit_queue_period_ms"  : 525,  
 	"transmit_queue_variance_ms": 475,  

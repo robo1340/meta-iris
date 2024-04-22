@@ -4,6 +4,10 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <czmq.h>
+
+///>load a json array into a zlistx_t
+bool jsmn_json_load_array(void * tokens, int num_toks, char * json_str, char * input_key, zlistx_t * list_to_load);
 
 ///>read a string from a file containing a string in the form "<contents>"
 bool read_json_str(char * path, char * dst, size_t dst_len);

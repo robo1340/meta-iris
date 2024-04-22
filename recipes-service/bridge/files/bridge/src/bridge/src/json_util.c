@@ -70,10 +70,26 @@ bool write_json_str(char * path, char * to_write){
 	return true;
 }
 
+bool jsmn_json_load_array(void * tokens, int num_toks, char * json_str, char * input_key, zlistx_t * list_to_load){
+	char * val = jsmn_json_lookup(tokens, num_toks, json_str, input_key);
+	if (val == NULL){return false;}
+	const char s[2] = ",";
+	char * token = strtok(val, s);
+	char * token_copy;
+	while( token != NULL ) { //walk through other tokens
+		//printf("%s\n", token);
+		token_copy = strdup(token);
+		if (token == NULL){return false;}
+		zlistx_add_end(list_to_load, token_copy);
+		token = strtok(NULL, s);
+	}
+	return true;
+}
+
 char * jsmn_json_lookup(void * tokens, int num_toks, char * json_str, char * input_key){
 	if (tokens==NULL) {return NULL;}
 	#define toks ((jsmntok_t*)tokens)
-	static char val[32];
+	static char val[256];
 	char key[32];
 	int i,j;
 	

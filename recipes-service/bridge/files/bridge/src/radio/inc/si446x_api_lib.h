@@ -22,6 +22,7 @@
 #include "si446x_nirq.h"
 #include "si446x_prop.h"
 #include "si446x_patch.h"
+#include <czmq.h>
 
 //#define SI466X_FIFO_SIZE 64
 #define SI466X_FIFO_SIZE 129 //using combined fifo
@@ -43,6 +44,7 @@ void si446x_reset(void);
 void si446x_power_up(U8 BOOT_OPTIONS, U8 XTAL_OPTIONS, U32 XO_FREQ);
 
 uint8_t si446x_configuration_init(const U8* pSetPropCmd);
+bool si446x_configuration_init_enhanced(zhashx_t * radio_config, zlistx_t * si4463_load_order);
 U8 si446x_apply_patch(void);
 void si446x_part_info(void);
 

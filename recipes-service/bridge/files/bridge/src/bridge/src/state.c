@@ -45,6 +45,10 @@ state_t * global_state;
 #define CALLSIGN_PATH "/bridge/conf/radio_callsign.json"
 #define CONFIG_PATH "/bridge/conf/config.json"
 #define DEFAULT_CONFIG_PATH "/bridge/conf/default/config.json.default"
+#define RADIO_OTHER_CONFIG_DIR "/bridge/conf/si4463/other/"			
+#define RADIO_MODEM_CONFIG_DIR "/bridge/conf/si4463/modem/"											  
+
+
 
 static bool state_read_config_settings(state_t * state, char * path);
 static void state_remove_stale_peers(state_t * state);
@@ -62,8 +66,6 @@ static void state_check_for_mac_collision(state_t * state, uint8_t mac_tail[3]){
 		}
 	}	
 }
-
-
 
 static void state_check_for_ip_collision(state_t * state, uint8_t ip[4], uint8_t mac[6]){
 	static uint8_t ip_collisions = 0; ///<the number of times this node has had an IP collision
@@ -121,7 +123,22 @@ state_t * state(void){
 	state_t * to_return = (state_t*)malloc(sizeof(state_t));
 	if (to_return == NULL) {return NULL;}
 	
-	if (!radio_init()){
+	to_return->si4463_load_order = zlistx_new();
+	if (to_return->si4463_load_order == NULL) {return NULL;}
+	zlistx_set_destructor(to_return->si4463_load_order, (zlistx_destructor_fn*)zstr_free);
+	
+	//read in settings from config.json
+	state_read_config_settings(to_return, CONFIG_PATH);
+
+	//read the radio config settings 
+	to_return->radio_config = radio_load_configs(RADIO_MODEM_CONFIG_DIR, NULL, RADIO_MODEM_CONFIG_REGEX);
+	to_return->radio_config = radio_load_configs(RADIO_OTHER_CONFIG_DIR, to_return->radio_config, RADIO_CONFIG_REGEX);
+	if (to_return->radio_config == NULL){
+		printf("CRITICAL ERROR: could not load radio config settings\n");
+		return NULL;
+	}
+	
+	if (!radio_init(to_return->radio_config, to_return->si4463_load_order)){
 		printf("ERROR: radio_init() failed!\n");
 	}
 	
@@ -129,9 +146,6 @@ state_t * state(void){
 	if (!state_read_mac(to_return, MAC_PATH)){return NULL;}
 	if (!state_read_callsign(to_return, CALLSIGN_PATH)){return NULL;}
 	printf("INFO \"%s\" at %s,%s\n", to_return->callsign, to_return->ip_str, to_return->mac_str);
-	
-	//read in settings from config.json
-	state_read_config_settings(to_return, CONFIG_PATH);
 	
 	to_return->tx_backoff_min_ms = to_return->transmit_queue_period_ms - to_return->transmit_queue_variance_ms;
 	
@@ -666,7 +680,7 @@ static bool state_read_config_settings(state_t * state, char * path){
 	uint32_t fsize;
 	void * tokens = NULL;
 	
-	char json_str[1224];
+	char json_str[1500];
 	FILE * f = fopen(path,"rb");
 	if (f==NULL){
 		printf("ERROR, failed to load config file at \"%s\", using default settings\n", path);
@@ -746,6 +760,9 @@ static bool state_read_config_settings(state_t * state, char * path){
 	strncpy(state->wifi_passphrase, ((val != NULL) ? val : DEFAULT_WIFI_PASSPHRASE), sizeof(state->wifi_passphrase));
 	printf("INFO: wifi ssid \"%s\", passphrase \"%s\"\n", state->wifi_ssid, state->wifi_passphrase);
 	
+	if (!jsmn_json_load_array(tokens, num_toks, json_str, "si4463_load_order", state->si4463_load_order)){ //load the defaults
+		zlistx_add_end(state->si4463_load_order, "RF_POWER_UP");
+	}
 	if (read_failed == true){
 		char cmd[256];
 		snprintf(cmd, sizeof(cmd), "cp %s %s", DEFAULT_CONFIG_PATH, CONFIG_PATH);
@@ -767,11 +784,13 @@ void state_destroy(state_t ** to_destroy){
 		serial_close((*to_destroy)->slip);
 	}
 	
+	zlistx_destroy(&(*to_destroy)->si4463_load_order);												   
 	zlistx_destroy(&(*to_destroy)->peers);
 	zlistx_destroy(&(*to_destroy)->link_peers);
 	zhashx_destroy(&(*to_destroy)->peers_by_ip);
 	zhashx_destroy(&(*to_destroy)->peers_by_mac);
 	zhashx_destroy(&(*to_destroy)->peers_by_callsign);
+	zhashx_destroy(&(*to_destroy)->radio_config);										  
 	
 	free(*to_destroy); //free the state_t from memory
 	*to_destroy = NULL; //set the state_t* to be a NULL pointer

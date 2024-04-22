@@ -137,9 +137,13 @@ struct state_t_DEFINITION {
 	uint16_t slip_mtu;					///<MTU for the slip interface 
 	char wifi_ssid[64];					///<wifi AP SSID
 	char wifi_passphrase[64];			///<wifi AP passphrase
+	zlistx_t * si4463_load_order; ///<a list of si4463 config settings to load first
 
 	//settings derives from config contents
 	uint8_t tx_backoff_min_ms;
+
+	//si4463 config settings
+	zhashx_t * radio_config; ///<keys are defines from a radio config, values are zchunk_t containing the definition
 	
 	//////////////////////////////////////////
 	//Dynamic State Variables

@@ -22,8 +22,7 @@ INSTALLDIR = ./
 endif
 
 # external libraries
-LIBS = "  -lzmq -lczmq -lgpiod "
-#LIBS = "-lz -lserialport -lzmq -lczmq -lgpiod -lm -lturbofec -lpthread"
+LIBS = "-lz -lserialport -lzmq -lczmq -lgpiod -lm -lturbofec -lpthread"
 
 # project
 PROJECT = test-radio-config-parsing

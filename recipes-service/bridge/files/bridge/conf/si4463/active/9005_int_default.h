@@ -1,1 +1,0 @@
-../all/interrupt/default.h

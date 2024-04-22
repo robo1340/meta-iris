@@ -1,1 +1,1 @@
-radio_configs/radio_config_900M_20kbps.h
+radio_configs/radio_config_433M_20kpbs.h

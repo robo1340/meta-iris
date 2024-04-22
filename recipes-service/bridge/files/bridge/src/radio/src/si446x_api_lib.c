@@ -19,6 +19,8 @@
 #include "si446x_patch.h"
 #include "radio_hal.h"
 #include "radio_comm.h"
+#include "print_util.h"
+
 
 union si446x_cmd_reply_union Si446xCmd;
 uint8_t Pro2Cmd[16];
@@ -54,6 +56,67 @@ void si446x_power_up(U8 BOOT_OPTIONS, U8 XTAL_OPTIONS, U32 XO_FREQ)
     Pro2Cmd[6] = (U8)(XO_FREQ);
 
     radio_comm_SendCmd( SI446X_CMD_ARG_COUNT_POWER_UP, Pro2Cmd );
+}
+
+#define DEBUG_SI4463_CONFIGURATION_INIT
+
+static bool si4463_configuration_load_property(zchunk_t * property){
+#ifdef DEBUG_SI4463_CONFIGURATION_INIT
+	printArrHex(zchunk_data(property),zchunk_size(property));
+#endif
+	
+	if (zchunk_size(property) > 16){
+		printf("ERROR: Number of command bytes exceeds maximal allowable length\n");
+		return false;
+	}
+	
+	if (radio_comm_SendCmdGetResp(zchunk_size(property), zchunk_data(property), 0, 0) != 0xFF){
+		printf("ERROR: Timeout occured in si4463_configuration_load_property()\n");
+		return false;
+	}
+	
+	if (radio_hal_NirqLevel() == 0){
+		si446x_get_int_status(0, 0, 0);
+		if (Si446xCmd.GET_INT_STATUS.CHIP_PEND & SI446X_CMD_GET_CHIP_STATUS_REP_CHIP_PEND_CMD_ERROR_PEND_MASK){
+			printf("ERROR: IRQ is asserted. An error has occured in si446x_configuration_init()\n");
+			return false;
+		}
+	}	
+	return true;
+}
+
+/*!
+ * This function is used to load all properties and commands with a list of NULL terminated commands.
+ * Before this function @si446x_reset should be called.
+ */
+bool si446x_configuration_init_enhanced(zhashx_t * radio_config, zlistx_t * si4463_load_order){
+	printf("INFO: si446x_configuration_init_enhanced()\n");
+	
+	zchunk_t * value;
+	
+	char * key = zlistx_first(si4463_load_order);
+	while (key != NULL){
+		value = zhashx_lookup(radio_config, key);
+		if (value != NULL){
+#ifdef DEBUG_SI4463_CONFIGURATION_INIT
+			printf("Loading \"%s\" = ", key);
+#endif
+			if (!si4463_configuration_load_property(value)){
+				return false;
+			}
+			zhashx_delete(radio_config, key);
+		}
+		key = zlistx_next(si4463_load_order);
+	}
+	
+	value = zhashx_first(radio_config);
+	while (value != NULL){
+		if (!si4463_configuration_load_property(value)){
+			return false;
+		}
+		value = zhashx_next(radio_config);
+	}
+	return true;
 }
 
 /*!
