@@ -6,24 +6,24 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2ba5c6e4c336f3d9e4d191d4a74fb91c"
 # project name
 prj="bridge"
 
-#inherit systemd
+inherit systemd
 
 # Create dependency to library packages
 RDEPENDS:${PN} += " zeromq zeromq-dev czmq libczmq-dev "
 RDEPENDS:${PN} += " libgpiod  libgpiod-dev "
 RDEPENDS:${PN} += " libserialport libserialport-dev "
 RDEPENDS:${PN} += " libturbofec libturbofec-dev "
-RDEPENDS:${PN} += " net-tools socat hostapd dnsmasq wifi-reset "
+RDEPENDS:${PN} += " net-tools socat hostapd dnsmasq wifi-reset logrotate "
 DEPENDS = " zeromq czmq libgpiod libturbofec libserialport net-tools socat "
 
 #src uri's for the source code and .service conf file
 SRC_URI +="file://bridge"
-#SRC_URI +="file://${prj}.service"
-#SRC_URI +="file://logrotate.d"
+SRC_URI +="file://${prj}.service"
+SRC_URI +="file://logrotate.d"
 SRC_URI +="file://LICENSE"
 
-#SYSTEMD_AUTO_ENABLE:${PN} = "enable"
-#SYSTEMD_SERVICE:${PN} = "${prj}.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "disable"
+SYSTEMD_SERVICE:${PN} = "${prj}.service"
 
 S = "${WORKDIR}"
 
@@ -56,13 +56,13 @@ do_install(){
 	find ${prj} -type f -exec install -Dm 644 "{}" "${D}/{}" \;
 	
 	#install the service file to /etc/systemd/system
-	#install -Dm 644 ${prj}.service ${D}${service_dir}/${prj}.service
+	install -Dm 644 ${prj}.service ${D}${service_dir}/${prj}.service
 
 	#install the logrotate configuration file
-	#install -Dm 644 logrotate.d/${prj} ${D}/etc/logrotate.d/${prj}
+	install -Dm 644 logrotate.d/${prj} ${D}/etc/logrotate.d/${prj}
 
 	#install the compiled binary
-        install -Dm 755 ${prj}/src/prj-${prj}/test ${D}/${prj}/src/prj-${prj}/bridge	
+        install -Dm 755 ${prj}/src/prj-${prj}/test ${D}/${prj}/src/prj-${prj}/test	
 	cd -
 	
 }

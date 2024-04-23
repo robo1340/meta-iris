@@ -7,13 +7,13 @@ WantedBy=multi-user.target
 
 [Service]
 Type=simple
-WorkingDirectory=/ares/bin
+WorkingDirectory=/bridge/src/prj-bridge
 #ExecStart=/bin/sh -c '/usr/bin/stdbuf -oL /ares/bin/executive  >> /var/log/executive.log 2>> /var/log/executive.log'
-ExecStart=/ares/bin/executive
+ExecStart=/bridge/src/prj-bridge/test
 #ExecStartPre=/bin/sleep 11
 Restart=always
 RestartSec=2
-StandardOutput=append:/var/log/executive.log
-StandardError=append:/var/log/executive.log
+StandardOutput=append:/var/log/bridge.log
+StandardError=append:/var/log/bridge.log
 SyslogIdentifier=%n
 

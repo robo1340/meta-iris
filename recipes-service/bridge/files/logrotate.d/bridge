@@ -1,4 +1,4 @@
-/var/log/executive.log {
+/var/log/bridge.log {
 	missingok	
 	rotate 4
 	size 100k
