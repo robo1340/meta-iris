@@ -19,7 +19,26 @@ typedef struct __attribute__((__packed__)) ipv4_header_DEF {
 	uint16_t header_checksum; ///<header checksum field
 	uint32_t src; ///<source address field
 	uint32_t dst; ///<destination address field
+	uint8_t ip_data; ///<first byte of IP data
 } ipv4_hdr_t;
+
+typedef struct __attribute__((__packed__)) udp_datagram_DEF {
+	uint8_t version_ihl; ///<version (4b) and IHL (4b) fields
+	uint8_t dscp_ecn; ///<Differentiated Services Code Point (6b) and ECN(2) fields
+	uint16_t total_length; ///<total length of the packet
+	uint16_t identification; ///<identification field for fragmented packets
+	uint16_t flags_fragment_offset; ///<flags(3b) and fragment offset(13b) fields
+	uint8_t ttl; ///<time to live field
+	uint8_t protocol; ///<protocol field
+	uint16_t header_checksum; ///<header checksum field
+	uint32_t src; ///<source address field
+	uint32_t dst; ///<destination address field
+	uint16_t src_port; ///<source UDP port
+	uint16_t dst_port; ///<destination UDP port
+	uint16_t udp_len; ///<the UDP packet length
+	uint16_t udp_checksum; ///<the UDP checksum
+	uint8_t  udp_data; ///<first byte of UDP data
+} udp_datagram_t;
 
 
 /** @brief check if the destination of an ipv4 packet is addressed to this node

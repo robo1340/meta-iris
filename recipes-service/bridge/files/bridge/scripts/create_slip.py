@@ -156,6 +156,7 @@ if __name__ == "__main__":
 		os.system('ip addr add %s dev %s' % (args['host_ip'], slip_if))
 		os.system('ip link set dev %s mtu %d' % (slip_if, args['mtu']))
 		os.system('ip link set dev %s up' % (slip_if,))
+		os.system('ip route add 10.0.0.0/8 dev %s' % (slip_if,)) #add a general route
 
 		config['interface']['name'] = slip_if
 		config['interface']['ip']	= args['host_ip']

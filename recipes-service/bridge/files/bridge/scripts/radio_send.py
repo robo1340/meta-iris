@@ -62,7 +62,7 @@ if __name__ == "__main__":
 	radio.set(zmq.LINGER, 1000)
 	#radio.connect('udp://%s:%d' % (config['routes'][0],args['port']))
 	radio.connect('udp://127.0.0.1:1337')
-	radio.send(args['msg'].encode())  #, group=args['group'])
+	radio.send(args['msg'].encode()) #, group=args['group'])
 	radio.close()
 	ctx.term()	
 

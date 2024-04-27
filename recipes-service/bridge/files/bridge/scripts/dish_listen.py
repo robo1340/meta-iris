@@ -62,8 +62,8 @@ if __name__ == "__main__":
 	dish.rcvtimeo = 1000
 
 	#dish.bind('udp://*:%d' % (args['port'],))
-	dish.bind('udp://127.0.0.1:1337')
-	#dish.join(args['group'])
+	dish.bind('udp://*:1337')
+	dish.join(args['group'])
 	
 	poller = zmq.Poller()
 	poller.register(dish, zmq.POLLIN)

@@ -5,9 +5,64 @@
 #include <string.h>
 #include <arpa/inet.h>
 
+#define ALLOW_BROADCAST
+
+static bool compute_udp_checksum(udp_datagram_t * udp);
+
 bool ipv4_check_dst(state_t * state, ipv4_hdr_t * ipv4){
 	//return true if the first two bytes of the destination IP address matches the address of this node
-	return (memcmp(state->ip, &ipv4->dst, 3)==0);
+	if (memcmp(state->ip, &ipv4->dst, 3)==0) {
+		return true;
+	}
+#ifdef ALLOW_BROADCAST
+	else if ((((uint8_t*)&ipv4->dst)[1]==255)&&(((uint8_t*)&ipv4->dst)[2]==255)) {
+		printf("broadcast\n");
+		memcpy(&ipv4->dst, state->ip, 3); //change the destination IP address first three bytes
+		ipv4_recompute_checksum(ipv4);
+		((udp_datagram_t*)ipv4)->udp_checksum = 0x0000; //set the UDP checksum to 0 (not used)
+		return true;
+	}
+#endif
+	return false;
+}
+
+#define UDP_PROTO 0x11
+
+//check if a packet contains a UDP datagram and recompute the check sum if sopen
+//returns false if packet is not a UDP datagram
+//NOT WORKING
+static bool compute_udp_checksum(udp_datagram_t * udp) {
+	if (udp->protocol != UDP_PROTO) {return false;}
+	
+	uint32_t sum = 0;
+	uint16_t udp_len = htons(udp->udp_len);
+	uint8_t * ip_pay = &(((ipv4_hdr_t*)udp)->ip_data);
+	
+	//add the pseudo header 
+	sum += (udp->src>>16) & 0xFFFF; //the source ip
+	sum += (udp->src) & 0xFFFF;
+	sum += (udp->dst>>16) & 0xFFFF; //the dest ip
+	sum += (udp->dst) & 0xFFFF;
+	sum += (uint16_t)UDP_PROTO; //protocol and reserved: 17
+	sum += udp->udp_len; //the length
+	
+	udp->udp_checksum = 0x0000; //initialize checksum to 0
+	while (udp_len > 1) {
+		sum += *((uint16_t*)ip_pay);
+		ip_pay += 2;
+		udp_len -= 2;
+	}
+	if(udp_len > 0) { //if any bytes left, pad the bytes and add
+		sum += ((*((uint16_t*)ip_pay)) & htons(0xFF00));
+	}
+	
+	while (sum>>16) { //Fold sum to 16 bits: add carrier to result
+		sum = (sum & 0xffff) + (sum >> 16);
+	}
+	sum = ~sum;
+	//set computation result
+	udp->udp_checksum = ((uint16_t)sum == 0x0000) ? 0xFFFF: (uint16_t)sum;
+	return true;
 }
 
 // Compute checksum for count bytes starting at addr, using one's complement of one's complement sum
@@ -36,7 +91,6 @@ void ipv4_set_ttl(ipv4_hdr_t * ipv4, uint8_t new_ttl){
 	ipv4->ttl = new_ttl;
 	ipv4_recompute_checksum(ipv4);
 }
-
 
 bool ipv4_ttl_decrement(state_t * state, ipv4_hdr_t * ipv4){
 	uint16_t ttl = ntohs(ipv4->ttl);
@@ -83,6 +137,7 @@ void ipv4_print(ipv4_hdr_t * ipv4){
 	);
 }
 
+//deprecated!!
 bool ipv4_filter_misc(ipv4_hdr_t * ipv4){
 	static uint8_t mdns_octet_1 = 224;
 	
