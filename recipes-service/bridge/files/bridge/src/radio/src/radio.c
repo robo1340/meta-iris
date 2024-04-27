@@ -162,9 +162,9 @@ uint8_t radio_get_modem_state(void){
 	return Si446xCmd.FRR_A_READ.FRR_A_VALUE;
 }
 
-uint8_t radio_get_modem_interrupt_pending(void){
-	si446x_frr_b_read(1);
-	return Si446xCmd.FRR_A_READ.FRR_B_VALUE;
+uint8_t radio_get_rssi(void){
+	si446x_get_modem_status(0xff);
+	return Si446xCmd.GET_MODEM_STATUS.CURR_RSSI;
 }
 
 bool radio_start_rx(uint8_t channel, size_t recv_len){

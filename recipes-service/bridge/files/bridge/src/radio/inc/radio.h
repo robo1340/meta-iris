@@ -22,7 +22,7 @@ bool radio_print_state(bool print_if_no_change);
 bool radio_print_modem_status(bool print_if_no_change);
 
 uint8_t radio_get_modem_state(void);
-uint8_t radio_get_modem_interrupt_pending(void);
+uint8_t radio_get_rssi(void);
 
 bool radio_start_rx(uint8_t channel, size_t recv_len);
 

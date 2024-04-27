@@ -67,6 +67,15 @@ typedef struct beacon_DEFINITION beacon_t;				///<object to hold information in 
 ////////////////////////////////////////////////////////////////////////////////////////////
 extern state_t * global_state; ///<global reference to the state_t, use with caution
 
+typedef struct csma_DEF {
+	bool enabled; 			///<csma is active
+	uint8_t tx_probability; ///<the probability to transmit, a value from 0% to 100%
+	uint16_t wait_upper;	///<upper limit in ms on the wait period
+	uint16_t wait_lower; 	///<lower limit in ms on the wait period
+	uint16_t period_ms;		///<current wait period in ms
+	int64_t count_ms;		///<the current count in millis, -1 when timer not set
+}csma_t;
+
 typedef struct timer_DEF {
 	bool enabled;
 	uint32_t period_ms;
@@ -167,6 +176,7 @@ struct state_t_DEFINITION {
 	
 	task_timer_t beacon_transmit;
 	task_timer_t transmit_send_queue;
+	csma_t csma;
 	
 };
 
@@ -210,6 +220,7 @@ bool state_loading_dock_run(state_t * state);
 #define state_loading_dock_empty(state) (state->loading_dock.created_ms < 0)
 bool state_append_loading_dock(state_t * state, uint8_t type, uint16_t len, uint8_t * value);
 bool state_add_frame_to_send_queue(state_t * state, radio_frame_t * frame, bool high_priority);
+bool state_peek_next_frame_to_transmit(state_t * state);
 radio_frame_t * state_get_next_frame_to_transmit(state_t * state);
 void state_abort_transceiving(state_t * state);
 void state_run(state_t * state);

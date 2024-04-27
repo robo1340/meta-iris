@@ -45,7 +45,7 @@ int slip_encode(uint8_t * packet, uint32_t packet_len, uint8_t * slip_buf, uint3
 }
 
 #define SLIP_MAX_PACKET_SIZE 1500
-#define SLIP_MAX_BUFFER_SIZE 2000
+#define SLIP_MAX_BUFFER_SIZE 10000
 
 
 typedef struct rolling_buffer_DEF {
@@ -65,7 +65,7 @@ static void rolling_buffer_init(rolling_buffer_t * rb){
 
 static bool rolling_buffer_append(rolling_buffer_t * rb, uint8_t * to_append, uint32_t len){
 	if ((rb->len + len) > rolling_buffer_maxlen(rb)) {
-		printf("WARNING: rolling_buffer_append overflow!\n");
+		printf("WARNING: rolling_buffer_append overflow! when appending %u bytes to %u existing\n", len, rb->len);
 		rolling_buffer_init(rb);
 		if (len > rolling_buffer_maxlen(rb)){
 			printf("ERROR: append bytes %u exceeds buffer size\n", len);

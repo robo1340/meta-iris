@@ -24,6 +24,7 @@
 #include <libserialport.h>
 
 #include "radio.h"
+#include "csma.h"
 
 //reporting debug definitions
 #define DEBUG
@@ -166,6 +167,8 @@ state_t * state(void){
 	timer_init(&to_return->beacon_transmit, 	true, 	to_return->beacon_period_ms, to_return->beacon_period_variance_ms);
 	timer_init(&to_return->transmit_send_queue, true,   to_return->transmit_queue_period_ms, to_return->transmit_queue_variance_ms);
 	timer_charge(&to_return->beacon_transmit, RANDINT(4000,6000)); //charge up the first beacon to happen within a specified amount of time
+	csma_init(&to_return->csma, 50, 5, 10); //probabillity to transmit, min backoff ms, max backoff ms
+	
 	
 	to_return->peers			= zlistx_new();
 	if (to_return->peers == NULL) {return NULL;}
@@ -444,6 +447,10 @@ bool state_add_frame_to_send_queue(state_t * state, radio_frame_t * frame, bool 
 	return true;
 }
 
+bool state_peek_next_frame_to_transmit(state_t * state){
+	return (zlistx_size(state->send_queue) > 0);
+}
+
 radio_frame_t * state_get_next_frame_to_transmit(state_t * state){
 	//printf("DEBUG: state_get_next_frame_to_transmit()\n");
 	radio_frame_t * to_return = zlistx_first(state->send_queue);
@@ -467,6 +474,19 @@ void state_abort_transceiving(state_t * state){
 
 #define TXRX_TIMEOUT_MS 2000 ///<timeout value used to detect when the program is in a locked state
 
+#define RSSI_THRESHHOLD 50 ///<only transmit if RSSI is lower than this
+
+static void state_tx_now(state_t * state){
+	state->transmitting = state_get_next_frame_to_transmit(state);
+	if (state->transmitting != NULL){
+		if (!radio_frame_transmit_start(state->transmitting, state->current_channel)){
+			printf("ERROR: radio_frame_transmit_start() failed!\n");
+		}
+	} else {
+		printf("ERROR: state_get_next_frame_to_transmit() returned NULL\n");
+	}
+}
+
 void state_run(state_t * state){
 	static int64_t txrx_timer = -1;
 	static task_timer_t check_for_stale_peers = {true, 30000, 0, 0};
@@ -474,6 +494,7 @@ void state_run(state_t * state){
 	//static task_timer_t radio_rssi_check  = {false, 5, 0};
 	static task_timer_t radio_peers_print = {true, 60000, 0, 0};
 	static beacon_t my_beacon;
+	static uint8_t rssi;
 
 	if (state_transceiving(state)) {
 		radio_event_callback(state);
@@ -497,20 +518,38 @@ void state_run(state_t * state){
 	if (!state_loading_dock_run(state)){
 		printf("ERROR: state_loading_dock_run() failed!\n");
 	}
-		
-	if (timer_run(&state->transmit_send_queue)) { //start a transmission
-		state->transmitting = state_get_next_frame_to_transmit(state);
-		if (state->transmitting == NULL){
-			state->transmit_send_queue.period_ms = state->tx_backoff_min_ms; //if there is nothing to transmit set back-off to its minimum
-		} else {
-#ifdef TX_START_DEBUG
-			printf("INFO: start next transmission: %u bytes\n", state->transmitting->frame_len);
-#endif
-			if (!radio_frame_transmit_start(state->transmitting, state->current_channel)){
-				printf("ERROR: radio_frame_transmit_start() failed!\n");
-			}	
+	
+	if (csma_enabled(&state->csma)) { //ready to transmit but medium is busy, check it after random backoff then probabalitistically transmit
+		if (csma_run_countdown(&state->csma)){
+			rssi = radio_get_rssi();
+			//printf("waiting rssi %u\n", rssi);
+			if (rssi < RSSI_THRESHHOLD){
+				if (csma_run_transmit(&state->csma)){ //transmit, csma will be disabled now
+					state_tx_now(state);
+				}			
+			}
 		}
 	}
+	else if (timer_run(&state->transmit_send_queue)) { //csma is not running start a transmission
+		
+		if (!state_peek_next_frame_to_transmit(state)){ //if there is nothing to transmit set back-off to its minimum
+			state->transmit_send_queue.period_ms = state->tx_backoff_min_ms;
+		} else { //there is a frame to transmit
+			rssi = radio_get_rssi();
+			printf("rssi %u\n", rssi);
+			if (rssi < RSSI_THRESHHOLD){
+				state_tx_now(state);
+			} else {
+				csma_reset(&state->csma); //start the csma algorithm
+			}			
+		}
+	}
+	
+	//csma_enabled(csma)
+	//void csma_reset(csma_t * csma);
+	//void csma_disable(csma_t * csma);
+	//bool csma_run_countdown(csma_t * csma);
+	//bool csma_run_transmit(csma_t * csma);
 
 	if (timer_run(&state->beacon_transmit)){ //add a beacon to the transmit queue
 		printf("INFO: beacon transmit\n");
@@ -898,11 +937,19 @@ int frame_len(frame_t * frame){
 	return rc;
 }
 
+#define DEBUG_FRAME_LOAD_RATIO
+
 packed_frame_t * frame_pack(frame_t ** frame){
-	if (frame_len(*frame) > (int)sizeof(packed_frame_t)){
+	int len = frame_len(*frame);
+	if (len > (int)sizeof(packed_frame_t)){
 		printf("ERROR: frame_pack() length check failed\n");
 		return NULL;
 	}
+#ifdef DEBUG_FRAME_LOAD_RATIO
+	float flen = len;
+	float fsz = sizeof(packed_frame_t);
+	printf("DEBUG: frame_pack %d/%u %4.1f%%\n", len, sizeof(packed_frame_t), (flen/fsz)*100);
+#endif
 	
 	packed_frame_t * to_return = (packed_frame_t*)malloc(sizeof(packed_frame_t));
 	if (to_return == NULL) {return NULL;}
@@ -1048,6 +1095,10 @@ int radio_frame_bytes_remaining(radio_frame_t * rf){
 }
 
 bool radio_frame_transmit_start(radio_frame_t * frame, uint8_t channel){
+#ifdef TX_START_DEBUG
+	printf("INFO: radio_frame_transmit_start(%u)\n", frame->frame_len);
+#endif
+	
 	if (frame->frame_ptr == NULL) {return false;} //nothing to transmit
 	frame->frame_position = frame->frame_ptr;
 	

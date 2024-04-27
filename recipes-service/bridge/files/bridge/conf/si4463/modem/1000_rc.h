@@ -1,1 +1,1 @@
-../all/wds_generated/radio_config_Si4463_900M_160kbps.h
+../all/wds_generated/radio_config_Si4463_868M_80kbps.h

@@ -492,13 +492,8 @@ void si446x_func_info(void)
  *
  * @param respByteCount Number of Fast Response Registers to be read.
  */
-void si446x_frr_a_read(U8 respByteCount)
-{
-    radio_comm_ReadData(SI446X_CMD_ID_FRR_A_READ,
-                            0,
-                        respByteCount,
-                        Pro2Cmd);
-
+void si446x_frr_a_read(U8 respByteCount){
+    radio_comm_ReadData(SI446X_CMD_ID_FRR_A_READ, 0, respByteCount,Pro2Cmd);
     Si446xCmd.FRR_A_READ.FRR_A_VALUE = Pro2Cmd[0];
     Si446xCmd.FRR_A_READ.FRR_B_VALUE = Pro2Cmd[1];
     Si446xCmd.FRR_A_READ.FRR_C_VALUE = Pro2Cmd[2];
@@ -510,13 +505,8 @@ void si446x_frr_a_read(U8 respByteCount)
  *
  * @param respByteCount Number of Fast Response Registers to be read.
  */
-void si446x_frr_b_read(U8 respByteCount)
-{
-    radio_comm_ReadData(SI446X_CMD_ID_FRR_B_READ,
-                            0,
-                        respByteCount,
-                        Pro2Cmd);
-
+void si446x_frr_b_read(U8 respByteCount){
+    radio_comm_ReadData(SI446X_CMD_ID_FRR_B_READ, 0, respByteCount, Pro2Cmd);
     Si446xCmd.FRR_B_READ.FRR_B_VALUE = Pro2Cmd[0];
     Si446xCmd.FRR_B_READ.FRR_C_VALUE = Pro2Cmd[1];
     Si446xCmd.FRR_B_READ.FRR_D_VALUE = Pro2Cmd[2];
@@ -528,12 +518,8 @@ void si446x_frr_b_read(U8 respByteCount)
  *
  * @param respByteCount Number of Fast Response Registers to be read.
  */
-void si446x_frr_c_read(U8 respByteCount)
-{
-    radio_comm_ReadData(SI446X_CMD_ID_FRR_C_READ,
-                            0,
-                        respByteCount,
-                        Pro2Cmd);
+void si446x_frr_c_read(U8 respByteCount){
+    radio_comm_ReadData(SI446X_CMD_ID_FRR_C_READ,0,respByteCount,Pro2Cmd);
 
     Si446xCmd.FRR_C_READ.FRR_C_VALUE = Pro2Cmd[0];
     Si446xCmd.FRR_C_READ.FRR_D_VALUE = Pro2Cmd[1];
@@ -546,12 +532,8 @@ void si446x_frr_c_read(U8 respByteCount)
  *
  * @param respByteCount Number of Fast Response Registers to be read.
  */
-void si446x_frr_d_read(U8 respByteCount)
-{
-    radio_comm_ReadData(SI446X_CMD_ID_FRR_D_READ,
-                            0,
-                        respByteCount,
-                        Pro2Cmd);
+void si446x_frr_d_read(U8 respByteCount){
+    radio_comm_ReadData(SI446X_CMD_ID_FRR_D_READ, 0, respByteCount, Pro2Cmd);
 
     Si446xCmd.FRR_D_READ.FRR_D_VALUE = Pro2Cmd[0];
     Si446xCmd.FRR_D_READ.FRR_A_VALUE = Pro2Cmd[1];
@@ -564,15 +546,11 @@ void si446x_frr_d_read(U8 respByteCount)
  *
  * @param ADC_EN  ADC enable parameter.
  */
-void si446x_get_adc_reading(U8 ADC_EN)
-{
+void si446x_get_adc_reading(U8 ADC_EN){
     Pro2Cmd[0] = SI446X_CMD_ID_GET_ADC_READING;
     Pro2Cmd[1] = ADC_EN;
 
-    radio_comm_SendCmdGetResp( SI446X_CMD_ARG_COUNT_GET_ADC_READING,
-                              Pro2Cmd,
-                              SI446X_CMD_REPLY_COUNT_GET_ADC_READING,
-                              Pro2Cmd );
+    radio_comm_SendCmdGetResp( SI446X_CMD_ARG_COUNT_GET_ADC_READING, Pro2Cmd, SI446X_CMD_REPLY_COUNT_GET_ADC_READING, Pro2Cmd );
 
     Si446xCmd.GET_ADC_READING.GPIO_ADC         = ((U16)Pro2Cmd[0] << 8) & 0xFF00;
     Si446xCmd.GET_ADC_READING.GPIO_ADC        |=  (U16)Pro2Cmd[1] & 0x00FF;
