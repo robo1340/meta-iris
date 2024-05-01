@@ -1,0 +1,19 @@
+[Unit]
+Description=Chat Service
+After=network.target ares-var-run.mount var-volatile.mount
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+WorkingDirectory=/bridge/src/prj-zmq-recv
+#ExecStart=/bin/sh -c '/usr/bin/stdbuf -oL /ares/bin/executive  >> /var/log/executive.log 2>> /var/log/executive.log'
+ExecStart=/bridge/src/prj-zmq-recv/test
+#ExecStartPre=/bin/sleep 11
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/chat.log
+StandardError=append:/var/log/chat.log
+SyslogIdentifier=%n
+
