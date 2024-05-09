@@ -10,6 +10,7 @@
 #include "tlv_types.h"
 #include "slip.h"
 #include "serial.h"
+#include "avg.h" //exp_moving_avg(uint32_t new_sample);
 
 #include <stdio.h>
 #include <stdint.h>
@@ -127,6 +128,11 @@ state_t * state(void){
 	to_return->si4463_load_order = zlistx_new();
 	if (to_return->si4463_load_order == NULL) {return NULL;}
 	zlistx_set_destructor(to_return->si4463_load_order, (zlistx_destructor_fn*)zstr_free);
+
+	if (!state_read_ip(to_return, IP_PATH)){return NULL;}
+	if (!state_read_mac(to_return, MAC_PATH)){return NULL;}
+	if (!state_read_callsign(to_return, CALLSIGN_PATH)){return NULL;}
+	printf("INFO \"%s\" at %s,%s\n", to_return->callsign, to_return->ip_str, to_return->mac_str);
 	
 	//read in settings from config.json
 	state_read_config_settings(to_return, CONFIG_PATH);
@@ -142,11 +148,6 @@ state_t * state(void){
 	if (!radio_init(to_return->radio_config, to_return->si4463_load_order)){
 		printf("ERROR: radio_init() failed!\n");
 	}
-	
-	if (!state_read_ip(to_return, IP_PATH)){return NULL;}
-	if (!state_read_mac(to_return, MAC_PATH)){return NULL;}
-	if (!state_read_callsign(to_return, CALLSIGN_PATH)){return NULL;}
-	printf("INFO \"%s\" at %s,%s\n", to_return->callsign, to_return->ip_str, to_return->mac_str);
 	
 	to_return->tx_backoff_min_ms = to_return->transmit_queue_period_ms - to_return->transmit_queue_variance_ms;
 	
@@ -474,9 +475,10 @@ void state_abort_transceiving(state_t * state){
 
 #define TXRX_TIMEOUT_MS 2000 ///<timeout value used to detect when the program is in a locked state
 
-#define RSSI_THRESHHOLD 50 ///<only transmit if RSSI is lower than this
+#define RSSI_THRESHHOLD 10 ///<only transmit if AVG RSSI plus this is lower than this
 
 static void state_tx_now(state_t * state){
+	//printf("INFO: state_tx_now\n");
 	state->transmitting = state_get_next_frame_to_transmit(state);
 	if (state->transmitting != NULL){
 		if (!radio_frame_transmit_start(state->transmitting, state->current_channel)){
@@ -494,7 +496,7 @@ void state_run(state_t * state){
 	//static task_timer_t radio_rssi_check  = {false, 5, 0};
 	static task_timer_t radio_peers_print = {true, 60000, 0, 0};
 	static beacon_t my_beacon;
-	static uint8_t rssi;
+	static uint32_t rssi, avg_rssi;
 
 	if (state_transceiving(state)) {
 		radio_event_callback(state);
@@ -519,11 +521,13 @@ void state_run(state_t * state){
 		printf("ERROR: state_loading_dock_run() failed!\n");
 	}
 	
+	avg_rssi = exp_moving_avg(radio_get_rssi());
+	
 	if (csma_enabled(&state->csma)) { //ready to transmit but medium is busy, check it after random backoff then probabalitistically transmit
 		if (csma_run_countdown(&state->csma)){
 			rssi = radio_get_rssi();
-			//printf("waiting rssi %u\n", rssi);
-			if (rssi < RSSI_THRESHHOLD){
+			printf("waiting rssi %u\n", rssi);
+			if (rssi < (avg_rssi+RSSI_THRESHHOLD)){
 				if (csma_run_transmit(&state->csma)){ //transmit, csma will be disabled now
 					state_tx_now(state);
 				}			
@@ -537,7 +541,7 @@ void state_run(state_t * state){
 		} else { //there is a frame to transmit
 			rssi = radio_get_rssi();
 			printf("rssi %u\n", rssi);
-			if (rssi < RSSI_THRESHHOLD){
+			if (rssi < (avg_rssi+RSSI_THRESHHOLD)){
 				state_tx_now(state);
 			} else {
 				csma_reset(&state->csma); //start the csma algorithm
@@ -794,7 +798,8 @@ static bool state_read_config_settings(state_t * state, char * path){
 		strncat(state->wifi_ssid, state->callsign, strlen(state->wifi_ssid)+sizeof(state->callsign));
 	} else {
 		strncpy(state->wifi_ssid, val, sizeof(state->wifi_ssid));
-	}	
+	}
+	printf("wifi SSID: \"%s\"\n", state->wifi_ssid);
 	val = jsmn_json_lookup(tokens, num_toks, json_str, "wifi_passphrase");
 	strncpy(state->wifi_passphrase, ((val != NULL) ? val : DEFAULT_WIFI_PASSPHRASE), sizeof(state->wifi_passphrase));
 	printf("INFO: wifi ssid \"%s\", passphrase \"%s\"\n", state->wifi_ssid, state->wifi_passphrase);

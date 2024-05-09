@@ -19,15 +19,15 @@
 
 // INPUT DATA
 /*
-// Crys_freq(Hz): 30000000    Crys_tol(ppm): 10    IF_mode: 2    High_perf_Ch_Fil: 1    OSRtune: 0    Ch_Fil_Bw_AFC: 0    ANT_DIV: 0    PM_pattern: 0    
-// MOD_type: 3    Rsymb(sps): 20000    Fdev(Hz): 20000    RXBW(Hz): 150000    Manchester: 0    AFC_en: 0    Rsymb_error: 0.0    Chip-Version: 2    
-// RF Freq.(MHz): 433    API_TC: 29    fhst: 250000    inputBW: 0    BERT: 0    RAW_dout: 0    D_source: 0    Hi_pfm_div: 1    
+// Crys_freq(Hz): 30000000    Crys_tol(ppm): 20    IF_mode: 2    High_perf_Ch_Fil: 1    OSRtune: 0    Ch_Fil_Bw_AFC: 0    ANT_DIV: 0    PM_pattern: 0    
+// MOD_type: 2    Rsymb(sps): 15000    Fdev(Hz): 40000    RXBW(Hz): 150000    Manchester: 0    AFC_en: 0    Rsymb_error: 0.0    Chip-Version: 2    
+// RF Freq.(MHz): 868    API_TC: 29    fhst: 250000    inputBW: 0    BERT: 0    RAW_dout: 0    D_source: 0    Hi_pfm_div: 1    
 // API_ARR_Det_en: 0    Fdev_error: 0    API_ETSI: 0    
 // 
 // # RX IF frequency is  -468750 Hz
-// # WB filter 1 (BW =  76.31 kHz);  NB-filter 1 (BW = 76.31 kHz)
+// # WB filter 1 (BW = 152.62 kHz);  NB-filter 1 (BW = 152.62 kHz)
 // 
-// Modulation index: 2
+// Modulation index: 5.333
 */
 
 
@@ -65,7 +65,7 @@
 //   GLOBAL_XO_TUNE - Configure the internal capacitor frequency tuning bank for the crystal oscillator.
 //   GLOBAL_CLK_CFG - Clock configuration options.
 */
-#define RF_GLOBAL_XO_TUNE_2 0x11, 0x00, 0x02, 0x00, 0x62, 0x00
+#define RF_GLOBAL_XO_TUNE_2 0x11, 0x00, 0x02, 0x00, 0x52, 0x00
 
 /*
 // Set properties:           RF_GLOBAL_CONFIG_1
@@ -275,7 +275,7 @@
 //   MODEM_FREQ_DEV_2 - 17-bit unsigned TX frequency deviation word.
 //   MODEM_FREQ_DEV_1 - 17-bit unsigned TX frequency deviation word.
 */
-#define RF_MODEM_MOD_TYPE_12 0x11, 0x20, 0x0C, 0x00, 0x03, 0x00, 0x07, 0x0C, 0x35, 0x00, 0x05, 0xC9, 0xC3, 0x80, 0x00, 0x05
+#define RF_MODEM_MOD_TYPE_12 0x11, 0x20, 0x0C, 0x00, 0x02, 0x00, 0x07, 0x02, 0x49, 0xF0, 0x01, 0xC9, 0xC3, 0x80, 0x00, 0x05
 
 /*
 // Set properties:           RF_MODEM_FREQ_DEV_0_1
@@ -308,7 +308,7 @@
 //   MODEM_BCR_OSR_1 - RX BCR/Slicer oversampling rate (12-bit unsigned number).
 //   MODEM_BCR_OSR_0 - RX BCR/Slicer oversampling rate (12-bit unsigned number).
 */
-#define RF_MODEM_TX_RAMP_DELAY_12 0x11, 0x20, 0x0C, 0x18, 0x01, 0x80, 0x08, 0x03, 0x80, 0x00, 0x20, 0x10, 0x00, 0xE8, 0x00, 0x7D
+#define RF_MODEM_TX_RAMP_DELAY_12 0x11, 0x20, 0x0C, 0x18, 0x01, 0x80, 0x08, 0x03, 0xC0, 0x00, 0x10, 0x10, 0x00, 0xE8, 0x01, 0x4D
 
 /*
 // Set properties:           RF_MODEM_BCR_NCO_OFFSET_2_12
@@ -330,7 +330,7 @@
 //   MODEM_AFC_GAIN_1 - Sets the gain of the PLL-based AFC acquisition loop, and provides miscellaneous control bits for AFC functionality.
 //   MODEM_AFC_GAIN_0 - Sets the gain of the PLL-based AFC acquisition loop, and provides miscellaneous control bits for AFC functionality.
 */
-#define RF_MODEM_BCR_NCO_OFFSET_2_12 0x11, 0x20, 0x0C, 0x24, 0x04, 0x18, 0x93, 0x02, 0x0C, 0x02, 0xC2, 0x00, 0x04, 0x23, 0x80, 0x3A
+#define RF_MODEM_BCR_NCO_OFFSET_2_12 0x11, 0x20, 0x0C, 0x24, 0x01, 0x89, 0x37, 0x00, 0xC5, 0x02, 0xC2, 0x00, 0x04, 0x23, 0x80, 0x16
 
 /*
 // Set properties:           RF_MODEM_AFC_LIMITER_1_3
@@ -343,7 +343,7 @@
 //   MODEM_AFC_LIMITER_0 - Set the AFC limiter value.
 //   MODEM_AFC_MISC - Specifies miscellaneous AFC control bits.
 */
-#define RF_MODEM_AFC_LIMITER_1_3 0x11, 0x20, 0x03, 0x30, 0x07, 0x67, 0x80
+#define RF_MODEM_AFC_LIMITER_1_3 0x11, 0x20, 0x03, 0x30, 0x13, 0x93, 0x80
 
 /*
 // Set properties:           RF_MODEM_AGC_CONTROL_1
@@ -376,7 +376,7 @@
 //   MODEM_OOK_CNT1 - OOK control.
 //   MODEM_OOK_MISC - Selects the detector(s) used for demodulation of an OOK signal, or for demodulation of a (G)FSK signal when using the asynchronous demodulator.
 */
-#define RF_MODEM_AGC_WINDOW_SIZE_12 0x11, 0x20, 0x0C, 0x38, 0x11, 0x1B, 0x1B, 0x80, 0x1A, 0x80, 0x00, 0x00, 0x28, 0x0C, 0xA4, 0x22
+#define RF_MODEM_AGC_WINDOW_SIZE_12 0x11, 0x20, 0x0C, 0x38, 0x11, 0x49, 0x49, 0x80, 0x02, 0xFF, 0xFF, 0x00, 0x2A, 0x0C, 0xA4, 0x22
 
 /*
 // Set properties:           RF_MODEM_RAW_CONTROL_10
@@ -396,7 +396,7 @@
 //   MODEM_RSSI_CONTROL2 - RSSI Jump Detection control.
 //   MODEM_RSSI_COMP - RSSI compensation value.
 */
-#define RF_MODEM_RAW_CONTROL_10 0x11, 0x20, 0x0A, 0x45, 0x83, 0x01, 0x4C, 0x01, 0x00, 0xFF, 0x06, 0x00, 0x18, 0x40
+#define RF_MODEM_RAW_CONTROL_10 0x11, 0x20, 0x0A, 0x45, 0x83, 0x01, 0xFF, 0x01, 0x00, 0xFF, 0x06, 0x00, 0x18, 0x40
 
 /*
 // Set properties:           RF_MODEM_RAW_SEARCH2_2
@@ -408,7 +408,7 @@
 //   MODEM_RAW_SEARCH2 - Defines and controls the search period length for the Moving Average and Min-Max detectors.
 //   MODEM_CLKGEN_BAND - Select PLL Synthesizer output divider ratio as a function of frequency band.
 */
-#define RF_MODEM_RAW_SEARCH2_2 0x11, 0x20, 0x02, 0x50, 0x84, 0x0A
+#define RF_MODEM_RAW_SEARCH2_2 0x11, 0x20, 0x02, 0x50, 0x84, 0x08
 
 /*
 // Set properties:           RF_MODEM_SPIKE_DET_2
@@ -420,7 +420,7 @@
 //   MODEM_SPIKE_DET - Configures the threshold for (G)FSK Spike Detection.
 //   MODEM_ONE_SHOT_AFC - Configures parameters for th e One Shot AFC function and for BCR timing/acquisition.
 */
-#define RF_MODEM_SPIKE_DET_2 0x11, 0x20, 0x02, 0x54, 0x04, 0x07
+#define RF_MODEM_SPIKE_DET_2 0x11, 0x20, 0x02, 0x54, 0x07, 0x07
 
 /*
 // Set properties:           RF_MODEM_RSSI_MUTE_1
@@ -446,7 +446,7 @@
 //   MODEM_DSA_RSSI - Signal Arrival Detect RSSI Qualifier Config
 //   MODEM_DSA_MISC - Miscellaneous detection of signal arrival bits.
 */
-#define RF_MODEM_DSA_CTRL1_5 0x11, 0x20, 0x05, 0x5B, 0x40, 0x04, 0x0B, 0x78, 0x20
+#define RF_MODEM_DSA_CTRL1_5 0x11, 0x20, 0x05, 0x5B, 0x40, 0x04, 0x10, 0x78, 0x20
 
 /*
 // Set properties:           RF_MODEM_CHFLT_RX1_CHFLT_COE13_7_0_12
@@ -583,7 +583,7 @@
 //   FREQ_CONTROL_W_SIZE - Set window gating period (in number of crystal reference clock cycles) for counting VCO frequency during calibration.
 //   FREQ_CONTROL_VCOCNT_RX_ADJ - Adjust target count for VCO calibration in RX mode.
 */
-#define RF_FREQ_CONTROL_INTE_8 0x11, 0x40, 0x08, 0x00, 0x38, 0x0D, 0xDD, 0xDD, 0x44, 0x44, 0x20, 0xFE
+#define RF_FREQ_CONTROL_INTE_8 0x11, 0x40, 0x08, 0x00, 0x38, 0x0E, 0xEE, 0xEE, 0x22, 0x22, 0x20, 0xFF
 
 
 // AUTOMATICALLY GENERATED CODE! 
