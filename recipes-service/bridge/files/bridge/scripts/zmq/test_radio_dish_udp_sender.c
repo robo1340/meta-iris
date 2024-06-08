@@ -11,7 +11,6 @@ volatile sig_atomic_t stop;
 
 #define DEFAULT_URL "udp://10.255.255.255:1337"
 #define MSG_MAXLEN 1500
-#define BROADCAST_GROUP "broadcast"
 
 void my_free (void *data, void *hint)
 {
@@ -62,9 +61,11 @@ int main(int argc, char *argv[]) {
     int rc = zmq_connect(radio, url);
     assert(rc > -1);
 
+    char group[] = "default";
+
 	zmq_msg_t msg;
 	zmq_msg_init_data (&msg, pay, 255, my_free, NULL);
-	zmq_msg_set_group(&msg, BROADCAST_GROUP);
+	zmq_msg_set_group(&msg, group);
 	zmq_sendmsg(radio, &msg, 0); 
 
     printf("Sent\n");

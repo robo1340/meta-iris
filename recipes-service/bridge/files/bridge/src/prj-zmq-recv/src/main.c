@@ -29,11 +29,21 @@ int pipefds[2];
 
 #define HEADER "=========================\n"
 
-static bool handle_msg(zmq_msg_t * msg){
-	char cmd[2000];
-	snprintf(cmd, sizeof(cmd), "wall -n \""HEADER"message received on chat group \"%s\"\n%s\"", zmq_msg_group(msg), (char*)zmq_msg_data(msg));
-	//printf("%s\n",cmd);
-	system(cmd);
+static bool handle_msg(zmq_msg_t * msg, void * pub){
+	static char group[32];
+	static char cmd[2000];
+        if ((strcmp(zmq_msg_group(msg),"location")!=0)&&
+            (strcmp(zmq_msg_group(msg),"newMessage")!=0))		
+	{	
+		snprintf(cmd, sizeof(cmd), "wall -n \""HEADER"message received on chat group \"%s\"\n%s\"", zmq_msg_group(msg), (char*)zmq_msg_data(msg));
+		system(cmd);
+	}
+	
+	strncpy(group, zmq_msg_group(msg), sizeof(group));
+	
+	zmq_send(pub, group, sizeof(group), ZMQ_SNDMORE);
+	zmq_send(pub, zmq_msg_data(msg), zmq_msg_size(msg), 0);
+	
 	return true;
 }
 
@@ -45,7 +55,17 @@ int main(int argc, char *argv[]){
     int rc = zmq_bind(dish, URL);
     assert(rc > -1);
 	
+	void * pub = zmq_socket(ctx, ZMQ_PUB);
+	assert(pub != NULL);
+	zmq_bind(pub, "ipc:///tmp/chat.ipc");
+	
 	zmq_join(dish, BROADCAST_GROUP);
+	zmq_join(dish, "location");
+	zmq_join(dish, "newMessage");
+	zmq_join(dish, "test");
+	zmq_join(dish, "group1");
+	zmq_join(dish, "group2");
+	zmq_join(dish, "group3");
 	if (argc > 1){
 		int i;
 		for (i=1; i<argc; i++){
@@ -80,13 +100,14 @@ int main(int argc, char *argv[]){
 			zmq_msg_t recv_msg;
 			zmq_msg_init (&recv_msg);
 			zmq_recvmsg (dish, &recv_msg, 0);
-			if (!handle_msg(&recv_msg)){
+			if (!handle_msg(&recv_msg, pub)){
 				printf("ERROR: handle_msg() failed\n");
 			}
 			zmq_msg_close (&recv_msg);
 		}
     }
 	zmq_close(dish);
+	zmq_close(pub);
 	zmq_ctx_term(ctx);
 	return 0;
 }
