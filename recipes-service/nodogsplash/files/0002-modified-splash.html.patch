@@ -1,0 +1,59 @@
+From 9999ec4e6ec3b0036fabc37f4ea2deb271a5a0cb Mon Sep 17 00:00:00 2001
+From: htodd9 <haines.todd@okstate.edu>
+Date: Thu, 6 Jun 2024 20:28:28 -0500
+Subject: [PATCH] modified splash.html
+
+---
+ nodogsplash-5.0.2/resources/splash.html | 23 ++++++++++-------------
+ 1 file changed, 10 insertions(+), 13 deletions(-)
+
+diff --git a/nodogsplash-5.0.2/resources/splash.html b/nodogsplash-5.0.2/resources/splash.html
+index 77d6375..af11a41 100644
+--- a/nodogsplash-5.0.2/resources/splash.html
++++ b/nodogsplash-5.0.2/resources/splash.html
+@@ -7,7 +7,7 @@
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 
+-<link rel="shortcut icon" href="/images/splash.jpg" type="image/x-icon">
++<link rel="shortcut icon" href="/animu.jpg" type="image/x-icon">
+ <link rel="stylesheet" type="text/css" href="/splash.css">
+ 
+ <title>$gatewayname Hotspot Gateway.</title>
+@@ -65,27 +65,24 @@ or appended to the query string of the authtarget link:
+ 
+ <body>
+ <div class="offset">
+-<med-blue>$gatewayname Hotspot Gateway.</med-blue>
++<med-blue>$gatewayname Gateway.</med-blue>
+ <div class="insert">
+ <br>
+-<img src="/images/splash.jpg" alt="Splash Page: For access to the Internet, please click Continue.">
+-<hr>
+-<big-red>Welcome!</big-red>
+-<hr>
++<img src="/animu.jpg" alt="Splash Page: For access to the network follow the following steps">
++<br>
++<italic-black>Welcome to the Iris network!, your ip is $clientip</italic-black>
+ <br>
+-<italic-black>For access to the Internet, please tap or click Continue.</italic-black>
++<big-red>Click continue, then type $gatewayip into your web browser to use the network</big-red>
++<br><br>
++<italic-black>You also may be able to type https://iris into our web browser. This probably won't work on Android though.</italic-black>
++<br><br>
++<italic-black>Sorry, this captive portal browser can't directly redirect you there.</italic-black>
+ <br><br>
+ <hr>
+ 
+ <form method="GET" action="$authaction">
+ <input type="hidden" name="tok" value="$tok">
+ <input type="hidden" name="redir" value="$redir">
+-<!-- for binauth script
+-<label>Name:</label>
+-<input type="text" name="username"><br><br>
+-<label>Password:</label>
+-<input type="text" name="password"><br><br>
+--->
+ <input type="submit" value="Continue">
+ </form>
+ 	

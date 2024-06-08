@@ -1,0 +1,44 @@
+From 172b100ac3802985ca8d780cf06701ca2f6d0257 Mon Sep 17 00:00:00 2001
+From: htodd9 <haines.todd@okstate.edu>
+Date: Thu, 6 Jun 2024 20:29:01 -0500
+Subject: [PATCH] modified status.html
+
+---
+ nodogsplash-5.0.2/resources/status.html | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/nodogsplash-5.0.2/resources/status.html b/nodogsplash-5.0.2/resources/status.html
+index 534baa3..1a26ac0 100644
+--- a/nodogsplash-5.0.2/resources/status.html
++++ b/nodogsplash-5.0.2/resources/status.html
+@@ -8,7 +8,6 @@
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 
+-<link rel="shortcut icon" href="/images/splash.jpg" type="image/x-icon">
+ <link rel="stylesheet" type="text/css" href="/splash.css">
+ 
+ <title>$gatewayname Hotspot Gateway Status</title>
+@@ -25,15 +24,14 @@ Status:
+ </head>
+ 
+ <body>
+-<div class="offset">
+-<med-blue>$gatewayname Hotspot Gateway.</med-blue>
+-<div class="insert">
+-<br>
+-<img src="/images/splash.jpg" alt="You are already logged in and have access to the Internet.">
+-<hr>
+-<p><big-red>You are already logged in and have access to the Internet.</big-red></p>
++<italic-black>Welcome to the Iris network!, your ip is $clientip</italic-black>
+ <hr>
+-<p><italic-black>You can use your Browser, Email and other network Apps as you normally would.</italic-black></p>
++<br>
++<italic-black>Click continue, then type $gatewayip into your web browser to use the network</italic-black>
++<br><br>
++<italic-black>You also may be able to type https://iris into our web browser. This probably won't work on Android though.</italic-black>
++<br><br>
++<italic-black>Sorry, this captive portal browser can't directly redirect you there.</italic-black>
+ 
+ <hr>
+ <copy-right>Copyright &copy; The Nodogsplash Contributors 2004-2019.<br>This software is released under the GNU GPL license.</copy-right>

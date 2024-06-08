@@ -1,0 +1,276 @@
+From 39be9a5455433dd2e0a068233896d423d89d0983 Mon Sep 17 00:00:00 2001
+From: htodd9 <haines.todd@okstate.edu>
+Date: Thu, 6 Jun 2024 20:30:25 -0500
+Subject: [PATCH] modified conf
+
+---
+ nodogsplash-5.0.2/resources/nodogsplash.conf | 206 +------------------
+ 1 file changed, 9 insertions(+), 197 deletions(-)
+
+diff --git a/nodogsplash-5.0.2/resources/nodogsplash.conf b/nodogsplash-5.0.2/resources/nodogsplash.conf
+index f53944a..50b2813 100644
+--- a/nodogsplash-5.0.2/resources/nodogsplash.conf
++++ b/nodogsplash-5.0.2/resources/nodogsplash.conf
+@@ -10,12 +10,14 @@
+ # that is to be managed by Nodogsplash.
+ # Typically br-lan for the wired and wireless lan.
+ #
+-GatewayInterface br-lan
++GatewayInterface wlu1
+ 
+ # Parameter: WebRoot
+ # Default: /etc/nodogsplash/htdocs
+ #
+ # The local path where the splash page content resides.
++WebRoot /etc/nodogsplash/
++
+ 
+ # FirewallRuleSet: authenticated-users
+ #
+@@ -133,32 +135,6 @@ FirewallRuleSet users-to-router {
+ }
+ # end FirewallRuleSet users-to-router
+ 
+-# EmptyRuleSetPolicy directives
+-# The FirewallRuleSets that NoDogSplash permits are:
+-#
+-# authenticated-users
+-# preauthenticated-users
+-# users-to-router
+-# trusted-users
+-# trusted-users-to-router
+-#
+-# For each of these, an EmptyRuleSetPolicy can be specified.
+-# An EmptyRuleSet policy applies to a FirewallRuleSet if the
+-# FirewallRuleSet is missing from this configuration file,
+-# or if it exists but contains no FirewallRules.
+-#
+-# The possible values of an EmptyRuleSetPolicy are:
+-# allow  -- packets are accepted
+-# block  -- packets are rejected
+-# passthrough -- packets are passed through to pre-existing firewall rules
+-#
+-# Default EmptyRuleSetPolicies are set as follows:
+-# EmptyRuleSetPolicy authenticated-users passthrough
+-# EmptyRuleSetPolicy preauthenticated-users block
+-# EmptyRuleSetPolicy users-to-router block
+-# EmptyRuleSetPolicy trusted-users allow
+-# EmptyRuleSetPolicy trusted-users-to-router allow
+-
+ 
+ # Parameter: GatewayName
+ # Default: NoDogSplash
+@@ -168,7 +144,7 @@ FirewallRuleSet users-to-router {
+ # and in status output from ndsctl, but otherwise doesn't matter.
+ # If none is supplied, the value "NoDogSplash" is used.
+ #
+-# GatewayName NoDogSplash
++GatewayName Iris
+ 
+ # Parameter: GatewayAddress
+ # Default: Discovered from GatewayInterface
+@@ -185,14 +161,14 @@ FirewallRuleSet users-to-router {
+ #
+ # The page the client is show if the client is already authenticated but navigates to the captive portal.
+ #
+-# StatusPage status.html
++StatusPage status.html
+ 
+ # Parameter: SplashPage
+ # Default: splash.html
+ #
+ # The page the client is redirected to if not authenticated or whitelisted.
+ #
+-# SplashPage splash.html
++SplashPage splash.html
+ 
+ # Parameter: RedirectURL
+ # Default: none
+@@ -201,15 +177,14 @@ FirewallRuleSet users-to-router {
+ # to their initially requested page. 
+ # If RedirectURL is set, the user is redirected to this URL instead.
+ # 
+-# RedirectURL http://www.ilesansfil.org/
+-
++RedirectURL https://10.1.1.1
+ # Parameter: GatewayPort
+ # Default: 2050
+ #
+ # Nodogsplash's own http server uses GatewayAddress as its IP address.
+ # The port it listens to at that IP can be set here; default is 2050.
+ #
+-# GatewayPort 2050
++GatewayPort 2050
+ 
+ # Parameter: MaxClients
+ # Default: 20
+@@ -218,168 +193,5 @@ FirewallRuleSet users-to-router {
+ # connect at any time.  (Does not include users on the TrustedMACList,
+ # who do not authenticate.)
+ #
+-  MaxClients 250
+-
+-# Parameter: SessionTimeout
+-# Default: 0
+-#
+-# Set the default session length in minutes. A value of 0 is for
+-# sessions without an end.
+-#
+-
+-# Parameter: PreAuthIdleTimeout
+-# Default: 10
+-#
+-# Set PreAuthIdleTimeout to the desired number of minutes before
+-# an pre-authenticated user is automatically removed from the client list.
+-#
+-
+-# Parameter: AuthIdleTimeout
+-# Default: 120
+-#
+-# Set AuthIdleTimeout to the desired number of minutes before
+-# an authenticated user is automatically 'deauthenticated'
+-# and removed from the client list.
+-#
+-
+-# Parameter: CheckInterval
+-# Default: 30
+-#
+-# Interval in seconds (!) the timeouts of all clients are checked.
+-#
+-
+-# Parameter: MACMechanism
+-# Default: block
+-#
+-# Either block or allow.
+-# If 'block', MAC addresses on BlockedMACList are blocked from
+-# authenticating, and all others are allowed.
+-# If 'allow', MAC addresses on AllowedMACList are allowed to
+-# authenticate, and all other (non-trusted) MAC's are blocked.
+-#
+-# MACMechanism block
+-
+-# Parameter: BlockedMACList
+-# Default: none
+-#
+-# Comma-separated list of MAC addresses who will be completely blocked
+-# from the GatewayInterface. Ignored if MACMechanism is allow.
+-# N.B.: weak security, since MAC addresses are easy to spoof.
+-#
+-# BlockedMACList 00:00:DE:AD:BE:EF,00:00:C0:1D:F0:0D
+-
+-# Parameter: AllowedMACList
+-# Default: none
+-#
+-# Comma-separated list of MAC addresses who will not be completely
+-# blocked from the GatewayInterface. Ignored if MACMechanism is block.
+-# N.B.: weak security, since MAC addresses are easy to spoof.
+-#
+-# AllowedMACList 00:00:12:34:56:78
+-
+-# Parameter: TrustedMACList
+-# Default: none
+-#
+-# Comma-separated list of MAC addresses who are not subject to
+-# authentication, and are not restricted by any FirewallRuleSet.
+-# N.B.: weak security, since MAC addresses are easy to spoof.
+-#
+-# TrustedMACList 00:00:CA:FE:BA:BE, 00:00:C0:01:D0:0D
+-
+-# Parameter: TrafficControl
+-# Default: no
+-#
+-# Set to yes (or true or 1), to enable traffic control in Nodogsplash.
+-#
+-# TrafficControl no
+-
+-# Parameter: DownloadLimit
+-# Default: 0
+-#
+-# If TrafficControl is enabled, this sets the maximum download
+-# speed to the GatewayInterface, in kilobits per second.
+-# For example if you have an ADSL connection with 768 kbit
+-# download speed, and you want to allow about half of that
+-# bandwidth for the GatewayInterface, set this to 384.
+-# A value of 0 means no download limiting is done.
+-#
+-# DownloadLimit 384
+-
+-# Parameter: UploadLimit
+-# Default: 0
+-#
+-# If TrafficControl is enabled, this sets the maximum upload
+-# speed from the GatewayInterface, in kilobits per second.
+-# For example if you have an ADSL connection with 128 kbit
+-# upload speed, and you want to allow about half of that
+-# bandwidth for the GatewayInterface, set this to 64.
+-# A value of 0 means no upload limiting is done.
+-#
+-# UploadLimit 64
++  MaxClients 32
+ 
+-# Parameter: GatewayIPRange
+-# Default: 0.0.0.0/0
+-#
+-# By setting this parameter, you can specify a range of IP addresses
+-# on the GatewayInterface that will be responded to and managed by
+-# Nodogsplash.  Addresses outside this range do not have their packets
+-# touched by Nodogsplash at all.
+-# Defaults to 0.0.0.0/0, that is, all addresses.
+-#
+-# GatewayIPRange 0.0.0.0/0
+-
+-# Parameter: DebugLevel
+-# Default: 1
+-#
+-# Set the debug level:
+-# 0: errors only
+-# 1: errors, warnings, infos
+-# 2: errors, warnings, infos, verbose messages
+-# 3: errors, warnings, infos, verbose messages, debug messages
+-#
+-#  DebugLevel 1
+-
+-# Parameter: BinAuth
+-#
+-# Enable BinAuth Support.
+-# If set, a program is called with several parameters on authentication (request) and deauthentication.
+-#
+-# Request for authentication:
+-#
+-# $<BinAuth> auth_client <client_mac> '<username>' '<password>'
+-#
+-# The username and password values may be empty strings and are URL encoded.
+-# The program is expected to output the number of seconds the client
+-# is to be authenticated. Zero or negative seconds will cause the authentification request
+-# to be rejected. The same goes for an exit code that is not 0.
+-# The output may contain a user specific download and upload limit in KBit/s:
+-# <seconds> <upload> <download>
+-#
+-# Called on authentication or deauthentication:
+-# $<BinAuth> <*auth|*deauth> <incoming_bytes> <outgoing_bytes> <session_start> <session_end>
+-#
+-# "client_auth": Client authenticated via this script.
+-# "client_deauth": Client deauthenticated by the client via splash page.
+-# "idle_deauth": Client was deauthenticated because of inactivity.
+-# "timeout_deauth": Client was deauthenticated because the session timed out.
+-# "ndsctl_auth": Client was authenticated manually by the ndsctl tool.
+-# "ndsctl_deauth": Client was deauthenticated by the ndsctl tool.
+-# "shutdown_deauth": Client was deauthenticated by Nodogsplash terminating.
+-#
+-# Values session_start and session_start are in seconds since 1970 or 0 for unknown/unlimited.
+-#
+-# BinAuth /bin/myauth.sh
+-
+-# Nodogsplash uses specific HEXADECIMAL values to mark packets used by iptables as a bitwise mask.
+-# This mask can conflict with the requirements of other packages such as mwan3, sqm etc
+-# Any values set here are interpreted as in hex format.
+-#
+-# Parameter: fw_mark_authenticated
+-# Default: 30000 (0011|0000|0000|0000|0000 binary)
+-#
+-# Parameter: fw_mark_trusted
+-# Default: 20000 (0010|0000|0000|0000|0000 binary)
+-#
+-# Parameter: fw_mark_blocked
+-# Default: 10000 (0001|0000|0000|0000|0000 binary)
+-#

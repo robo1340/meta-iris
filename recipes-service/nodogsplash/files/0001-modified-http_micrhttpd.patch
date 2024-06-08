@@ -1,0 +1,81 @@
+From 4e629a9a686fad76c830b513d8f36ec793f124e5 Mon Sep 17 00:00:00 2001
+From: htodd9 <haines.todd@okstate.edu>
+Date: Thu, 6 Jun 2024 20:27:13 -0500
+Subject: [PATCH] modified http_micrhttpd
+
+---
+ nodogsplash-5.0.2/src/http_microhttpd.c | 40 +++++++++++++++++++++++--
+ 1 file changed, 38 insertions(+), 2 deletions(-)
+
+diff --git a/nodogsplash-5.0.2/src/http_microhttpd.c b/nodogsplash-5.0.2/src/http_microhttpd.c
+index ebfa6af..ae23ee7 100644
+--- a/nodogsplash-5.0.2/src/http_microhttpd.c
++++ b/nodogsplash-5.0.2/src/http_microhttpd.c
+@@ -43,6 +43,7 @@
+ #include "template.h"
+ #include "util.h"
+ 
++
+ #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+ 
+ /* how much memory we reserve for extending template variables */
+@@ -618,8 +619,30 @@ static int encode_and_redirect_to_splashpage(struct MHD_Connection *connection,
+ 			config->gw_http_name, config->splashpage, encoded);
+ 
+ 	debug(LOG_DEBUG, "splashpageurl: %s", splashpageurl);
+-
+-	ret = send_redirect_temp(connection, splashpageurl);
++        
++        char ip2[64];	
++        FILE * fp = fopen("/bridge/conf/radio_ip.json","r");
++	if (fp != NULL){
++		char ip[64];
++	        	
++		fgets(ip,sizeof(ip),fp);
++		int i,j,k;
++		for (i=0,j=0,k=0; i<sizeof(ip)-2; i++){
++           	        if (ip[i] == '\"') {continue;}	
++		        if (ip[i] == '.') {j++;}
++			ip2[k] = ip[i];
++			k++;
++           		if (j==3){
++              			ip2[k] = '1';
++	      			ip2[k+1] = '\0';
++	      			break;
++           		}
++		}
++	}
++        char url[70];
++        snprintf(url,sizeof(url), "https://%s", ip2);	
++	//printf("%s\n", ip2);
++	ret = send_redirect_temp(connection, url);
+ 	free(splashpageurl);
+ 	return ret;
+ }
+@@ -856,6 +879,18 @@ static void replace_variables(
+ 	safe_asprintf(&authaction, "http://%s/%s/", config->gw_http_name, config->authdir);
+ 	safe_asprintf(&authtarget, "http://%s/%s/?tok=%s&amp;redir=%s", config->gw_http_name, config->authdir, client->token, redirect_url);
+ 
++        char gatewayip[32];
++	snprintf(gatewayip, sizeof(gatewayip), "%s", client->ip);
++	int i,j;
++	for (i=0,j=0; i<sizeof(gatewayip)-2; i++){
++           if (gatewayip[i] == '.'){j++;}  
++           if (j==3){
++              gatewayip[i+1] = '1';
++	      gatewayip[i+2] = '\0';
++	      break;
++           }
++	}
++		
+ 	struct template vars[] = {
+ 		{"authaction", authaction},
+ 		{"denyaction", denyaction},
+@@ -866,6 +901,7 @@ static void replace_variables(
+ 		{"clientdownload", clientdownload},
+ 		{"gatewaymac", config->gw_mac},
+ 		{"gatewayname", config->gw_name},
++		{"gatewayip", gatewayip},
+ 		{"maxclients", maxclients},
+ 		{"nclients", nclients},
+ 		{"redir", redirect_url},
