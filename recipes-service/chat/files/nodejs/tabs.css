@@ -1,0 +1,266 @@
+
+.body {
+	overflow: hidden;
+}
+
+/* Style the tab */
+.tab {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 10%; 
+	overflow: hidden;
+	border: 1px solid #ccc;
+	background-color: #f1f1f1;
+}
+
+.general_button {
+	font-size: 1.5em;
+}
+
+/*
+.tab #chat_button {
+	background-image:url('/images/chat.png');
+	background-color: rgba(255,255,255,0.6);
+	background-blend-mode: lighten;
+	background-size: 100% 100%;
+}
+*/
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+	height: 100%;
+	width: 25%;
+	font-size: 1.5em;
+	background-color: inherit;
+	float: left;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 4px;
+	transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+.tab button.pending {
+	border: 2px solid red;
+}
+
+/* Style the tab content */
+.tabcontent {
+	display: none;
+	padding: 6px 12px;
+	border: 1px solid #ccc;
+	border-top: none;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 90%;
+	width:100%;
+	flex-grow: 1;
+	animation: fadeEffect 1s; /* Fading effect takes 1 second */
+}
+
+#settings.tabcontent {
+	overflow-y: auto;	
+}
+
+/* Go from zero to full opacity */
+@keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+/**************************************************************************/
+
+.NumberIcon { 
+	/*background-image: url("/node_modules/leaflet/dist/images/marker-icon.png");*/
+	background-image: url("/images/marker_custom.png");
+    text-align:center;
+    color:Black;   
+    text-shadow: 1px 1px #000000;
+    font-size: large;
+    font-weight: bold;
+}
+
+.waypoint_icon path {fill:OrangeRed;}
+
+.user_icon.Crimson path {fill:Crimson;}
+.user_icon.DarkCyan path {fill:DarkCyan;}
+.user_icon.Chocolate path {fill:Chocolate;}
+.user_icon.Chartreuse path {fill:Chartreuse;}
+.user_icon.Magenta path {fill:Magenta;}
+.user_icon.DarkOrange path {fill:DarkOrange;}
+.user_icon.ForestGreen path {fill:ForestGreen;}
+.user_icon.Gold path {fill:Gold;}
+.user_icon.Aqua path {fill:Aqua;}
+
+.circle_icon circle {fill:DodgerBlue;}
+.leaflet-tooltip {font-size: 2em;}
+
+.user-entry-index.Crimson {background-color:Crimson;}
+.user-entry-index.DarkCyan {background-color:DarkCyan;}
+.user-entry-index.Chocolate {background-color:Chocolate;}
+.user-entry-index.Chartreuse {background-color:Chartreuse;}
+.user-entry-index.Magenta {background-color:Magenta;}
+.user-entry-index.DarkOrange {background-color:DarkOrange;}
+.user-entry-index.ForestGreen {background-color:ForestGreen;}
+.user-entry-index.Gold {background-color:Gold;}
+.user-entry-index.Aqua {background-color:Aqua;}
+.user-entry-index.ME {background-color:DodgerBlue;}
+
+.waypoint_icon path {fill:inherit;}
+
+/*
+
+.waypoint_icon.green path {fill:green;}
+.waypoint_icon.orange path {fill:orange;}
+.waypoint_icon.red path {fill:red;}
+.waypoint_icon.black path {fill:black;}
+*/
+
+#themap {
+	height: 80%;
+	left: 0;
+    right: 0;
+	flex-grow: 1;
+	padding: 0;
+	border: 1px solid black;
+	outline: none;
+	overflow: hidden;
+} 
+
+.user-pane {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 18%;
+	width: 100%;
+	overflow-y: auto;
+    overflow-x: auto;
+	border: 1px solid #ccc;
+	background-color: #f1f1f1;
+}
+
+.user-list {
+	width: 100%;
+	padding: 0;
+	display:table; 
+}
+
+
+.user-entry {
+	text-align: left;
+	width: 100%;
+	/*outline: 1px solid red;*/
+	padding: 1px;
+	/*display:table-row;*/
+}
+
+
+.user-entry td{
+	display:table-cell; 
+	text-align:left;
+	height: 100%;
+	font-size: 2em;
+	padding: 1px;
+}
+
+/* Chat Pane */
+.chat-box {
+    position: fixed;
+    left: 0;
+    right: 0;
+	top: 10%;
+	bottom: 10%;
+    /*top:max(100px, 10%);*/
+	border: 1px solid black;
+	padding: 0;
+    /*background-color: red;*/
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#message_box {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    /*background-color: blue;*/
+    border: 1px solid black;
+	padding: 0;
+    height: 10%;
+    /*min-height: 100px;*/
+}
+
+.message {
+	width: 100%;
+	margin: 0;
+	padding: 5px;
+	font-size: 2em;
+}
+
+[name=messageText] {
+  width: 80%;
+  border: none;
+  padding: 5px;
+  min-height: 100px;
+  font-size: 2em;
+}
+
+#send_button {
+	height: 100%;
+	width: 100%;
+	font-size: 3em;
+	background-color: #ddd;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	padding: 4px;
+	transition: 0.3s;
+}
+
+.Input {
+	height: 100%;
+	background-color: grey;
+	border: 1px solid black;
+	font-size: 2em;
+}
+
+#list {
+  padding-left: 0px;
+}
+
+
+#settings > * {
+	font-size: 2em;
+}
+
+.map_context_button {
+	font-size: 2.5em;
+}
+
+.map_context_button.active {
+  background-color: #ccc;
+}
+
+.map_context_button_color {
+	font-size: 2.5em;
+	color:white;
+}
+
+.map_context_button_color.active {
+	border: 3px solid black;
+}
