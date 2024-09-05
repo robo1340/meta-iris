@@ -79,7 +79,7 @@ bool jsmn_json_load_array(void * tokens, int num_toks, char * json_str, char * i
 	while( token != NULL ) { //walk through other tokens
 		//printf("%s\n", token);
 		token_copy = strdup(token);
-		if (token == NULL){return false;}
+		if (token_copy == NULL){return false;}
 		zlistx_add_end(list_to_load, token_copy);
 		token = strtok(NULL, s);
 	}

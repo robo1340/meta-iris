@@ -66,4 +66,11 @@ void ipv4_recompute_checksum(ipv4_hdr_t * ipv4);
 
 void ipv4_set_ttl(ipv4_hdr_t * ipv4, uint8_t new_ttl);
 
+/** @brief check if an ipv4 packet is UDP and uses the port tagged for low priority_queue
+    @param ipv4 pointer to the ipv4 packet
+	@param uint16_t the low priority port number
+	@return returns true if the ipv4 packet is low priority UDP, returns false otherwise
+*/
+bool check_udp_dst_port(udp_datagram_t * udp, uint16_t port);
+
 #endif

@@ -192,7 +192,11 @@ state_t * state(void){
 	if (to_return->peers_by_callsign == NULL) {return NULL;}
 	zhashx_set_key_destructor(to_return->peers_by_callsign, (zhashx_destructor_fn*) zstr_free);
 	zhashx_set_key_duplicator(to_return->peers_by_callsign, (zhashx_duplicator_fn*) strdup);
-
+	
+	to_return->low_priority_queue = zlistx_new();
+	if (to_return->low_priority_queue == NULL) {return NULL;}
+	zlistx_set_destructor(to_return->low_priority_queue, (zlistx_destructor_fn*)zchunk_destroy);
+	
 	global_state = to_return; //set the global state object, this is ok since this is a singleton class
 	
 	return to_return;
@@ -392,12 +396,32 @@ bool state_transceiving(state_t * state){
 	return (radio_frame_active(state->receiving) || (state->transmitting != NULL));
 }
 
+static bool add_low_priority_packet(state_t * state){
+	tlv_t * p = zlistx_first(state->low_priority_queue);
+	if (p == NULL){return false;} //nothing in the queue
+	
+	if (!frame_append_tlv(state->loading_dock.frame, p)){ //unable to append anymore
+		return false;
+	} else {//otherwise packet was appended
+		zlistx_detach_cur(state->low_priority_queue);
+		//zlistx_detach (state->low_priority_queue, p);
+		return true;
+	}
+}
+
+static void add_low_priority_packets(state_t * state){
+	while(add_low_priority_packet(state)){
+		printf("added low priority packet\n");
+	}	
+}
+
 bool state_loading_dock_run(state_t * state){
 	//printf("DEBUG: state_loading_dock_run()\n");
 	if (state_loading_dock_empty(state)){return true;} //loading dock is empty, nothing to do
 	if ((zclock_mono() - state->loading_dock.created_ms) > state->loading_dock.max_idle_ms){
 		state->loading_dock.created_ms = -1; //set loading dock as empty
 		
+		add_low_priority_packets(state);
 		packed_frame_t * pf = frame_pack(&state->loading_dock.frame);		//1. pack the frame
 		if (pf == NULL) {return false;} 									////	failure to pack frame
 		radio_frame_t * rf = packed_frame_encode(&pf);						//2. encode the frame
@@ -438,6 +462,22 @@ bool state_append_loading_dock(state_t * state, uint8_t type, uint16_t len, uint
 	return true;
 }
 
+bool state_append_low_priority_packet(state_t * state, uint8_t type, uint16_t len, uint8_t * value){
+	
+	tlv_t * to_append = tlv(type, len, value);
+	if (to_append == NULL) {
+		printf("ERROR: tlv() failed\n");
+		return false;
+	}
+	
+	if(!zlistx_add_end(state->low_priority_queue, to_append)){
+		printf("state_append_low_priority_packet() failed\n");
+		return false;
+	}
+	
+	return true;
+}
+
 bool state_add_frame_to_send_queue(state_t * state, radio_frame_t * frame, bool high_priority){
 	//printf("DEBUG: state_add_frame_to_send_queue()\n");
 	if (!high_priority){
@@ -473,7 +513,7 @@ void state_abort_transceiving(state_t * state){
 	si446x_change_state(SI446X_CMD_REQUEST_DEVICE_STATE_REP_CURR_STATE_MAIN_STATE_ENUM_READY); //change to ready state
 }
 
-#define TXRX_TIMEOUT_MS 2000 ///<timeout value used to detect when the program is in a locked state
+#define TXRX_TIMEOUT_MS 4000 ///<timeout value used to detect when the program is in a locked state
 
 #define RSSI_THRESHHOLD 10 ///<only transmit if AVG RSSI plus this is lower than this
 
@@ -807,6 +847,9 @@ static bool state_read_config_settings(state_t * state, char * path){
 	if (!jsmn_json_load_array(tokens, num_toks, json_str, "si4463_load_order", state->si4463_load_order)){ //load the defaults
 		zlistx_add_end(state->si4463_load_order, "RF_POWER_UP");
 	}
+	val = jsmn_json_lookup(tokens, num_toks, json_str, "low_priority_udp_port");
+	state->low_priority_udp_port			= (val != NULL) ? strtol(val, NULL, 10) : LOW_PRIORITY_UDP_PORT;
+	
 	if (read_failed == true){
 		char cmd[256];
 		snprintf(cmd, sizeof(cmd), "cp %s %s", DEFAULT_CONFIG_PATH, CONFIG_PATH);
@@ -828,17 +871,37 @@ void state_destroy(state_t ** to_destroy){
 		serial_close((*to_destroy)->slip);
 	}
 	
-	zlistx_destroy(&(*to_destroy)->si4463_load_order);												   
+	zlistx_destroy(&(*to_destroy)->si4463_load_order);
 	zlistx_destroy(&(*to_destroy)->peers);
 	zlistx_destroy(&(*to_destroy)->link_peers);
 	zhashx_destroy(&(*to_destroy)->peers_by_ip);
 	zhashx_destroy(&(*to_destroy)->peers_by_mac);
 	zhashx_destroy(&(*to_destroy)->peers_by_callsign);
-	zhashx_destroy(&(*to_destroy)->radio_config);										  
+	zhashx_destroy(&(*to_destroy)->radio_config);	
+	zlistx_destroy(&(*to_destroy)->low_priority_queue);
 	
 	free(*to_destroy); //free the state_t from memory
 	*to_destroy = NULL; //set the state_t* to be a NULL pointer
 	return;	
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////// uint16_ptr_t definition start///////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+uint16_t * uint16_ptr(uint16_t val){
+	uint16_t * to_return = (uint16_t*)malloc(sizeof(uint16_t));
+	*to_return = val;
+	return to_return;
+}
+
+void uint16_ptr_destroy(uint16_t ** to_destroy){
+#ifdef OBJECT_DESTROY_DEBUG
+    printf("destroying uint16_t at 0x%p\n", (void*)*to_destroy);
+#endif
+	free(*to_destroy);
+	*to_destroy = NULL;
+	return;		
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -914,7 +977,6 @@ frame_t * frame(char * callsign, uint8_t opt1, uint8_t * mac){
 }
 
 bool frame_append(frame_t * frame, uint8_t type, uint16_t len, uint8_t * value){
-	
 	if ((frame_len(frame) + tlv_len(len)) > FRAME_LEN_MAX){ //cannot append value, frame would be too large
 		return false;
 	}
@@ -930,6 +992,18 @@ bool frame_append(frame_t * frame, uint8_t type, uint16_t len, uint8_t * value){
 		return false;
 	}	
 	return true;
+}
+
+bool frame_append_tlv(frame_t * frame, tlv_t * to_append){
+	if ((frame_len(frame) + to_append->len) > FRAME_LEN_MAX){ //cannot append value, frame would be too large
+		return false;
+	}
+	
+	if (zlistx_add_end(frame->payload, to_append) == NULL){
+		printf("ERROR: zlistx_add_end() failed\n");
+		return false;
+	}	
+	return true;	
 }
 
 int frame_len(frame_t * frame){

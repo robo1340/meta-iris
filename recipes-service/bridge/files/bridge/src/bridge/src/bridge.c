@@ -89,6 +89,7 @@ bridge_t * bridge_create(bool no_slip, bool no_gpio_events, bool no_incoming_soc
 bool bridge_slip_run(bridge_t * b){
 	static zchunk_t * packet;
 	static uint32_t len;
+	static bool low_priority;
 	bool success;
 	
 	if (b->my_state->slip > 0){
@@ -105,11 +106,21 @@ bool bridge_slip_run(bridge_t * b){
 			ipv4_print((ipv4_hdr_t*)zchunk_data(packet));
 			
 			ipv4_set_ttl((ipv4_hdr_t*)zchunk_data(packet), b->my_state->ttl_set);
-			len = sizeof(buf);
+			len = sizeof(buf); //compress sets len so set it now
+			low_priority = check_udp_dst_port((udp_datagram_t*)zchunk_data(packet), b->my_state->low_priority_udp_port);
+			//printf("low priority %u\n", low_priority);
 			if ((b->my_state->compress_ipv4) && (compress(buf, (uLongf*)&len, zchunk_data(packet), zchunk_size(packet)) == Z_OK )){
-				success = state_append_loading_dock(b->my_state, TYPE_IPV4_COMPRESSED, len, buf);
+				if (!low_priority){
+					success = state_append_loading_dock(b->my_state, TYPE_IPV4_COMPRESSED, len, buf);
+				} else {
+					success = state_append_low_priority_packet(b->my_state, TYPE_IPV4_COMPRESSED, len, buf);
+				}
 			} else {
-				success = state_append_loading_dock(b->my_state, TYPE_IPV4, zchunk_size(packet), zchunk_data(packet));
+				if (!low_priority){
+					success = state_append_loading_dock(b->my_state, TYPE_IPV4, zchunk_size(packet), zchunk_data(packet));
+				} else {
+					success = state_append_low_priority_packet(b->my_state, TYPE_IPV4_COMPRESSED, len, buf);
+				}
 			}
 			//printArrHex(zchunk_data(packet), zchunk_size(packet));
 			zchunk_destroy(&packet);

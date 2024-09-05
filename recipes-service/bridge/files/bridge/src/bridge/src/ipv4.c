@@ -150,3 +150,9 @@ bool ipv4_filter_misc(ipv4_hdr_t * ipv4){
 	
 	return true;
 }
+
+bool check_udp_dst_port(udp_datagram_t * udp, uint16_t port){
+	if (udp->protocol != UDP_PROTO) {return false;}
+	//printf("%u %u\n", ntohs(udp->src_port), ntohs(udp->dst_port)); 
+	return (ntohs(udp->dst_port) == port);
+}

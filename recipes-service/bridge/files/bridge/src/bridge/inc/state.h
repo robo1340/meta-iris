@@ -37,6 +37,7 @@
 #define DEFAULT_SLIP_MTU					  500   ///<MTU for the slip interface
 #define DEFAULT_WIFI_SSID					  "irisnode"   ///<default SSID for the wifi AP
 #define DEFAULT_WIFI_PASSPHRASE				  "irisnode"   ///<default passphrase for the wifi AP
+#define LOW_PRIORITY_UDP_PORT				  1337 ///<UDP port on which send datagrams will be treated as a low priority packet
 
 //global state settings
 #define MAX_PACKET_LEN 747 ///<the maximum length of packet that can be transmitted over the radio
@@ -110,7 +111,8 @@ typedef struct timed_frame_DEFINITION {
 	"compress_ipv4"					: true,	 #set to true to compress ipv4 packets
 	"slip_mtu"						: 500,	#MTU for the slip interface 
 	"wifi_ssid"						: "irisnode",
-	"wifi_passphrase"				: "irisnode"
+	"wifi_passphrase"				: "irisnode",
+	"low_priority_udp_port"			: 1337
 }
 */
 
@@ -147,6 +149,7 @@ struct state_t_DEFINITION {
 	char wifi_ssid[64];					///<wifi AP SSID
 	char wifi_passphrase[64];			///<wifi AP passphrase
 	zlistx_t * si4463_load_order; ///<a list of si4463 config settings to load first
+	uint16_t low_priority_udp_port;     ///<UDP port on which low priority datagrams are sent
 
 	//settings derives from config contents
 	uint8_t tx_backoff_min_ms;
@@ -173,6 +176,8 @@ struct state_t_DEFINITION {
 	zhashx_t * peers_by_ip;			///<hash table of peers where the key is IP string
 	zhashx_t * peers_by_mac;		///<hash table of peers where the key is MAC string
 	zhashx_t * peers_by_callsign;	///<hash table of peers where the key is callsign string
+	
+	zlistx_t * low_priority_queue;  ///<a list of zchunk_t that are low priority packets to send
 	
 	task_timer_t beacon_transmit;
 	task_timer_t transmit_send_queue;
@@ -219,6 +224,7 @@ bool state_transceiving(state_t * state);
 bool state_loading_dock_run(state_t * state); 
 #define state_loading_dock_empty(state) (state->loading_dock.created_ms < 0)
 bool state_append_loading_dock(state_t * state, uint8_t type, uint16_t len, uint8_t * value);
+bool state_append_low_priority_packet(state_t * state, uint8_t type, uint16_t len, uint8_t * value);
 bool state_add_frame_to_send_queue(state_t * state, radio_frame_t * frame, bool high_priority);
 bool state_peek_next_frame_to_transmit(state_t * state);
 radio_frame_t * state_get_next_frame_to_transmit(state_t * state);
@@ -233,6 +239,13 @@ bool state_write_mac(state_t * state, char * path, char * mac_str);
 bool state_read_callsign(state_t * state, char * path);
 bool state_write_callsign(state_t * state, char * path, char * callsign);
 void state_destroy(state_t ** to_destroy);
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////// uint16_ptr_t definition start///////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+uint16_t * uint16_ptr(uint16_t val);
+void uint16_ptr_destroy(uint16_t ** to_destroy);
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// tlv_t definition start///////////////////////////////////
@@ -294,6 +307,7 @@ frame_t * frame(char * callsign, uint8_t opt1, uint8_t * mac);
  *  @return returns true when data was added to the frame, returns false when the frame is full
  */
 bool frame_append(frame_t * frame, uint8_t type, uint16_t len, uint8_t * value);
+bool frame_append_tlv(frame_t * frame, tlv_t * to_append);
 
 /** @brief get the length of the frame if it was packed, return -1 on error
  */

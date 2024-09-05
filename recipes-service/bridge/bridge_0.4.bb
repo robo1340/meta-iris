@@ -2,7 +2,7 @@ DESCRIPTION = "Recipe to build and install the slip ip radio bridge "
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 LICENSE="LICENSE"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2ba5c6e4c336f3d9e4d191d4a74fb91c"
-
+RM_WORK_EXCLUDE += "${PN}"
 # project name
 prj="bridge"
 
@@ -22,7 +22,7 @@ SRC_URI +="file://${prj}.service"
 SRC_URI +="file://logrotate.d"
 SRC_URI +="file://LICENSE"
 
-SYSTEMD_AUTO_ENABLE:${PN} = "disable"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 SYSTEMD_SERVICE:${PN} = "${prj}.service"
 
 S = "${WORKDIR}"
@@ -34,7 +34,16 @@ do_compile(){
 
 	#cross-compile proxy binary	
 	cd ${WORKDIR}/${prj}/src/prj-${prj}
-	#cd ${S}/${prj}/src/prj-${prj}
+	make clean
+	make	
+	cd -
+	
+	cd ${WORKDIR}/${prj}/src/prj-zmq-send
+	make clean
+	make	
+	cd -
+	
+	cd ${WORKDIR}/${prj}/src/prj-zmq-recv
 	make clean
 	make	
 	cd -
@@ -52,8 +61,23 @@ do_install(){
   #navigate to the working directory where everything was compiled and install
   #all the files and subdirectories in the proxy directory  
 	cd ${WORKDIR}
-
 	find ${prj} -type f -exec install -Dm 644 "{}" "${D}/{}" \;
+       
+	install -d ${D}/bridge/conf/si4463/other
+	install -d ${D}/bridge/conf/si4463/modem
+        cd -
+      
+	rm ${D}/bridge/conf/radio_*.json
+ 
+        cd ${D}/bridge/conf/si4463/modem 
+        ln -s ../all/wds_generated/radio_config_Si4463_430M_50kbps.h  1000_modem_config.h      
+        cd -
+        cd ${D}/bridge/conf/si4463/other
+ 	ln -s ../all/general/default.h 9000_general.h
+ 	ln -s ../all/packet/default.h 9000_packet.h
+ 	ln -s ../all/preamble/default.h 9000_preamble.h
+	cd -
+
 	
 	#install the service file to /etc/systemd/system
 	install -Dm 644 ${prj}.service ${D}${service_dir}/${prj}.service
@@ -63,6 +87,14 @@ do_install(){
 
 	#install the compiled binary
         install -Dm 755 ${prj}/src/prj-${prj}/test ${D}/${prj}/src/prj-${prj}/test	
+        install -Dm 755 ${prj}/src/prj-zmq-send/test ${D}/${prj}/src/prj-zmq-send/test	
+        install -Dm 755 ${prj}/src/prj-zmq-recv/test ${D}/${prj}/src/prj-zmq-recv/test	
+        
+	install -Dm 755 ${prj}/scripts/virtual_tty_setup.sh ${D}/${prj}/scripts/virtual_tty_setup.sh	
+	install -Dm 755 ${prj}/scripts/kill_virtual_tty.sh ${D}/${prj}/scripts/kill_virtual_tty.sh	
+	install -Dm 755 ${prj}/scripts/sync_radio_conf.sh ${D}/${prj}/scripts/sync_radio_conf.sh	
+	install -Dm 755 ${prj}/scripts/sync_scripts.sh ${D}/${prj}/scripts/sync_scripts.sh	
+	install -Dm 755 ${prj}/scripts/sync_src.sh ${D}/${prj}/scripts/sync_src.sh	
 	cd -
 	
 }

@@ -1,0 +1,18 @@
+[Unit]
+Description=gps receiver service
+After=network.target var-volatile.mount
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/root
+ExecStart=/usr/bin/python3 /home/root/gps.py
+#ExecStartPre=/bin/sleep 11
+Restart=always
+RestartSec=20
+StandardOutput=append:/var/log/gps.log
+StandardError=append:/var/log/gps.log
+SyslogIdentifier=%n
+

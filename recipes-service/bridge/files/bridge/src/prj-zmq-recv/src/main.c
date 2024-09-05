@@ -33,7 +33,8 @@ static bool handle_msg(zmq_msg_t * msg, void * pub){
 	static char group[32];
 	static char cmd[2000];
         if ((strcmp(zmq_msg_group(msg),"location")!=0)&&
-            (strcmp(zmq_msg_group(msg),"newMessage")!=0))		
+            (strcmp(zmq_msg_group(msg),"newMessage")!=0)&&
+			(strcmp(zmq_msg_group(msg),"waypoint")!=0))		
 	{	
 		snprintf(cmd, sizeof(cmd), "wall -n \""HEADER"message received on chat group \"%s\"\n%s\"", zmq_msg_group(msg), (char*)zmq_msg_data(msg));
 		system(cmd);
@@ -62,6 +63,7 @@ int main(int argc, char *argv[]){
 	zmq_join(dish, BROADCAST_GROUP);
 	zmq_join(dish, "location");
 	zmq_join(dish, "newMessage");
+	zmq_join(dish, "waypoint");
 	zmq_join(dish, "test");
 	zmq_join(dish, "group1");
 	zmq_join(dish, "group2");

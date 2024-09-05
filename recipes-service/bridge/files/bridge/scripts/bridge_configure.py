@@ -61,7 +61,7 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description = 'configure the bridge interface')
 	parser.add_argument('-lm',   '--list-modem-configs', action='store_true', help='list available modem configs')
 	parser.add_argument('-sm', '--set-modem-config', type=str, default='', help='set the modem config by name')
-	parser.add_argument('-nr',   '--no-restart', action='store_false', help='do not restart the bridge service after making configuration changes')
+	parser.add_argument('-nr',   '--no-restart', action='store_true', help='do not restart the bridge service after making configuration changes')
 	parser.add_argument('-mcln', '--modem-config-link-name', type=str, default='1000_modem_config.h', help='set the modem config link name')
 	args = parser.parse_args().__dict__
 	log.basicConfig(level=log.DEBUG)

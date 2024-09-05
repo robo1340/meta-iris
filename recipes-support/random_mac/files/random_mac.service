@@ -1,0 +1,9 @@
+[Unit]
+Description=set a random mac for the ethernet device
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/random_mac.py
