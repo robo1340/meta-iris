@@ -19,7 +19,7 @@
 #include <czmq.h>
 #include <zlib.h>
 
-#include "radio_config.h"
+//#include "radio_config.h"
 
 #include "si446x_api_lib.h"
 #include "si446x_patch.h" 

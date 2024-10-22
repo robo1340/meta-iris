@@ -11,14 +11,14 @@ prj="node"
 inherit systemd
 
 # Create dependency to library packages
-RDEPENDS:${PN} += " bridge "
+RDEPENDS:${PN} += " bridge tiles "
+PACKAGES="${PN}"
 
 #src uri's for the source code and .service conf file
 SRC_URI +="file://${prj}.service"
 SRC_URI +="file://logrotate.d"
 SRC_URI +="file://LICENSE"
 SRC_URI +="file://nodejs"
-SRC_URI +="file://tiles"
 
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 SYSTEMD_SERVICE:${PN} = "${prj}.service"
@@ -33,13 +33,10 @@ service_dir = "/etc/systemd/system"
 #add dir to the package files variable
 FILES:${PN} += "${service_dir}/${prj}.service "
 FILES:${PN} += "/home/nodejs/*"
-FILES:${PN} += "/home/tiles/*"
 
 do_install(){ 
-	cd ${WORKDIR}
-        
+	cd ${WORKDIR} 
         find nodejs -type f -exec install -Dm 644 "{}" "${D}/home/{}" \;	
-        find tiles -type f -exec install -Dm 644 "{}" "${D}/home/{}" \;	        
         cd -
  
         cd ${D}/home/nodejs 

@@ -1,0 +1,1 @@
+PREFERRED_VERSION_python-pynmea2 = "1.19.0"

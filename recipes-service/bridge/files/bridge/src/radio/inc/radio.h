@@ -5,7 +5,6 @@
 #include <stdbool.h>
 
 #include "compiler_defs.h"
-#include "radio_config.h"
 #include "si446x_api_lib.h"
 #include "si446x_patch.h"
 #include "si446x_cmd.h"

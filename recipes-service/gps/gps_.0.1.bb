@@ -10,6 +10,7 @@ inherit systemd
 
 # Create dependency to library packages
 RDEPENDS:${PN} += " bridge "
+RDEPENDS:${PN} += " python-pynmea2 "
 
 #src uri's for the source code and .service conf file
 SRC_URI +="file://${prj}.service"
@@ -29,7 +30,7 @@ service_dir = "/etc/systemd/system"
 
 #add dir to the package files variable
 FILES:${PN} += "${service_dir}/* "
-FILES:${PN} += "/home/root/${prj}.py"
+FILES:${PN} += "/root/${prj}.py"
 
 do_install(){ 
 	cd ${WORKDIR}
@@ -37,7 +38,7 @@ do_install(){
 	#install the service file to /etc/systemd/system
 	install -Dm 644 ${prj}.service ${D}${service_dir}/${prj}.service
 	
-        install -Dm 644 ${prj}.py ${D}/home/root/${prj}.py
+        install -Dm 644 ${prj}.py ${D}/root/${prj}.py
 
 	#install the logrotate configuration file
 	install -Dm 644 logrotate.d/${prj} ${D}/etc/logrotate.d/${prj}

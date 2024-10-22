@@ -76,6 +76,18 @@ function clear_waypoints_ui() {
 	return false;
 }
 
+var selected_radio_config = null;
+function load_radio_config() {
+	if (selected_radio_config === null){return;} //do nothing
+	messenger.postMessage(["select_radio_config",selected_radio_config]);
+	lbl = document.getElementById('current_radio_config');
+	lbl.innerHTML = "Current: LOADING";
+	
+	setTimeout(function(){
+		get_current_radio_config()	
+	}, 2500);
+}
+
 function setup_button_callbacks(){
 
 	document.getElementById("send_button").onclick = get_message_to_send;
@@ -84,8 +96,10 @@ function setup_button_callbacks(){
 	document.getElementById("clear_messages").onclick = clear_messages_ui;
 	document.getElementById("clear_users").onclick = clear_users_ui;
 	document.getElementById("clear_waypoints").onclick = clear_waypoints_ui;
+	document.getElementById("load_radio_config").onclick = load_radio_config;
 	document.getElementById("set_username").onclick = set_username;
 	document.getElementById("do_nothing").onclick = function() {return false;};
+	document.getElementById("radio_configs").onclick = load_radio_configs;
 	
 	/*
 	$(document).keypress(function(event) {
@@ -464,6 +478,70 @@ function set_username(){
 	return false;
 }
 
+var radio_configs = null;
+
+function load_radio_configs(){
+	console.log("load_radio_configs");
+	if (radio_configs === null){
+		messenger.postMessage(["get_radio_configs",{}]);
+	} else {
+		var rs = document.getElementById("radio_configs");
+		selected_radio_config = rs.options[rs.selectedIndex].value;
+		//console.log(selected);
+	}
+}
+
+function get_current_radio_config(){
+	console.log("get_current_radio_config")
+	messenger.postMessage(["get_current_radio_config",{}]);
+}
+
+function radio_config_path_extract(path){
+	const freq_re 	 = new RegExp("(\\d+)M", "gm");
+	const bitrate_re = new RegExp("(\\d+)kbps", "gm");
+	var freq = freq_re.exec(path);
+	var bitrate = bitrate_re.exec(path);
+	if ((freq === null) || (bitrate === null)){
+		console.log("throwing out " + path);
+		return null;
+	}
+	return {"freq":freq[1],"bitrate":bitrate[1],"path":path};
+}
+
+function radio_configs_received(config_paths){
+	radio_configs = []
+	console.log(config_paths);
+	
+	for (i in config_paths){
+		var c = radio_config_path_extract(config_paths[i]);
+		if (c === null) {continue;}
+		radio_configs.push(c);
+	}
+	if (radio_configs.length == 0){
+		radio_configs = null;
+		return;
+	}
+	console.log(radio_configs);
+	
+	for (i in radio_configs){ //generate HTML objects now
+		rs = document.getElementById('radio_configs');
+		rs.add(new Option(radio_configs[i]["freq"] + "M " + radio_configs[i]["bitrate"] + "kbps", radio_configs[i]["path"]));
+	}
+}
+
+function current_radio_config_received(current_config){
+	console.log("current_radio_config_received");
+	console.log(current_config);
+	var c = radio_config_path_extract(current_config);
+	lbl = document.getElementById('current_radio_config');
+	if (c === null){
+		lbl.innerHTML = "Current: None Loaded!";
+	} else {
+		lbl.innerHTML = "Current: " + c["freq"] + "M " + c["bitrate"] + "kbps";
+	}
+	
+}
+
 function retrieve_username(){
 	my_username = Cookies.get('username');
 	if (my_username === undefined){
@@ -502,7 +580,9 @@ $(document).ready(function() {
 handlers = {
 	"newMessage" : other_user_message_cb,
 	"location"   : other_user_location_cb,
-	"waypoint"   : other_user_waypoint_cb
+	"waypoint"   : other_user_waypoint_cb,
+	"get_radio_configs" : radio_configs_received,
+	"get_current_radio_config" : current_radio_config_received
 };
 
 var messenger = new Worker("message_worker.js");
@@ -690,6 +770,7 @@ function user_accepted() {
 	
 	setup_waypoints(map);
 	setup_button_callbacks();
+	get_current_radio_config();
 	
 	///end of map setup///////////////////////////
 	

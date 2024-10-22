@@ -7,8 +7,8 @@ WantedBy=multi-user.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/root
-ExecStart=/usr/bin/python3 /home/root/gps.py
+WorkingDirectory=/root
+ExecStart=/usr/bin/python3 /root/gps.py
 #ExecStartPre=/bin/sleep 11
 Restart=always
 RestartSec=20

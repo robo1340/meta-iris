@@ -26,29 +26,26 @@ SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 SYSTEMD_SERVICE:${PN} = "${prj}.service"
 
 S = "${WORKDIR}"
+PACKAGES = "${PN}"
 
 #skip this part of the qa check
 do_package_qa[noexec] = "1"
 
-do_compile(){
-
-	#cross-compile proxy binary	
-	cd ${WORKDIR}/${prj}/src/prj-${prj}
-	make clean
-	make	
-	cd -
-	
-	cd ${WORKDIR}/${prj}/src/prj-zmq-send
-	make clean
-	make	
-	cd -
-	
-	cd ${WORKDIR}/${prj}/src/prj-zmq-recv
-	make clean
-	make	
-	cd -
-
-}
+#do_compile(){
+#	#cross-compile proxy binary	
+#	#cd ${WORKDIR}/${prj}/src/prj-${prj}
+#	#make clean
+#	#make	
+#	#cd -	
+#	#cd ${WORKDIR}/${prj}/src/prj-zmq-send
+#	#make clean
+#	#make	
+#	#cd -	
+#	#cd ${WORKDIR}/${prj}/src/prj-zmq-recv
+#	#make clean
+#	#make	
+#	#cd -
+#}
 
 service_dir = "/etc/systemd/system"
 
@@ -78,6 +75,9 @@ do_install(){
  	ln -s ../all/preamble/default.h 9000_preamble.h
 	cd -
 
+	cd ${D}/bridge/src/radio/inc
+	ln -s si446x_patch_revC.h si446x_patch.h
+	cd -
 	
 	#install the service file to /etc/systemd/system
 	install -Dm 644 ${prj}.service ${D}${service_dir}/${prj}.service

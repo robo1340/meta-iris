@@ -20,9 +20,7 @@
 #include "radio.h"
 #include "gpio.h"
 
-//uint8_t Radio_Configuration_Data_Array[] = RADIO_CONFIGURATION_DATA_ARRAY; //from radio_config.h
-//radio_configuration_t RadioConfiguration = RADIO_CONFIGURATION_DATA; //from radio_config.h
-//radio_configuration_t * radio_config_ptr = &RadioConfiguration;
+#define RADIO_CONFIGURATION_DATA_RADIO_DELAY_CNT_AFTER_RESET       0xF000
 
 static void radio_power_up(void){
 	printf("INFO: radio_power_up()\n");

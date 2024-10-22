@@ -1,51 +1,43 @@
 
 #pyserial library is required for working
 import serial
+import sys
+from serial.serialutil import SerialException
+import pynmea2
 import json
 import time
 import os
+import logging as log
+from logging.handlers import RotatingFileHandler
 
 mport = '/dev/ttySTM1'                     #choose your com port on which you connected your neo 6m GPS
 GPS_PATH = '/tmp/gps.json'
 DELETION_TIME_S = 30
 
-def decode(coord):
-	l = list(coord)
-	for i in range(0,len(l)-1):
-			if l[i] == "." :
-					break
-	base = l[0:i-2]
-	degi = l[i-2:i]
-	degd = l[i+1:]
-	#print(base,"   ",degi,"   ",degd)
-	baseint = int("".join(base))
-	degiint = int("".join(degi))
-	degdint = float("".join(degd))
-	degdint = degdint / (10**len(degd))
-	degs = degiint + degdint
-	full = float(baseint) + (degs/60)
-	#print(full)
-	return full
+def configure_logging(verbose=True):
+	lvl = log.DEBUG if (verbose) else log.INFO
+	handler = RotatingFileHandler('/var/log/gps.log', maxBytes=10*10000, backupCount=5)
+	log.basicConfig(handlers=(handler,), level=lvl)
 
-def parseGPS(data):
-	#print(data)
+def configure_logging_commandline(verbose=True):
+	lvl = log.DEBUG if (verbose) else log.INFO
+	log.basicConfig(level=lvl)
+
+def parseGPS(s):
+	s = s.decode()
+	#print(s)
+	#return
+	if 'GGA' in s:
+	#if 'GLL' in s:
+		msg = pynmea2.parse(s)
+		log.debug("Timestamp: %s -- Lat: %s %s %s -- Lon: %s %s %s -- Altitude: %s %s" % (msg.timestamp,msg.latitude,msg.lat,msg.lat_dir,msg.longitude,msg.lon,msg.lon_dir,msg.altitude,msg.altitude_units))
+		return (msg.timestamp, msg.latitude, msg.longitude, msg.altitude, msg.altitude_units, msg.gps_qual, msg.num_sats)
+
+def safe_parseGPS(s):
 	try:
-		data = data.decode()
+		return parseGPS(s)
 	except BaseException as ex:
 		print(ex)
-		return None
-	
-	if data.startswith("$GPGGA"):
-		s = data.split(",")
-		if s[7] == '0' or s[7]=='00':
-			#print ("no satellite data available")
-			return None
-		time = s[1][0:2] + ":" + s[1][2:4] + ":" + s[1][4:6]
-		#print("-----------")
-		lat = decode(s[2])
-		lon = decode(s[4])
-		return  [lat,lon]
-	else:
 		return None
 
 ser = serial.Serial(mport,9600,timeout = 2)
@@ -62,15 +54,34 @@ def write(path, contents):
 		print(ex)
 
 if __name__=="__main__":
+	if ((len(sys.argv) > 1) and (sys.argv[1] == '-F')): #log everything to stdout
+		configure_logging_commandline(verbose=True)
+	else:
+		configure_logging(verbose=False)
+	
+	log.info('GPS Service Starting')
 	delete(GPS_PATH)
 	last_update = -1
-	try:
-		while True:
-			coords = parseGPS(ser.readline())
-			if (coords is not None):
-				last_update = time.monotonic()
-				write(GPS_PATH, coords)
-			elif ((time.monotonic() - last_update) > DELETION_TIME_S):
-				delete(GPS_PATH)
-	except KeyboardInterrupt:
-		print("stopping")
+	
+	while True:
+		try:
+			while True:
+				rc = safe_parseGPS(ser.readline())
+				if (rc is not None):
+					(timestamp,lat,lon,alt,alt_units,gps_qual,num_sats) = rc
+					if (gps_qual != 0):
+						if (last_update < 0):
+							log.info('Lock: %s' % (rc,))
+						last_update = time.monotonic()
+						write(GPS_PATH, [lat,lon])
+				elif (last_update > 0) and ((time.monotonic() - last_update) > DELETION_TIME_S):
+					delete(GPS_PATH)
+					last_update = -1
+					log.info('Lock Lost')
+		except KeyboardInterrupt:
+			print("stopping")
+			break
+		except SerialException as ex:
+			print(ex)
+		#except BaseException as ex:
+		#	print(ex)
