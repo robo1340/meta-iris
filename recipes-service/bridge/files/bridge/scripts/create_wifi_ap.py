@@ -94,19 +94,19 @@ def create_dnsmasq_conf(lines, path='/tmp/dnsmasq.conf'):
 	
 	current_lines = [] #the lines currently in dnsmasq.conf
 	
-	try:
-		with open(path, 'r') as f:
-			current_lines = f.readlines()
-	except BaseException: #this will happen if dnsmasq does not yet exist
-		pass
-	current_lines = [l.rstrip('\r\n') for l in current_lines] #strip newline character away
-	
-	for new_line in lines: #iterate over the lines to be added to make sure they aren't already in the conf file
-		if (new_line not in current_lines):
-			current_lines.append(new_line)
+	#try:
+	#	with open(path, 'r') as f:
+	#		current_lines = f.readlines()
+	#except BaseException: #this will happen if dnsmasq does not yet exist
+	#	pass
+	#current_lines = [l.rstrip('\r\n') for l in current_lines] #strip newline character away
+	#
+	#for new_line in lines: #iterate over the lines to be added to make sure they aren't already in the conf file
+	#	if (new_line not in current_lines):
+	#		current_lines.append(new_line)
 	
 	with open(path, 'w') as conf_file:
-		for line in current_lines:
+		for line in lines:
 			if (line != ''):
 				conf_file.write(line + '\n')
 
@@ -166,8 +166,9 @@ if __name__ == "__main__":
 	create_hostapd_conf(attributes=hostapd_conf, path=conf_path)
 	
 	dnsmasq_conf = []
-	dnsmasq_conf.append("interface=%s" % (config['interface'],))
-	dnsmasq_conf.append("dhcp-range=%s.%s.%s.2,%s.%s.%s.30,255.255.255.0,12h" % (ips[0],ips[1],ips[2],ips[0],ips[1],ips[2]))
+	dnsmasq_conf.append("interface=br0")
+	#dnsmasq_conf.append("interface=%s" % (config['interface'],))
+	dnsmasq_conf.append("dhcp-range=%s.%s.%s.5,%s.%s.%s.30,255.255.255.0,12h" % (ips[0],ips[1],ips[2],ips[0],ips[1],ips[2]))
 	dnsmasq_conf.append("dhcp-option=3,%s" % (config['ip'],))
 	dnsmasq_conf.append("dhcp-option=6,%s" % (config['ip'],))
 	dnsmasq_conf.append("server=8.8.8.8")
@@ -178,6 +179,16 @@ if __name__ == "__main__":
 	os.system('systemctl restart dnsmasq')
 	
 	os.system('hostapd -B %s' % (conf_path,))
+	
+	#configure the bridge and add end1 and wlu1 to the bridge
+	os.system('ip link add name br0 type bridge')
+	os.system('ip addr flush dev end1')
+	os.system('ip addr flush dev br0')
+	os.system('ip addr add dev br0 %s.%s.%s.%d/24' % (ips[0],ips[1],ips[2],int(ips[3])+2))
+	os.system('ip addr add dev end1 %s.%s.%s.%d/24' % (ips[0],ips[1],ips[2],int(ips[3])+1))
+	os.system('ip link set end1 master br0')
+	os.system('ip link set %s master br0' % (config['interface'],))
+	os.system('ip link set dev br0 up')
 	
 	os.system('ip addr flush dev %s > /dev/null 2>&1' % (config['interface'],))
 	os.system('ip addr add %s/24 dev %s > /dev/null 2>&1' % (config['ip'], config['interface']))

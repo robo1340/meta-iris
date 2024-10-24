@@ -47,6 +47,8 @@ do_package_qa[noexec] = "1"
 #	#cd -
 #}
 
+INSANE_SKIP:${PN}:append = "already-stripped"
+
 service_dir = "/etc/systemd/system"
 
 #add dir to the package files variable

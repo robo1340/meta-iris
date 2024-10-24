@@ -1,1 +1,0 @@
-radio_configs/radio_config_433M_20kpbs.h

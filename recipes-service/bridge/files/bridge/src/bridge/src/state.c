@@ -116,7 +116,8 @@ static int slip_init(state_t * state, char * ip){
 
 bool state_restart_wifi_ap(state_t * state){
 	char str[256];
-	snprintf(str, sizeof(str), "python3 /bridge/scripts/create_wifi_ap.py -ip %u.%u.%u.1 -s %s -p %s", state->ip[0], state->ip[1], state->ip[2], state->wifi_ssid, state->wifi_passphrase);
+	snprintf(str, sizeof(str), "python3 /bridge/scripts/create_wifi_ap.py -ip 192.168.2.1 -s %s -p %s", state->wifi_ssid, state->wifi_passphrase);
+	//snprintf(str, sizeof(str), "python3 /bridge/scripts/create_wifi_ap.py -ip %u.%u.%u.1 -s %s -p %s", state->ip[0], state->ip[1], state->ip[2], state->wifi_ssid, state->wifi_passphrase);
 	system(str);
 	return true;
 }

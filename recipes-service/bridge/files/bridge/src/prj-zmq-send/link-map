@@ -1,22 +1,22 @@
 Archive member included to satisfy reference by file (symbol)
 
-/bridge/src/prj-zmq-send/test.a(main.o)
-                              /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o (main)
+/home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+                              /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o (main)
 
 Discarded input sections
 
  .note.GNU-stack
-                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00000000        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
  .note.GNU-stack
-                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x00000000        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
  .note.GNU-stack
-                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                0x00000000        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
  .note.GNU-stack
-                0x00000000        0x0 /bridge/src/prj-zmq-send/test.a(main.o)
+                0x00000000        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
  .note.GNU-stack
-                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+                0x00000000        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtend.o
  .note.GNU-stack
-                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                0x00000000        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
 
 Memory Configuration
 
@@ -25,38 +25,38 @@ Name             Origin             Length             Attributes
 
 Linker script and memory map
 
-LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
-LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
-LOAD /bridge/src/prj-zmq-send/test.a
-LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libzmq.so
-LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libczmq.so
-LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
-LOAD /lib/libgcc_s.so
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/libzmq.so
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/libczmq.so
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/lib/libgcc_s.so
 START GROUP
-LOAD /lib/libgcc_s.so.1
-LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/lib/libgcc_s.so.1
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/libgcc.a
 END GROUP
-LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libc.so
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/libc.so
 START GROUP
-LOAD /lib/libc.so.6
-LOAD /usr/lib/libc_nonshared.a
-LOAD /lib/ld-linux-armhf.so.3
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/lib/libc.so.6
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/libc_nonshared.a
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/lib/ld-linux-armhf.so.3
 END GROUP
-LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
-LOAD /lib/libgcc_s.so
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/lib/libgcc_s.so
 START GROUP
-LOAD /lib/libgcc_s.so.1
-LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/lib/libgcc_s.so.1
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/libgcc.a
 END GROUP
-LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
-LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtend.o
+LOAD /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
                 [!provide]                        PROVIDE (__executable_start = SEGMENT_START ("text-segment", 0x10000))
                 0x00010154                        . = (SEGMENT_START ("text-segment", 0x10000) + SIZEOF_HEADERS)
 
 .interp         0x00010154       0x19
  *(.interp)
- .interp        0x00010154       0x19 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .interp        0x00010154       0x19 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
 
 .note.gnu.build-id
                 0x00010170       0x24
@@ -65,60 +65,60 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
                 0x00010170       0x24 linker stubs
 
 .note.ABI-tag   0x00010194       0x20
- .note.ABI-tag  0x00010194       0x20 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .note.ABI-tag  0x00010194       0x20 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
 
-.hash
+.hash           0x000101b4       0xa0
  *(.hash)
+ .hash          0x000101b4       0xa0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
 
-.gnu.hash       0x000101b4       0xb8
+.gnu.hash
  *(.gnu.hash)
- .gnu.hash      0x000101b4       0xb8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.dynsym         0x0001026c      0x190
+.dynsym         0x00010254      0x150
  *(.dynsym)
- .dynsym        0x0001026c      0x190 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .dynsym        0x00010254      0x150 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
 
-.dynstr         0x000103fc      0x15a
+.dynstr         0x000103a4      0x13f
  *(.dynstr)
- .dynstr        0x000103fc      0x15a /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .dynstr        0x000103a4      0x13f /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
 
-.gnu.version    0x00010556       0x32
+.gnu.version    0x000104e4       0x2a
  *(.gnu.version)
- .gnu.version   0x00010556       0x32 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .gnu.version   0x000104e4       0x2a /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
 
-.gnu.version_d  0x00010588        0x0
+.gnu.version_d  0x00010510        0x0
  *(.gnu.version_d)
  .gnu.version_d
-                0x00010588        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00010510        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
 
-.gnu.version_r  0x00010588       0x30
+.gnu.version_r  0x00010510       0x30
  *(.gnu.version_r)
  .gnu.version_r
-                0x00010588       0x30 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00010510       0x30 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
 
-.rel.dyn        0x000105b8       0x10
+.rel.dyn        0x00010540        0x8
  *(.rel.init)
  *(.rel.text .rel.text.* .rel.gnu.linkonce.t.*)
  *(.rel.fini)
  *(.rel.rodata .rel.rodata.* .rel.gnu.linkonce.r.*)
  *(.rel.data.rel.ro .rel.data.rel.ro.* .rel.gnu.linkonce.d.rel.ro.*)
  .rel.data.rel.ro
-                0x000105b8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00010540        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
  *(.rel.data .rel.data.* .rel.gnu.linkonce.d.*)
  *(.rel.tdata .rel.tdata.* .rel.gnu.linkonce.td.*)
  *(.rel.tbss .rel.tbss.* .rel.gnu.linkonce.tb.*)
  *(.rel.ctors)
  *(.rel.dtors)
  *(.rel.got)
- .rel.got       0x000105b8        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .rel.got       0x00010540        0x8 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
  *(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*)
- .rel.bss       0x000105c0        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .rel.bss       0x00010548        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
                 [!provide]                        PROVIDE (__rel_iplt_start = .)
  *(.rel.iplt)
- .rel.iplt      0x000105c8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .rel.iplt      0x00010548        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
                 [!provide]                        PROVIDE (__rel_iplt_end = .)
 
-.rela.dyn       0x000105c8        0x0
+.rela.dyn       0x00010548        0x0
  *(.rela.init)
  *(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)
  *(.rela.fini)
@@ -134,111 +134,112 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(.rela.iplt)
                 [!provide]                        PROVIDE (__rela_iplt_end = .)
 
-.rel.plt        0x000105c8       0xa8
+.rel.plt        0x00010548       0x90
  *(.rel.plt)
- .rel.plt       0x000105c8       0xa8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .rel.plt       0x00010548       0x90 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
 
 .rela.plt
  *(.rela.plt)
 
-.init           0x00010670        0xc
+.init           0x000105d8        0xc
  *(SORT_NONE(.init))
- .init          0x00010670        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
-                0x00010670                _init
- .init          0x00010678        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .init          0x000105d8        0x8 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
+                0x000105d8                _init
+ .init          0x000105e0        0x4 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
 
-.plt            0x0001067c      0x110
+.plt            0x000105e4       0xf0
  *(.plt)
- .plt           0x0001067c      0x110 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00010690                strnlen@@GLIBC_2.4
-                0x0001069c                free@@GLIBC_2.4
-                0x000106a8                puts@@GLIBC_2.4
-                0x000106b4                memset@@GLIBC_2.4
-                0x000106c0                __libc_start_main@@GLIBC_2.34
-                0x000106cc                snprintf@@GLIBC_2.4
-                0x000106d8                abort@@GLIBC_2.4
-                0x000106e4                zmq_msg_set_group
-                0x000106f0                __assert_fail@@GLIBC_2.4
-                0x000106fc                zmq_connect
-                0x00010708                zmq_msg_init_data
-                0x00010714                zmq_setsockopt
-                0x00010720                fread@@GLIBC_2.4
-                0x0001072c                zmq_sendmsg
-                0x00010738                zmq_close
-                0x00010744                malloc@@GLIBC_2.4
-                0x00010750                zmq_ctx_term
-                0x0001075c                zmq_ctx_new
-                0x00010768                strncpy@@GLIBC_2.4
-                0x00010774                zmq_socket
+ .plt           0x000105e4       0xf0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
+                0x000105fc                free@@GLIBC_2.4
+                0x00010608                puts@@GLIBC_2.4
+                0x00010614                __libc_start_main@@GLIBC_2.34
+                0x00010620                snprintf@@GLIBC_2.4
+                0x0001062c                abort@@GLIBC_2.4
+                0x00010638                zmq_msg_set_group
+                0x00010644                __assert_fail@@GLIBC_2.4
+                0x00010650                zmq_connect
+                0x0001065c                zmq_msg_init_data
+                0x00010668                zmq_setsockopt
+                0x00010674                calloc@@GLIBC_2.4
+                0x00010680                zmq_sendmsg
+                0x0001068c                zmq_close
+                0x00010698                zmq_ctx_term
+                0x000106a4                zmq_ctx_new
+                0x000106b0                strncpy@@GLIBC_2.4
+                0x000106bc                zmq_socket
 
-.iplt           0x0001078c        0x0
+.iplt           0x000106d4        0x0
  *(.iplt)
- .iplt          0x0001078c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .iplt          0x000106d4        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
 
-.text           0x0001078c      0x520
+.text           0x000106d4      0x2dc
  *(.text.unlikely .text.*_unlikely .text.unlikely.*)
  *(.text.exit .text.exit.*)
  *(.text.startup .text.startup.*)
+ .text.startup  0x000106d4      0x214 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+                0x000106d4                main
  *(.text.hot .text.hot.*)
  *(SORT_BY_NAME(.text.sorted.*))
  *(.text .stub .text.* .gnu.linkonce.t.*)
- .text          0x0001078c       0x34 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x0001078c                _start
- .text          0x000107c0       0x24 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .text          0x000107e4       0x6c /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
- .text          0x00010850      0x45c /bridge/src/prj-zmq-send/test.a(main.o)
-                0x00010850                my_free
-                0x00010978                main
- .text          0x00010cac        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
- .text          0x00010cac        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .text          0x000108e8       0x34 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
+                0x000108e8                _start
+ .text          0x0001091c       0x24 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
+ .text          0x00010940       0x6c /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .text          0x000109ac        0x4 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+                0x000109ac                my_free
+ .text          0x000109b0        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .text          0x000109b0        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
  *(.gnu.warning)
  *(.glue_7t)
- .glue_7t       0x00010cac        0x0 linker stubs
+ .glue_7t       0x000109b0        0x0 linker stubs
  *(.glue_7)
- .glue_7        0x00010cac        0x0 linker stubs
+ .glue_7        0x000109b0        0x0 linker stubs
  *(.vfp11_veneer)
- .vfp11_veneer  0x00010cac        0x0 linker stubs
+ .vfp11_veneer  0x000109b0        0x0 linker stubs
  *(.v4_bx)
- .v4_bx         0x00010cac        0x0 linker stubs
+ .v4_bx         0x000109b0        0x0 linker stubs
 
-.fini           0x00010cac        0x8
+.fini           0x000109b0        0x8
  *(SORT_NONE(.fini))
- .fini          0x00010cac        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
-                0x00010cac                _fini
- .fini          0x00010cb0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .fini          0x000109b0        0x4 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
+                0x000109b0                _fini
+ .fini          0x000109b4        0x4 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
                 [!provide]                        PROVIDE (__etext = .)
                 [!provide]                        PROVIDE (_etext = .)
                 [!provide]                        PROVIDE (etext = .)
 
-.rodata         0x00010cb4      0x264
+.rodata         0x000109b8      0x298
  *(.rodata .rodata.* .gnu.linkonce.r.*)
- .rodata.cst4   0x00010cb4        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00010cb4                _IO_stdin_used
- .rodata        0x00010cb8       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
- .rodata        0x00010d48      0x13d /bridge/src/prj-zmq-send/test.a(main.o)
- *fill*         0x00010e85        0x3 
- .rodata        0x00010e88       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .rodata.cst4   0x000109b8        0x4 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
+                0x000109b8                _IO_stdin_used
+ .rodata        0x000109bc       0x90 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .rodata.str1.4
+                0x00010a4c      0x169 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+ *fill*         0x00010bb5        0x3 
+ .rodata        0x00010bb8        0x5 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+ *fill*         0x00010bbd        0x3 
+ .rodata        0x00010bc0       0x90 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtend.o
 
 .rodata1
  *(.rodata1)
 
-.ARM.extab      0x00010f18        0x0
+.ARM.extab      0x00010c50        0x0
  *(.ARM.extab* .gnu.linkonce.armextab.*)
- .ARM.extab     0x00010f18        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .ARM.extab     0x00010c50        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
 
-.ARM.exidx      0x00010f18        0x8
+.ARM.exidx      0x00010c50        0x8
                 [!provide]                        PROVIDE (__exidx_start = .)
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
- .ARM.exidx     0x00010f18        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .ARM.exidx     0x00010c50        0x8 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
                 [!provide]                        PROVIDE (__exidx_end = .)
 
 .eh_frame_hdr
  *(.eh_frame_hdr)
  *(.eh_frame_entry .eh_frame_entry.*)
 
-.eh_frame       0x00010f20        0x4
+.eh_frame       0x00010c58        0x4
  *(.eh_frame)
- .eh_frame      0x00010f20        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .eh_frame      0x00010c58        0x4 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtend.o
  *(.eh_frame.*)
 
 .sframe
@@ -289,14 +290,14 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
                 [!provide]                        PROVIDE (__init_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
  *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
- .init_array    0x00011f00        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .init_array    0x00011f00        0x4 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
                 [!provide]                        PROVIDE (__init_array_end = .)
 
 .fini_array     0x00011f04        0x4
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
  *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
- .fini_array    0x00011f04        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .fini_array    0x00011f04        0x4 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
                 [!provide]                        PROVIDE (__fini_array_end = .)
 
 .ctors
@@ -319,76 +320,75 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 .data.rel.ro    0x00011f08        0x0
  *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
  *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
- .data.rel.ro   0x00011f08        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .data.rel.ro   0x00011f08        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
 
 .dynamic        0x00011f08       0xf8
  *(.dynamic)
- .dynamic       0x00011f08       0xf8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .dynamic       0x00011f08       0xf8 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
                 0x00011f08                _DYNAMIC
                 0x00012000                        . = DATA_SEGMENT_RELRO_END (., 0x0)
 
-.got            0x00012000       0x68
+.got            0x00012000       0x5c
  *(.got.plt)
- .got.plt       0x00012000       0x60 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .got.plt       0x00012000       0x54 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
                 0x00012000                _GLOBAL_OFFSET_TABLE_
  *(.igot.plt)
- .igot.plt      0x00012060        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .igot.plt      0x00012054        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
  *(.got)
- .got           0x00012060        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .got           0x00012054        0x8 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
  *(.igot)
 
-.data           0x00012068        0x8
+.data           0x0001205c        0x8
                 [!provide]                        PROVIDE (__data_start = .)
  *(.data .data.* .gnu.linkonce.d.*)
- .data          0x00012068        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00012068                data_start
-                0x00012068                __data_start
- .data          0x0001206c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .data          0x0001206c        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
-                0x0001206c                __dso_handle
- .data          0x00012070        0x0 /bridge/src/prj-zmq-send/test.a(main.o)
- .data          0x00012070        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
- .data          0x00012070        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .data          0x0001205c        0x4 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
+                0x0001205c                data_start
+                0x0001205c                __data_start
+ .data          0x00012060        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
+ .data          0x00012060        0x4 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                0x00012060                __dso_handle
+ .data          0x00012064        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+ .data          0x00012064        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .data          0x00012064        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
 
 .tm_clone_table
-                0x00012070        0x0
+                0x00012064        0x0
  .tm_clone_table
-                0x00012070        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                0x00012064        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
  .tm_clone_table
-                0x00012070        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+                0x00012064        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtend.o
 
 .data1
  *(.data1)
-                0x00012070                        _edata = .
+                0x00012064                        _edata = .
                 [!provide]                        PROVIDE (edata = .)
-                0x00012070                        . = .
-                0x00012070                        __bss_start = .
-                0x00012070                        __bss_start__ = .
+                0x00012064                        . = .
+                0x00012064                        __bss_start = .
+                0x00012064                        __bss_start__ = .
 
-.bss            0x00012070        0xc
+.bss            0x00012064        0x8
  *(.dynbss)
- .dynbss        0x00012070        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00012070                stdin@@GLIBC_2.4
+ .dynbss        0x00012064        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
  *(.bss .bss.* .gnu.linkonce.b.*)
- .bss           0x00012074        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
- .bss           0x00012074        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .bss           0x00012074        0x1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
- *fill*         0x00012075        0x3 
- .bss           0x00012078        0x4 /bridge/src/prj-zmq-send/test.a(main.o)
-                0x00012078                stop
- .bss           0x0001207c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
- .bss           0x0001207c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .bss           0x00012064        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
+ .bss           0x00012064        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
+ .bss           0x00012064        0x1 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ *fill*         0x00012065        0x3 
+ .bss           0x00012068        0x4 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+                0x00012068                stop
+ .bss           0x0001206c        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .bss           0x0001206c        0x0 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
  *(COMMON)
-                0x0001207c                        . = ALIGN ((. != 0x0)?0x4:0x1)
-                0x0001207c                        _bss_end__ = .
-                0x0001207c                        __bss_end__ = .
-                0x0001207c                        . = ALIGN (0x4)
-                0x0001207c                        . = SEGMENT_START ("ldata-segment", .)
-                0x0001207c                        . = ALIGN (0x4)
-                0x0001207c                        __end__ = .
-                0x0001207c                        _end = .
+                0x0001206c                        . = ALIGN ((. != 0x0)?0x4:0x1)
+                0x0001206c                        _bss_end__ = .
+                0x0001206c                        __bss_end__ = .
+                0x0001206c                        . = ALIGN (0x4)
+                0x0001206c                        . = SEGMENT_START ("ldata-segment", .)
+                0x0001206c                        . = ALIGN (0x4)
+                0x0001206c                        __end__ = .
+                0x0001206c                        _end = .
                 [!provide]                        PROVIDE (end = .)
-                0x0001207c                        . = DATA_SEGMENT_END (.)
+                0x0001206c                        . = DATA_SEGMENT_END (.)
 
 .stab
  *(.stab)
@@ -410,26 +410,26 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
 .comment        0x00000000       0x12
  *(.comment)
- .comment       0x00000000       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .comment       0x00000000       0x12 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
                                  0x39 (size before relaxing)
- .comment       0x00000012       0x13 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
- .comment       0x00000012       0x13 /bridge/src/prj-zmq-send/test.a(main.o)
- .comment       0x00000012       0x13 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .comment       0x00000012       0x13 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .comment       0x00000012       0x13 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+ .comment       0x00000012       0x13 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtend.o
 
 .ARM.attributes
                 0x00000000       0x3b
  .ARM.attributes
-                0x00000000       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00000000       0x3b /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
  .ARM.attributes
-                0x0000003b       0x2b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x0000003b       0x2b /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
  .ARM.attributes
-                0x00000066       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                0x00000066       0x3b /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
  .ARM.attributes
-                0x000000a1       0x39 /bridge/src/prj-zmq-send/test.a(main.o)
+                0x000000a1       0x3b /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
  .ARM.attributes
-                0x000000da       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+                0x000000dc       0x3b /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/arm-ostl-linux-gnueabi/12.2.0/crtend.o
  .ARM.attributes
-                0x00000115       0x2b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                0x00000117       0x2b /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
 
 .gnu.build.attributes
  *(.gnu.build.attributes .gnu.build.attributes.*)
@@ -446,46 +446,54 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000       0xa8
+.debug_aranges  0x00000000       0xd0
  *(.debug_aranges)
  .debug_aranges
-                0x00000000       0x50 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00000000       0x50 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
  .debug_aranges
-                0x00000050       0x30 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x00000050       0x30 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
  .debug_aranges
-                0x00000080       0x28 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                0x00000080       0x28 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+ .debug_aranges
+                0x000000a8       0x28 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0x564
+.debug_info     0x00000000      0xd3b
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x00000000      0x51e /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
- .debug_info    0x0000051e       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .debug_info    0x00000541       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .debug_info    0x00000000      0x51e /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
+ .debug_info    0x0000051e       0x23 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
+ .debug_info    0x00000541      0x7d7 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+ .debug_info    0x00000d18       0x23 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
 
-.debug_abbrev   0x00000000      0x198
+.debug_abbrev   0x00000000      0x40c
  *(.debug_abbrev)
- .debug_abbrev  0x00000000      0x174 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
- .debug_abbrev  0x00000174       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .debug_abbrev  0x00000186       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .debug_abbrev  0x00000000      0x174 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
+ .debug_abbrev  0x00000174       0x12 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
+ .debug_abbrev  0x00000186      0x274 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+ .debug_abbrev  0x000003fa       0x12 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
 
-.debug_line     0x00000000      0x2b9
+.debug_line     0x00000000      0x56c
  *(.debug_line .debug_line.* .debug_line_end)
- .debug_line    0x00000000      0x1f1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
- .debug_line    0x000001f1       0x70 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .debug_line    0x00000261       0x58 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .debug_line    0x00000000      0x1f1 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
+ .debug_line    0x000001f1       0x70 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
+ .debug_line    0x00000261      0x2b3 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+ .debug_line    0x00000514       0x58 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
 
-.debug_frame
+.debug_frame    0x00000000       0x4c
  *(.debug_frame)
+ .debug_frame   0x00000000       0x4c /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
 
-.debug_str      0x00000000      0x485
+.debug_str      0x00000000      0x6df
  *(.debug_str)
- .debug_str     0x00000000      0x459 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_str     0x00000000      0x459 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
                                 0x76c (size before relaxing)
- .debug_str     0x00000459       0x16 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_str     0x00000459       0x16 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
                                  0x43 (size before relaxing)
- .debug_str     0x0000046f       0x16 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .debug_str     0x0000046f      0x25a /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+                                0x33e (size before relaxing)
+ .debug_str     0x000006c9       0x16 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
                                  0x43 (size before relaxing)
 
 .debug_loc
@@ -519,16 +527,19 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
                 0x00000000       0x46
  *(.debug_line_str)
  .debug_line_str
-                0x00000000       0x38 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00000000       0x38 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crt1.o
  .debug_line_str
-                0x00000038        0x7 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x00000038        0x7 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
                                  0x37 (size before relaxing)
  .debug_line_str
-                0x0000003f        0x7 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                0x0000003f        0x7 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
                                  0x37 (size before relaxing)
 
 .debug_loclists
+                0x00000000      0x1b5
  *(.debug_loclists)
+ .debug_loclists
+                0x00000000      0x1b5 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
 
 .debug_macro
  *(.debug_macro)
@@ -537,12 +548,14 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(.debug_names)
 
 .debug_rnglists
-                0x00000000       0x38
+                0x00000000       0x52
  *(.debug_rnglists)
  .debug_rnglists
-                0x00000000       0x1f /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x00000000       0x1f /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crti.o
  .debug_rnglists
-                0x0000001f       0x19 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                0x0000001f       0x1a /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test.a(main.o)
+ .debug_rnglists
+                0x00000039       0x19 /home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/recipe-sysroot/usr/lib/crtn.o
 
 .debug_str_offsets
  *(.debug_str_offsets)
@@ -560,5 +573,5 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(.note.GNU-stack)
  *(.gnu_debuglink)
  *(.gnu.lto_*)
-OUTPUT(/bridge/src/prj-zmq-send/test elf32-littlearm)
+OUTPUT(/home/robo1340/stm32mp1/build-openstlinuxweston-stm32mp1/tmp-glibc/work/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi/bridge/0.4-r0/bridge/src/prj-zmq-send/test elf32-littlearm)
 LOAD linker stubs
