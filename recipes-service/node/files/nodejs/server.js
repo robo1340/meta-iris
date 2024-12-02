@@ -132,20 +132,45 @@ io.sockets.on("connection", function(socket) {
 		spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(msg) + "\"", "waypoint"]);
 		io.emit('waypoint', msg);
 	});	
-	socket.on('get_radio_configs', function() {
-		var files = fs.readdirSync('/bridge/conf/si4463/all/wds_generated');
+	socket.on('get_radio_configs', function(msg) {
+		var files;
+		console.log(msg)
+		if (msg['type'] == 'modem'){
+			files = fs.readdirSync('/bridge/conf/si4463/all/wds_generated');
+		}
+		else if (msg['type'] == 'general'){
+			files = fs.readdirSync('/bridge/conf/si4463/all/general');
+		}
+		else if (msg['type'] == 'packet'){
+			files = fs.readdirSync('/bridge/conf/si4463/all/packet');
+		}
+		else if (msg['type'] == 'preamble'){
+			files = fs.readdirSync('/bridge/conf/si4463/all/preamble');
+		}
+
 		console.log(files);
-		io.emit('get_radio_configs', files);
+		io.emit('get_radio_configs', {'config_paths':files,'config_type':msg['type']});
 	});
-	socket.on('get_current_radio_config', function() {
+	socket.on('get_current_radio_config', function(msg) {
 		var files = fs.readdirSync('/bridge/conf/si4463/modem/');
 		console.log(files);
 		if (files.length == 0){return;}
 		io.emit('get_current_radio_config', fs.realpathSync('/bridge/conf/si4463/modem/' + files[0]));
 	});
-	socket.on('select_radio_config', function(config) {
-		console.log('reconfiguring bridge ' + config);
-		spawn('/usr/bin/python3', ["/bridge/scripts/bridge_configure.py", "-sm", config]); 
+	socket.on('get_current_radio_config_other', function(msg) {
+		var files = fs.readdirSync('/bridge/conf/si4463/other/');
+		console.log(files);
+		//if (files.length == 0){return;}
+		var to_return = [];
+		for (i in files) {
+			to_return.push(fs.realpathSync('/bridge/conf/si4463/other/'+files[i]));
+		}
+		//console.log(to_return);
+		io.emit('get_current_radio_config_other', to_return);
+	});
+	socket.on('select_radio_config', function(msg) {
+		console.log('reconfiguring bridge ' + msg);
+		spawn('/usr/bin/python3', ["/bridge/scripts/bridge_configure.py", "-t", msg['config_type'], "-sm", msg['selected']]); 
 	});
 });
 

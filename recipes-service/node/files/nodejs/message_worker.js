@@ -8,8 +8,8 @@ function get_iso_timestamp(date) {
 
 var my_username;
 var location_beacon_ms;
-var my_location;
-var my_waypoint;
+var my_location = null;
+var my_waypoint = null;
 
 var socket;
 var started = false;
@@ -28,8 +28,9 @@ handlers = {
 	"start_waypoint_beacon" : setup_waypoint_beacon,
 	"stop_waypoint_beacon" : cancel_waypoint_beacon,
 	"username"   : function(data){my_username=data},
-	"get_radio_configs" : function(){socket.emit('get_radio_configs', {});},
-	"get_current_radio_config" : function(){socket.emit('get_current_radio_config', {});},
+	"get_radio_configs" : function(data){socket.emit('get_radio_configs', data);},
+	"get_current_radio_config" : function(data){socket.emit('get_current_radio_config', data);},
+	"get_current_radio_config_other" : function(data){socket.emit('get_current_radio_config_other', data);},
 	"select_radio_config" : function(config){socket.emit('select_radio_config', config);}
 };
 
@@ -51,6 +52,7 @@ onmessage = function(e) {
 		socket.on("waypoint", 	function(data){postMessage(['waypoint',data, get_iso_timestamp()]);});
 		socket.on("get_radio_configs", 	function(data){postMessage(['get_radio_configs',data]);});
 		socket.on("get_current_radio_config", function(data){postMessage(['get_current_radio_config',data]);});
+		socket.on("get_current_radio_config_other", function(data){postMessage(['get_current_radio_config_other',data]);});
 		setup_location_beacon();
 		return;
 	}

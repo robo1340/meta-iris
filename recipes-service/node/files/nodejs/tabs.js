@@ -77,16 +77,36 @@ function clear_waypoints_ui() {
 }
 
 var selected_radio_config = null;
-function load_radio_config() {
-	if (selected_radio_config === null){return;} //do nothing
-	messenger.postMessage(["select_radio_config",selected_radio_config]);
+function set_radio_config(config_type='modem') {
+	console.log("set_radio_config("+config_type+")");
+	var selected = '';
+	if (config_type=='modem'){
+		selected = selected_radio_config;
+	} else {
+		selected = selected_radio_config_other[config_type];
+	}
+	
+	if ((selected === null)||(selected === undefined)){return;} //do nothing
+	messenger.postMessage(["select_radio_config",{'config_type':config_type,'selected':selected}]);
 	lbl = document.getElementById('current_radio_config');
+	lbl.innerHTML = "Current: LOADING";
+	lbl = document.getElementById('current_radio_general_config');
+	lbl.innerHTML = "Current: LOADING";
+	lbl = document.getElementById('current_radio_packet_config');
+	lbl.innerHTML = "Current: LOADING";
+	lbl = document.getElementById('current_radio_preamble_config');
 	lbl.innerHTML = "Current: LOADING";
 	
 	setTimeout(function(){
 		get_current_radio_config()	
+		get_current_radio_config_other()
 	}, 2500);
 }
+
+function set_radio_modem_config() {set_radio_config(config_type='modem');};
+function set_radio_general_config() {set_radio_config(config_type='general');};
+function set_radio_packet_config() 	{set_radio_config(config_type='packet');};
+function set_radio_preamble_config(){set_radio_config(config_type='preamble');};
 
 function setup_button_callbacks(){
 
@@ -96,10 +116,17 @@ function setup_button_callbacks(){
 	document.getElementById("clear_messages").onclick = clear_messages_ui;
 	document.getElementById("clear_users").onclick = clear_users_ui;
 	document.getElementById("clear_waypoints").onclick = clear_waypoints_ui;
-	document.getElementById("load_radio_config").onclick = load_radio_config;
+	document.getElementById("set_radio_config").onclick = set_radio_modem_config;
+	document.getElementById("set_radio_general_config").onclick = set_radio_general_config;
+	document.getElementById("set_radio_packet_config").onclick = set_radio_packet_config;
+	document.getElementById("set_radio_preamble_config").onclick = set_radio_preamble_config;
 	document.getElementById("set_username").onclick = set_username;
 	document.getElementById("do_nothing").onclick = function() {return false;};
 	document.getElementById("radio_configs").onclick = load_radio_configs;
+	document.getElementById("radio_general_configs").onclick = load_radio_general_configs;
+	document.getElementById("radio_packet_configs").onclick = load_radio_packet_configs;
+	document.getElementById("radio_preamble_configs").onclick = load_radio_preamble_configs;
+	
 	
 	/*
 	$(document).keypress(function(event) {
@@ -479,11 +506,13 @@ function set_username(){
 }
 
 var radio_configs = null;
+var radio_configs_other = {};
+selected_radio_config_other = {};
 
 function load_radio_configs(){
 	console.log("load_radio_configs");
 	if (radio_configs === null){
-		messenger.postMessage(["get_radio_configs",{}]);
+		messenger.postMessage(["get_radio_configs",{'type':'modem'}]);
 	} else {
 		var rs = document.getElementById("radio_configs");
 		selected_radio_config = rs.options[rs.selectedIndex].value;
@@ -491,9 +520,28 @@ function load_radio_configs(){
 	}
 }
 
+function load_radio_other_configs(config_type){
+	console.log("load_radio_other_configs("+config_type+")");
+	if (!(config_type in radio_configs_other)) {
+		messenger.postMessage(["get_radio_configs",{'type':config_type}]);
+	} else {
+		var rs = document.getElementById("radio_"+config_type+"_configs");
+		selected_radio_config_other[config_type] = rs.options[rs.selectedIndex].value;
+	}
+}
+
+function load_radio_general_configs(){load_radio_other_configs("general");}
+function load_radio_packet_configs(){load_radio_other_configs("packet");}
+function load_radio_preamble_configs(){load_radio_other_configs("preamble");}
+
 function get_current_radio_config(){
 	console.log("get_current_radio_config")
-	messenger.postMessage(["get_current_radio_config",{}]);
+	messenger.postMessage(["get_current_radio_config",{'type':'modem'}]);
+}
+
+function get_current_radio_config_other(){
+	console.log("get_current_radio_config_other")
+	messenger.postMessage(["get_current_radio_config_other",{'type':'general'}]);
 }
 
 function radio_config_path_extract(path){
@@ -508,24 +556,44 @@ function radio_config_path_extract(path){
 	return {"freq":freq[1],"bitrate":bitrate[1],"path":path};
 }
 
-function radio_configs_received(config_paths){
-	radio_configs = []
-	console.log(config_paths);
-	
-	for (i in config_paths){
-		var c = radio_config_path_extract(config_paths[i]);
-		if (c === null) {continue;}
-		radio_configs.push(c);
-	}
-	if (radio_configs.length == 0){
-		radio_configs = null;
+function radio_configs_other_received(config_type, config_paths){
+	console.log('radio_configs_other_received('+config_type+')');
+	radio_configs_other[config_type] = config_paths
+	if (radio_configs_other[config_type].length == 0){
+		radio_configs_other[config_type] = null;
 		return;
 	}
-	console.log(radio_configs);
+	//console.log(radio_configs_other[config_type]);
+	for (i in radio_configs_other[config_type]){ //generate HTML objects now
+		rs = document.getElementById('radio_'+config_type+'_configs');
+		rs.add(new Option(radio_configs_other[config_type][i]));
+	}
+}
+
+function radio_configs_received(value){
+	config_paths = value['config_paths']
+	config_type = value['config_type']
+	console.log(config_paths);
 	
-	for (i in radio_configs){ //generate HTML objects now
-		rs = document.getElementById('radio_configs');
-		rs.add(new Option(radio_configs[i]["freq"] + "M " + radio_configs[i]["bitrate"] + "kbps", radio_configs[i]["path"]));
+	if (config_type == 'modem'){
+		radio_configs = [];
+		for (i in config_paths){
+			var c = radio_config_path_extract(config_paths[i]);
+			if (c === null) {continue;}
+			radio_configs.push(c);
+		}
+		if (radio_configs.length == 0){
+			radio_configs = null;
+			return;
+		}
+		console.log(radio_configs);
+		
+		for (i in radio_configs){ //generate HTML objects now
+			rs = document.getElementById('radio_configs');
+			rs.add(new Option(radio_configs[i]["freq"] + "M " + radio_configs[i]["bitrate"] + "kbps", radio_configs[i]["path"]));
+		}
+	} else {
+		radio_configs_other_received(config_type, config_paths)
 	}
 }
 
@@ -539,7 +607,16 @@ function current_radio_config_received(current_config){
 	} else {
 		lbl.innerHTML = "Current: " + c["freq"] + "M " + c["bitrate"] + "kbps";
 	}
-	
+}
+
+function current_radio_config_other_received(current_config){
+	console.log("current_radio_config_other_received");
+	txt = document.getElementById('current_radio_general_config')
+	txt.innerHTML = current_config[0];
+	txt = document.getElementById('current_radio_packet_config')
+	txt.innerHTML = current_config[1];
+	txt = document.getElementById('current_radio_preamble_config')
+	txt.innerHTML = current_config[2];
 }
 
 function retrieve_username(){
@@ -582,7 +659,8 @@ handlers = {
 	"location"   : other_user_location_cb,
 	"waypoint"   : other_user_waypoint_cb,
 	"get_radio_configs" : radio_configs_received,
-	"get_current_radio_config" : current_radio_config_received
+	"get_current_radio_config" : current_radio_config_received,
+	"get_current_radio_config_other" : current_radio_config_other_received
 };
 
 var messenger = new Worker("message_worker.js");
@@ -771,6 +849,7 @@ function user_accepted() {
 	setup_waypoints(map);
 	setup_button_callbacks();
 	get_current_radio_config();
+	get_current_radio_config_other()
 	
 	///end of map setup///////////////////////////
 	

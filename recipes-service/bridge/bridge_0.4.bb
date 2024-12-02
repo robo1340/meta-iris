@@ -78,7 +78,8 @@ do_install(){
 	cd -
 
 	cd ${D}/bridge/src/radio/inc
-	ln -s si446x_patch_revC.h si446x_patch.h
+        rm si446x_patch.h	
+        ln -s si446x_patch_revC.h si446x_patch.h
 	cd -
 	
 	#install the service file to /etc/systemd/system

@@ -1,0 +1,9 @@
+/var/log/wifi.log {
+	missingok	
+	rotate 4
+	size 10k
+	compress
+	notifempty
+	create 0600 root root
+}
+

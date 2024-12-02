@@ -54,34 +54,60 @@ def change_ip(slip_if, new_ip):
 	os.system('ip addr add %s dev %s' % (new_ip, slip_if))
 	os.system('ip link set dev %s up' % (slip_if,))
 
-MODEM_CONFIGS_PATH = '/bridge/conf/si4463/all/wds_generated'
-MODEM_CONFIG_SELECTED_PATH = '/bridge/conf/si4463/modem/'
+MODEM_CONFIGS_PATHS = {
+	'modem'   : '/bridge/conf/si4463/all/wds_generated',
+	'general' : '/bridge/conf/si4463/all/general',
+	'packet'  : '/bridge/conf/si4463/all/packet',
+	'preamble': '/bridge/conf/si4463/all/preamble'
+}
+
+MODEM_CONFIG_SELECTED_PATHS = {
+	'modem'   : '/bridge/conf/si4463/modem/',
+	'general' : '/bridge/conf/si4463/other',
+	'packet'  : '/bridge/conf/si4463/other',
+	'preamble': '/bridge/conf/si4463/other'
+}
+
+CONFIG_LINK_NAME_KEY = {
+	'modem'   : 'modem_config_link_name',
+	'general' : 'general_config_link_name',
+	'packet'  : 'packet_config_link_name',
+	'preamble': 'preamble_config_link_name'	
+}
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description = 'configure the bridge interface')
-	parser.add_argument('-lm',   '--list-modem-configs', action='store_true', help='list available modem configs')
-	parser.add_argument('-sm', '--set-modem-config', type=str, default='', help='set the modem config by name')
-	parser.add_argument('-nr',   '--no-restart', action='store_true', help='do not restart the bridge service after making configuration changes')
-	parser.add_argument('-mcln', '--modem-config-link-name', type=str, default='1000_modem_config.h', help='set the modem config link name')
+	parser.add_argument('-t',   '--config-type', choices=['modem','general','packet','preamble'], default='modem', help='the config type being set')
+	parser.add_argument('-lm',  '--list-configs', action='store_true', help='list available modem configs')
+	parser.add_argument('-sm',  '--set-config', type=str, default='', help='set the modem config by name')
+	parser.add_argument('-nr',  '--no-restart', action='store_true', help='do not restart the bridge service after making configuration changes')
+	parser.add_argument('-mcln','--modem-config-link-name', type=str, default='1000_modem_config.h', help='set the modem config link name')
+	parser.add_argument('-gcln','--general-config-link-name', type=str, default='9000_general.h', help='set the general config link name')
+	parser.add_argument('-pcln','--packet-config-link-name', type=str, default='9000_packet.h', help='set the packet config link name')
+	parser.add_argument('-ppln','--preamble-config-link-name', type=str, default='9000_preamble.h', help='set the preamble config link name')
 	args = parser.parse_args().__dict__
 	log.basicConfig(level=log.DEBUG)
 	
 	config_changed = False
 	
-	if (args['list_modem_configs']):
+	MODEM_CONFIGS_PATH = MODEM_CONFIGS_PATHS[args['config_type']]
+	MODEM_CONFIG_SELECTED_PATH = MODEM_CONFIG_SELECTED_PATHS[args['config_type']]
+	link_name_key = CONFIG_LINK_NAME_KEY[args['config_type']]
+	
+	if (args['list_configs']):
 		print("Currently Selected Radio Config")
 		os.system('ls -lh %s' % (MODEM_CONFIG_SELECTED_PATH,))
 		print("\nAvailable:")
 		os.system('ls -lh %s' % (MODEM_CONFIGS_PATH,))
 	
-	if (args['set_modem_config'] != ''):
-		if (not os.path.isfile(os.path.join(MODEM_CONFIGS_PATH, args['set_modem_config']))):
-			log.warning('\"%s\" does not exist' % (args['set_modem_config'],))
+	if (args['set_config'] != ''):
+		if (not os.path.isfile(os.path.join(MODEM_CONFIGS_PATH, args['set_config']))):
+			log.warning('\"%s\" does not exist' % (args['set_config'],))
 		else:
-			os.system('rm %s' % (os.path.join(MODEM_CONFIG_SELECTED_PATH,'*'),))
+			os.system('rm %s' % (os.path.join(MODEM_CONFIG_SELECTED_PATH,args[link_name_key] if (args['config_type'] != 'modem') else '*'),))
 			old_cd = os.getcwd()
 			os.chdir(MODEM_CONFIG_SELECTED_PATH)
-			os.system('ln -s %s %s' % (os.path.join('..','all','wds_generated',args['set_modem_config']), args['modem_config_link_name']))
+			os.system('ln -s %s %s' % (os.path.join('..','all',os.path.basename(MODEM_CONFIGS_PATHS[args['config_type']]),args['set_config']), args[link_name_key]))
 			os.chdir(old_cd)
 			config_changed = True
 

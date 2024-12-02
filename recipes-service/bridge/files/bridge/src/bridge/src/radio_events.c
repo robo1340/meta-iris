@@ -7,7 +7,7 @@
  
 #include "turbo_wrapper.h"
 #include "timer.h"
-#include "print_util.h"
+#include "print_util.h" 
 
 #include <stdio.h>
 #include <stdint.h>
@@ -43,7 +43,8 @@ bool radio_preamble_detect_callback(state_t * state){
 	printf("INFO: preamble\n");
 #endif
 	if (state_receiving(state)){ //this shouldn't happen
-		printf("WARNING: throwing away radio frame mid reception\n");
+		return true;
+		//printf("WARNING: throwing away radio frame mid reception\n");
 	}
 	if (!radio_frame_receive_start(state->receiving)) {return false;}
 	//printf("[INTPT-P/S,PHDLR-P/S,MODEM-P/S,CHIP-P/S ]\n");
@@ -65,10 +66,11 @@ bool radio_receive_pending_callback(state_t * state){
 	int remaining = radio_frame_bytes_remaining(state->receiving);
 	if (remaining < 0){ return true;} //this was a false interrupt
 	else if (remaining > RADIO_MAX_PACKET_LENGTH){
-		printf("WARNING: %d bytes remain unfilled in radio_frame_t but frame is ended\n", remaining);
-		remaining = RADIO_MAX_PACKET_LENGTH;
+		//printf("WARNING: %d bytes remain unfilled in radio_frame_t but frame is ended\n", remaining);
+		//remaining = RADIO_MAX_PACKET_LENGTH;
 		//state_abort_transceiving(state);
 		//return false;
+		return true;
 	}
 	
 	if (remaining != 0){
@@ -127,11 +129,12 @@ bool radio_transmit_complete_callback(state_t * state){
 	printf("radio_transmit_complete_callback()\n");
 #endif
 	if (state->transmitting == NULL){
-		printf("WARNING: state->transmitting is NULL\n");
-		return false;
+		//printf("WARNING: state->transmitting is NULL\n");
+		//return false;
+	} else {
+		state->transmitting->frame_position = NULL; //set frame position to null for the transmitting frame
+		radio_frame_destroy(&state->transmitting); //destroy the transmitted radio frame
 	}
-	state->transmitting->frame_position = NULL; //set frame position to null for the transmitting frame
-	radio_frame_destroy(&state->transmitting); //destroy the transmitted radio frame
 	
 	timer_reset(&state->transmit_send_queue); 												//reset the timer to transmit another packet
 	return true;	
@@ -254,7 +257,18 @@ bool radio_event_callback(state_t * state) {
 		handled = true;
 		//printf("WARNING: TX/RX FIFO overflow detected! at %lld\n", zclock_usecs());
 		//printf("WARNING: FIFO overflow detected! prem:%u, sync:%u\n", (PREAMBLE_DETECTED!=0),(SYNC_DETECTED!=0));
-		printf("WARNING: FIFO overflow!\n");
+		if (state_receiving(state)){
+			int remaining = radio_frame_bytes_remaining(state->transmitting);
+			if (remaining > 0){
+				printf("WARNING: FIFO overflow while RECEIVING! %d bytes remained\n", remaining);
+			}
+		}
+		else if (state_transmitting(state)){
+			printf("WARNING: FIFO overflow while TRANSMITTING!\n");
+		}
+		else {
+			printf("WARNING: FIFO overflow in non txrx state!\n");
+		}
 		state_abort_transceiving(state);
 	}
 	
