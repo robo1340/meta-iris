@@ -69,11 +69,15 @@ do_install(){
 	rm ${D}/bridge/conf/radio_*.json
  
         cd ${D}/bridge/conf/si4463/modem 
-        ln -s ../all/wds_generated/radio_config_Si4463_430M_50kbps.h  1000_modem_config.h      
+        rm 1000_modem_config.h 
+        ln -s ../all/wds_generated/radio_config_Si4463_430M_10kbps.h  1000_modem_config.h      
         cd -
         cd ${D}/bridge/conf/si4463/other
- 	ln -s ../all/general/default.h 9000_general.h
- 	ln -s ../all/packet/default.h 9000_packet.h
+        rm 9000_general.h
+        rm 9000_packet.h
+        rm 9000_preamble.h	
+        ln -s ../all/general/default.h 9000_general.h
+ 	ln -s ../all/packet/fsk.h 9000_packet.h
  	ln -s ../all/preamble/default.h 9000_preamble.h
 	cd -
 

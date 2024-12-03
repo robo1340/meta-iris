@@ -151,34 +151,40 @@ function other_user_message_cb(data, timestamp){
 
 var markers = {}; //a dictionary of location markers for other users
 
+function generate_user_tooltip_contents(username, last_location_beacon_time=null, coords=null){
+	if (username == my_username){
+		return '(Me) ' + username  + ' ' + coords;
+	} else {
+		return username + ' ' + iso_to_time(last_location_beacon_time) + ' ' + coords;
+	}
+	return to_return;
+}
+
 function other_user_location_cb(data, timestamp){
 	if (data == null){return;}
 	if (data.username == my_username){return;}
 	//console.log("other_user_location_cb");
-	updateUser(data.username, data.coords, timestamp, function(user){
+	//console.log(data);
+	updateUser(data.username, data.coords, timestamp, type=data.type, function(user){
 		if (first_map_update == false){
 			first_map_update = true;
 			set_map_location(data.coords);
 		}
 		if (user.username in markers){
 			markers[data.username].setLatLng(data.coords);
-			markers[data.username]._tooltip._content = user.username + ' ' + iso_to_time(user.last_location_beacon_time);
-			if (data.username == my_username){
-				markers[data.username]._tooltip._content = "(Me) " + markers[data.username]._tooltip._content;
-			}
+			markers[data.username]._tooltip._content = generate_user_tooltip_contents(data.username, data.last_location_beacon_time, data.coords);
 			
 			let e = $('#'+user.username+'.user-entry-time');
 			e.html(iso_to_time(user.last_location_beacon_time));
 			//console.log($("#userList")[0]);
 		} else {
 			const i = Object.keys(markers).length;
-			var user_icon = user_icon_factory(i);
+			var user_icon = user_icon_factory(i, data.type);
 			markers[data.username] = L.marker(data.coords, {icon: user_icon}).addTo(map);
-			markers[data.username].bindTooltip(
-				user.username + ' ' + iso_to_time(user.last_location_beacon_time), 
+			markers[data.username].bindTooltip(generate_user_tooltip_contents(user.username, user.last_location_beacon_time, data.coords),
 				{permanent: false, direction: 'right', className: 'leaflet-tooltip'}
 			);
-			add_user_to_list(user, i)	
+			add_user_to_list(user, i, me=false, stale=false, type=data.type);
 		}
 	});
 }
@@ -211,7 +217,7 @@ function go_to_waypoint(username) {
 
 var user_last_grey = false;
 
-function add_user_to_list(user, index, me=false, stale=false){
+function add_user_to_list(user, index, me=false, stale=false, type=null){
 	
 	var color = (me == false) ? user_color_by_id(index) : "ME";
 	//console.log(index + ' ' + color);
@@ -289,10 +295,7 @@ function user_color_by_id(id){
 	return user_colors[(id)%num_user_colors];
 }
 
-function user_icon_factory(id){
-	var class_name = "user_icon " + user_color_by_id(id);
-	var to_return = L.divIcon({
-		html: `
+const HTML_TRIANGLE_1 = `
 			<svg
 			  width="24"
 			  height="36"
@@ -302,10 +305,47 @@ function user_icon_factory(id){
 			  xmlns="http://www.w3.org/2000/svg"
 			>
 				<path d="M0 0 L50 100 L100 0 Z" fill="#7A8BE7"></path>
-			</svg>`,
+			</svg>`;
+
+const HTML_CIRCLE_1 = `
+			<svg
+			  width="26"
+			  height="26"
+			  viewBox="0 0 100 100"
+			  version="1.1"
+			  preserveAspectRatio="none"
+			  xmlns="http://www.w3.org/2000/svg"
+			>
+				<circle r="45" cx="50" cy="50" fill="red" /></circle>
+			</svg>`;
+			
+const HTML_CIRCLE_2 = `
+			<svg
+			  width="14"
+			  height="14"
+			  viewBox="0 0 100 100"
+			  version="1.1"
+			  preserveAspectRatio="none"
+			  xmlns="http://www.w3.org/2000/svg"
+			>
+				<circle r="45" cx="50" cy="50" fill="#7A8BE7" /></circle>
+			</svg>`;
+			
+const ICON_BY_USER_TYPE = {
+	'station' : {'html' : HTML_CIRCLE_2, 'size': [14, 14],'anchor' : [7, 7]},
+	'self' : {'html' : HTML_CIRCLE_1, 'size': [24, 36],'anchor' : [12, 36]},
+	null : {'html' : HTML_TRIANGLE_1, 'size': [24, 36],'anchor' : [12, 36]},
+	undefined : {'html' : HTML_TRIANGLE_1, 'size': [24, 36],'anchor' : [12, 36]},
+};
+
+function user_icon_factory(id, type=null){
+	//console.log(type);
+	var class_name = "user_icon " + user_color_by_id(id);
+	var to_return = L.divIcon({
+		html: ICON_BY_USER_TYPE[type].html,
 		className: class_name,
-		iconSize: [24, 36],
-		iconAnchor: [12, 36]
+		iconSize: ICON_BY_USER_TYPE[type].size,
+		iconAnchor: ICON_BY_USER_TYPE[type].anchor
 	});	
 	return to_return;
 }
@@ -335,19 +375,19 @@ function users_loaded_cb(users){
 	//console.log(users)
 	for (i in users) {
 		if (users[i].username == my_username){ 
-			add_user_to_list(users[i], i, me=true, stale=true);
+			add_user_to_list(users[i], i, me=true, stale=true, type=users[i].type);
 		}
 		else {
-			var user_icon = user_icon_factory(i);
+			var user_icon = user_icon_factory(i, users[i].type);
 			if ((users[i].lat !== undefined) && (users[i].lon !== undefined)) {
-				markers[users[i].username] = L.marker([users[i].lat, users[i].lon], {icon: user_icon}).addTo(map);
-				markers[users[i].username].bindTooltip(
-					users[i].username + ' ' + iso_to_time(users[i].last_location_beacon_time),
+				var coords = [users[i].lat, users[i].lon]
+				markers[users[i].username] = L.marker(coords, {icon: user_icon}).addTo(map);
+				markers[users[i].username].bindTooltip( generate_user_tooltip_contents(users[i].username, users[i].last_location_beacon_time, coords),
 					{permanent: false, direction: 'right', className: 'leaflet-tooltip'}
 				);
 			}
 		
-			add_user_to_list(users[i], i, me=false, stale=true);
+			add_user_to_list(users[i], i, me=false, stale=true, type=users[i].type);
 		}
 	}
 	
@@ -390,7 +430,7 @@ function set_map_location(lat_lon_arr){
 	map.flyTo(lat_lon_arr, 14);	
 	
 	var my_location_marker = L.marker(lat_lon_arr, {icon: circle_icon_factory()}).addTo(map);
-	my_location_marker.bindTooltip(my_username + " (Me)", {permanent: false});
+	my_location_marker.bindTooltip(generate_user_tooltip_contents(my_username,null,lat_lon_arr), {permanent: false});
 	markers[my_username] = my_location_marker;
 }
 
@@ -482,7 +522,7 @@ function set_username(){
 			if (old != my_username) {
 				Object.defineProperty(markers, my_username, Object.getOwnPropertyDescriptor(markers, old));
 				delete markers[old];
-				markers[my_username]._tooltip._content = "(me)" + my_username;
+				markers[my_username]._tooltip._content = generate_user_tooltip_contents(my_username);
 				
 				getUser(old, function(old_user) {
 					updateUser(my_username, coords=[old_user.lat,old_user.lon], timestamp=null);

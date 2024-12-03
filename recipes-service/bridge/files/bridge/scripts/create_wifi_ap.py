@@ -182,11 +182,11 @@ if __name__ == "__main__":
 	
 	#configure the bridge and add end1 and wlu1 to the bridge
 	os.system('ip link add name br0 type bridge')
-	os.system('ip addr flush dev end1')
+	#os.system('ip addr flush dev end1')
 	os.system('ip addr flush dev br0')
 	os.system('ip addr add dev br0 %s.%s.%s.%d/24' % (ips[0],ips[1],ips[2],int(ips[3])+2))
-	os.system('ip addr add dev end1 %s.%s.%s.%d/24' % (ips[0],ips[1],ips[2],int(ips[3])+1))
-	os.system('ip link set end1 master br0')
+	#os.system('ip addr add dev end1 %s.%s.%s.%d/24' % (ips[0],ips[1],ips[2],int(ips[3])+1))
+	#os.system('ip link set end1 master br0')
 	os.system('ip link set %s master br0' % (config['interface'],))
 	os.system('ip link set dev br0 up')
 	

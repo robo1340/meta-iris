@@ -37,7 +37,7 @@ function get_iso_timestamp(date) {
 ////////////////////Database Operations/////////////////////////
 ////////////////////////////////////////////////////////////////
 
-function addUser(username, lat=null, lon=null){
+function addUser(username, lat=null, lon=null, type=null){
 	if (user_db === undefined){
 		return
 	}
@@ -54,7 +54,8 @@ function addUser(username, lat=null, lon=null){
 		username:username, 
 		lat:lat, lon:lon, 
 		last_location_beacon_time:last_location_beacon_time, 
-		last_activity_time:last_activity_time
+		last_activity_time:last_activity_time,
+		type:type
 	});		
 }
 
@@ -72,7 +73,7 @@ function getUser(username, cb) {
     };	
 }
 
-function updateUser(username, coords=null, timestamp, complete_cb=do_nothing){
+function updateUser(username, coords=null, timestamp=null, type=null, complete_cb=do_nothing){
 	if (user_db === undefined){
 		return;
 	}
@@ -84,9 +85,9 @@ function updateUser(username, coords=null, timestamp, complete_cb=do_nothing){
 	read_request.onsuccess = function() {
 		if (read_request.result === undefined){
 			if (coords !== null){
-				addUser(username, coords[0], coords[1]);
+				addUser(username, coords[0], coords[1], type);
 			} else {
-				addUser(username);
+				addUser(username, null, null, type);
 			}
 		} else {
 			//console.log(read_request.result)
@@ -106,7 +107,8 @@ function updateUser(username, coords=null, timestamp, complete_cb=do_nothing){
 				username:username, 
 				lat:new_lat, lon:new_lon, 
 				last_location_beacon_time:last_location_beacon_time, 
-				last_activity_time:last_activity_time
+				last_activity_time:last_activity_time,
+				type:type
 			};
 			const addRequest = objectStore.put(updated_user);
 			complete_cb(updated_user);
@@ -220,6 +222,7 @@ function setup_db(msg_db_cb=do_nothing,user_db_cb=do_nothing) {
 		objectStore.createIndex("lon", "lon", 			{unique: false });
 		objectStore.createIndex("last_location_beacon_time", "last_location_beacon_time", 	{unique: false });
 		objectStore.createIndex("last_activity_time", "last_activity_time", 				{unique: false });
+		objectStore.createIndex("type", "type", 				{unique: false });
 		console.log("Database setup complete");
 	});
 }

@@ -173,6 +173,7 @@ bool radio_state_change_callback(state_t * state){
 #define NO_INTERRUPT_PENDING ((Si446xCmd.GET_INT_STATUS.MODEM_PEND==0) && (Si446xCmd.GET_INT_STATUS.PH_PEND==0) && (Si446xCmd.GET_INT_STATUS.CHIP_PEND==0))
 #define RSSI_LATCH					(Si446xCmd.GET_INT_STATUS.MODEM_PEND & 0x80)
 #define POSTAMBLE_DETECT			(Si446xCmd.GET_INT_STATUS.MODEM_PEND & 0x40)
+#define RSSI						(Si446xCmd.GET_INT_STATUS.MODEM_PEND & 0x08)
 #define RSSI_JUMP_DETECTED 			(Si446xCmd.GET_INT_STATUS.MODEM_PEND & SI446X_CMD_GET_INT_STATUS_REP_MODEM_STATUS_RSSI_JUMP_BIT)
 #define PREAMBLE_DETECTED			(Si446xCmd.GET_INT_STATUS.MODEM_PEND & SI446X_CMD_GET_INT_STATUS_REP_MODEM_STATUS_PREAMBLE_DETECT_BIT)
 #define SYNC_DETECTED				(Si446xCmd.GET_INT_STATUS.MODEM_PEND & SI446X_CMD_GET_INT_STATUS_REP_MODEM_STATUS_SYNC_DETECT_BIT)
@@ -186,6 +187,11 @@ bool radio_state_change_callback(state_t * state){
 #define FIFO_OVERFLOW_OR_UNDERFLOW	(Si446xCmd.GET_INT_STATUS.CHIP_PEND 	& SI446X_CMD_GET_INT_STATUS_REP_CHIP_STATUS_FIFO_UNDERFLOW_OVERFLOW_ERROR_BIT)
 #define STATE_CHANGE				(Si446xCmd.GET_INT_STATUS.CHIP_PEND 	& SI446X_CMD_GET_INT_STATUS_REP_CHIP_PEND_STATE_CHANGE_PEND_BIT)
 #define COMMAND_ERROR				(Si446xCmd.GET_INT_STATUS.CHIP_PEND	& SI446X_CMD_GET_INT_STATUS_REP_CHIP_PEND_CMD_ERROR_PEND_BIT)
+#define CHIP_READY					(Si446xCmd.GET_INT_STATUS.CHIP_PEND	& 0x04)
+#define LOW_BAT						(Si446xCmd.GET_INT_STATUS.CHIP_PEND	& 0x02)
+#define WAKE_UP_TIMER				(Si446xCmd.GET_INT_STATUS.CHIP_PEND	& 0x01)
+
+
 #define INVALID_SYNC				(Si446xCmd.GET_INT_STATUS.MODEM_PEND & SI446X_CMD_GET_INT_STATUS_ARG_MODEM_CLR_PEND_INVALID_SYNC_PEND_CLR_BIT)
 
 
@@ -313,11 +319,32 @@ bool radio_event_callback(state_t * state) {
 		handled = true;
 	}
 	
+	if (RSSI){
+		//printf("RSSI\n");
+		//if (state_receiving(state)){printf("rx\n");}
+		//else if (state_transmitting(state)){printf("tx\n");}
+		handled = true;
+	}
+	
 	if (POSTAMBLE_DETECT){
 		//printf("POSTAMBLE_DETECT\n");
 		handled = true;
 	}
 	
+	if (CHIP_READY){
+		//printf("CHIP_READY\n");
+		handled = true;
+	}
+	
+	if (LOW_BAT){
+		//printf("LOW_BAT\n");
+		handled = true;
+	}
+	
+	if (WAKE_UP_TIMER){
+		//printf("WAKE_UP_TIMER\n");
+		handled = true;
+	}
 	
 	if (!handled){
 		printf("INFO: unhandled interrupt\n");

@@ -87,13 +87,34 @@ var server = https.createServer(options, function(req, resp) {
     }
 });
 
+function safe_execute(func){
+	try {
+		return func();
+	} catch { 
+		return null;
+	}
+}
+
+function get_station_callsign(){
+	var to_return = JSON.parse(fs.readFileSync('/bridge/conf/radio_callsign.json', 'utf8'));
+	if (to_return !== null){
+		return to_return;
+	} else { return null;}
+}
+
+function get_location(){
+	var to_return = JSON.parse(fs.readFileSync('/tmp/gps.json', 'utf8'));
+	if (to_return !== null){
+		return to_return;
+	} else { return null;}
+}
+
 function set_location(msg){
 	
 	if (fs.existsSync('/tmp/gps.json')) {
-		var obj = JSON.parse(fs.readFileSync('/tmp/gps.json', 'utf8'));
-		if (obj !== null){
-			msg.coords = obj;
-			//console.log(msg);
+		gps_location = safe_execute(get_location);
+		if (gps_location !== null){
+			msg.coords = gps_location;
 		}
 	}
 	
@@ -193,6 +214,17 @@ sub.on("message", function(topic, msg) {
 		console.log(str)
 	}	
 });
+
+var intervalId = setInterval(function() {
+	callsign = safe_execute(get_station_callsign);
+	if (callsign === null){return;}
+	gps_location = safe_execute(get_location);
+	if (gps_location === null) {return;}
+	msg = {'username':callsign, 'coords':gps_location,'type':'station'};
+	//console.log(msg);
+	spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(msg) + "\"", "location"]);
+	io.emit('location', msg);
+}, 30000);
 
 //server.listen(8085);
 server.listen(443);

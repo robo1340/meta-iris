@@ -27,7 +27,7 @@ bool set_my_niceness(int niceness){
 
 int main(void) {
 	setbuf(stdout, NULL);
-	
+	zclock_sleep(1000);
 	/*
 	//handle Command Line args
 	if (argc >= 3){ //handle args

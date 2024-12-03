@@ -106,6 +106,16 @@
 .user_icon.Gold path {fill:Gold;}
 .user_icon.Aqua path {fill:Aqua;}
 
+.user_icon.Crimson circle {fill:Crimson;}
+.user_icon.DarkCyan circle {fill:DarkCyan;}
+.user_icon.Chocolate circle {fill:Chocolate;}
+.user_icon.Chartreuse circle {fill:Chartreuse;}
+.user_icon.Magenta circle {fill:Magenta;}
+.user_icon.DarkOrange circle {fill:DarkOrange;}
+.user_icon.ForestGreen circle {fill:ForestGreen;}
+.user_icon.Gold circle {fill:Gold;}
+.user_icon.Aqua circle {fill:Aqua;}
+
 .circle_icon circle {fill:DodgerBlue;}
 .leaflet-tooltip {font-size: 2em;}
 

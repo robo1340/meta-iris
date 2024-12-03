@@ -1,8 +1,8 @@
 [Match]
-Name=nomatch1
-#Name=end1
+#Name=nomatch1
+Name=end1
 
 [Network]
-Address=192.168.1.1/24
-Gateway=192.168.1.1
+Address=192.168.3.1/24
+Gateway=192.168.3.1
 DNS=8.8.8.8
