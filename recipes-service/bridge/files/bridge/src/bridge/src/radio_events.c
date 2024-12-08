@@ -117,9 +117,10 @@ bool radio_receive_fifo_almost_full_callback(state_t * state, uint32_t rx_almost
 		state->receiving->frame_position += rx_almost_full_threshhold;
 		
 	}else{
-		printf("ERROR: radio frame longer than radio_frame_t memory allocated\n");
-		si446x_read_rx_fifo(remaining, state->receiving->frame_position);
-		state->receiving->frame_position += remaining;
+		//printf("ERROR: radio frame longer than radio_frame_t memory allocated\n");
+		//si446x_read_rx_fifo(remaining, state->receiving->frame_position);
+		//state->receiving->frame_position += remaining;
+		state_abort_transceiving(state);
 	}	
 	return true;	
 }

@@ -14,9 +14,7 @@
 #define SHUTDOWN_GPIO_CHIP_PATH "/dev/gpiochip4" //gpio bank for PE*
 #define SHUTDOWN_OFFSET 10
 
-//#define LINE_REQUEST_TIMEOUT_NS 500000 ///<0.5ms
-//#define LINE_REQUEST_TIMEOUT_NS 1000000 ///<1ms 
-#define LINE_REQUEST_TIMEOUT_NS 1500000 ///<1.5ms 
+#define LINE_REQUEST_TIMEOUT_NS 500000 ///<0.5ms
 
 #include "gpio.h"
 #include <czmq.h>

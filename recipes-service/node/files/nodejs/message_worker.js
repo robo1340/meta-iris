@@ -31,7 +31,10 @@ handlers = {
 	"get_radio_configs" : function(data){socket.emit('get_radio_configs', data);},
 	"get_current_radio_config" : function(data){socket.emit('get_current_radio_config', data);},
 	"get_current_radio_config_other" : function(data){socket.emit('get_current_radio_config_other', data);},
-	"select_radio_config" : function(config){socket.emit('select_radio_config', config);}
+	"select_radio_config" : function(config){socket.emit('select_radio_config', config);},
+	"ping_request" : function(data){socket.emit('ping_request', data);},
+	"ping_response" : function(data){socket.emit('ping_response', data);},
+	"properties" : function(data){socket.emit('properties', data);}
 };
 
 onmessage = function(e) {
@@ -53,6 +56,9 @@ onmessage = function(e) {
 		socket.on("get_radio_configs", 	function(data){postMessage(['get_radio_configs',data]);});
 		socket.on("get_current_radio_config", function(data){postMessage(['get_current_radio_config',data]);});
 		socket.on("get_current_radio_config_other", function(data){postMessage(['get_current_radio_config_other',data]);});
+		socket.on("ping_request", function(data){postMessage(['ping_request',data]);});
+		socket.on("ping_response", function(data){postMessage(['ping_response',data]);});
+		socket.on("properties", function(data){postMessage(['properties',data]);});
 		setup_location_beacon();
 		return;
 	}
@@ -86,8 +92,10 @@ function setup_waypoint_beacon(period_seconds){
 function cancel_waypoint_beacon(){
 	if (waypoint_beacon !== null){
 		clearInterval(waypoint_beacon);
+		
 		waypoint_beacon = null;
 	}
+	socket.emit('waypoint',{'username':my_username,'cancel':true});
 }
 
 const MAX_LOCATION_TX = 5000;
@@ -119,8 +127,8 @@ function send_waypoint_beacon(){
 	} else {
 		last_waypoint_tx = Date.now();
 	}
-	console.log("send_waypoint_beacon()");
-	if (my_waypoint !== null){
+	if ((my_waypoint !== null) && (my_waypoint.coords[0] != 0) && (my_waypoint.coords[1] != 0)){
+		console.log("send_waypoint_beacon()");
 		my_waypoint.username = my_username;
 		socket.emit('waypoint', my_waypoint)
 	}

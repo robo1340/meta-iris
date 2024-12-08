@@ -255,7 +255,7 @@ function setup_waypoints(map){
 		document.getElementById('cancel_waypoint').addEventListener('click', function(e){
 			console.log("cancel waypoint");
 			messenger.postMessage(["stop_waypoint_beacon",null]);
-			updateWaypoint(my_username, coords, msg="", timestamp=null, color=null, function(w){
+			updateWaypoint(my_username, [0,0], msg="", timestamp=null, color=null, function(w){
 				if (w.username in waypoints){
 					waypoints[w.username].remove();
 					delete waypoints[w.username];
@@ -378,12 +378,29 @@ function waypoints_loaded_cb(w){
 			messenger.postMessage(["start_waypoint_beacon",retrive_waypoint_period()]);
 			messenger.postMessage(["waypoint",{'username': w[i].username, 'msg': w[i].msg, 'coords':w[i].coords, 'color':w[i].color}]);
 		}
+		update_span_waypoint(w[i].username, 'WAYPOINT ' + get_distance(waypoints[w[i].username], markers[my_username]) + 'm');
+		
 	}	
 }
 
 function other_user_waypoint_cb(data, timestamp){
-	if (data.username == my_username){return;}
+	if (data.username == my_username){
+		update_span_waypoint(data.username, 'WAYPOINT ' + get_distance(waypoints[data.username], markers[my_username]) + 'm');
+		return;
+	}
 	console.log("other_user_waypoint_cb");
+	
+	if (data.cancel !== undefined) { //delete the waypoint
+		console.log('delete waypoint from ' + data.username);
+		updateWaypoint(data.username, [0,0], msg="", timestamp=null, color=null, function(w){
+			if (data.username in waypoints){
+				waypoints[data.username].remove();
+				delete waypoints[data.username];
+			}
+		});
+		return;
+	}
+	//else
 	updateWaypoint(data.username, data.coords, data.msg, timestamp, data.color, function(w, changed){
 		txt = w.username + ' ' + iso_to_time(w.time) + ' ' + w.msg
 		if (w.username in waypoints){
@@ -397,8 +414,10 @@ function other_user_waypoint_cb(data, timestamp){
 			waypoints[data.username].bindTooltip(txt,{permanent: false, direction: 'right', className: 'leaflet-tooltip'});	
 		}	
 		
+		update_span_waypoint(data.username, 'WAYPOINT ' + get_distance(waypoints[data.username], markers[my_username]) + 'm');
+		
 		//need to make this popup more conditional
-		if (changed == true){
+		if ((changed == true) && (data.coords[0] != 0)){
 			var popup = L.popup({className: "leaflet-tooltip"}).setLatLng(data.coords).setContent('<p>'+txt+'</p>').openOn(map);
 			setTimeout(function(){popup.close()}, 1500);
 		}

@@ -33,7 +33,7 @@ if __name__ == "__main__":
 	if ('wifi_passphrase' in config):
 		passphrase = config['wifi_passphrase']
 	
-	os.system('python3 /bridge/scripts/create_wifi_ap.py -ip 192.168.2.1 -s %s -p %s' % (callsign, passphrase))
+	os.system('python3 /bridge/scripts/create_wifi_ap.py -ip 192.168.3.1 -s %s -p %s' % (callsign, passphrase))
 	
 	log.info('wifi AP started %s:%s' % (callsign,passphrase))
 	time.sleep(5)

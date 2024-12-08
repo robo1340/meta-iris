@@ -102,17 +102,28 @@ function get_station_callsign(){
 	} else { return null;}
 }
 
-function get_location(){
+var last_user_location = null;
+
+function get_station_gps_location(){
 	var to_return = JSON.parse(fs.readFileSync('/tmp/gps.json', 'utf8'));
 	if (to_return !== null){
 		return to_return;
-	} else { return null;}
+	} else {return null;}	
+}
+
+function get_location(){
+	var to_return = safe_execute(get_station_gps_location);
+	if (last_user_location !== null){
+		return last_user_location;
+	} else { 
+		return null;
+	}
 }
 
 function set_location(msg){
 	
 	if (fs.existsSync('/tmp/gps.json')) {
-		gps_location = safe_execute(get_location);
+		gps_location = safe_execute(get_station_gps_location);
 		if (gps_location !== null){
 			msg.coords = gps_location;
 		}
@@ -146,6 +157,9 @@ io.sockets.on("connection", function(socket) {
 			//console.log('new location for ' + msg.username + ': ' + msg.coords)
 			spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(msg) + "\"", "location"]);
 			io.emit('location', msg);
+			if (msg.coords !== undefined){
+				last_user_location = msg.coords;
+			}
 		}
 	});
 	socket.on('waypoint', function(msg) {
@@ -193,6 +207,34 @@ io.sockets.on("connection", function(socket) {
 		console.log('reconfiguring bridge ' + msg);
 		spawn('/usr/bin/python3', ["/bridge/scripts/bridge_configure.py", "-t", msg['config_type'], "-sm", msg['selected']]); 
 	});
+	socket.on('ping_request', function(msg) {
+		//console.log(msg);
+		if (msg['dst'] == safe_execute(get_station_callsign)){
+			var rsp = {'src':safe_execute(get_station_callsign),'dst':msg['src'],'ping_id':msg['ping_id']}
+			io.emit('ping_response', rsp);
+			spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(rsp) + "\"", "ping_response"]);
+		} else {
+			spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(msg) + "\"", "ping_request"]);
+			io.emit('ping_request', msg);			
+		}
+	});
+	socket.on('ping_response', function(msg) {
+		//console.log(msg);
+		spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(msg) + "\"", "ping_response"]);
+		io.emit('ping_response', msg);			
+	});
+	socket.on('properties', function(msg){
+		if (msg.name === undefined){return;}
+		if (msg.action === undefined) {msg.action = 'get';}
+		
+		if (msg.name == 'station_callsign'){
+			if (msg.action == 'get'){
+				io.emit('properties', {'name':'station_callsign','action':'rep','value':safe_execute(get_station_callsign)});
+			}
+		}
+		
+	});
+	
 });
 
 sub.on("message", function(topic, msg) {
@@ -209,7 +251,21 @@ sub.on("message", function(topic, msg) {
 	}
 	else if (topic.startsWith("waypoint")){
 		io.emit('waypoint', JSON.parse(str));
-	} else {
+	} 
+	else if (topic.startsWith("ping_request")){
+		msg = JSON.parse(str);
+		if (msg['dst'] == safe_execute(get_station_callsign)){
+			console.log('ping response sent to ' + msg['src']);
+			var rsp = {'src':safe_execute(get_station_callsign),'dst':msg['src'],'ping_id':msg['ping_id']}
+			spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(rsp) + "\"", "ping_response"]);
+		} else {
+			io.emit('ping_request', msg);			
+		}
+	}
+	else if (topic.startsWith("ping_response")){
+		io.emit('ping_response', JSON.parse(str));
+	}
+	else {
 		console.log("message received on unknown topic " + topic);
 		console.log(str)
 	}	
@@ -219,12 +275,14 @@ var intervalId = setInterval(function() {
 	callsign = safe_execute(get_station_callsign);
 	if (callsign === null){return;}
 	gps_location = safe_execute(get_location);
-	if (gps_location === null) {return;}
+	if (gps_location === null) {
+		gps_location = [0,0]; //set to dummy coordinates
+	}
 	msg = {'username':callsign, 'coords':gps_location,'type':'station'};
 	//console.log(msg);
 	spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(msg) + "\"", "location"]);
 	io.emit('location', msg);
-}, 30000);
+}, 15000);
 
 //server.listen(8085);
 server.listen(443);

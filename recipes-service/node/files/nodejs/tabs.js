@@ -1,5 +1,7 @@
 
-const COOKIE_EXP=30
+const COOKIE_EXP=30;
+const LOAD_WAIT_MS=2000;
+var user_list_loaded = false;
 
 function add_saved_message(username, msg){
 	addMessage(username, msg);
@@ -53,7 +55,7 @@ function clear_messages_ui() {
 }
 function clear_users_ui() {
 	try {
-		clear_users(); //delete all messages from the db
+		clear_users(); //delete all user entries from the db
 		$("#userList").empty();
 		for (const [k, m] of Object.entries(markers)) {
 			if (k == my_username){continue;}
@@ -98,8 +100,8 @@ function set_radio_config(config_type='modem') {
 	lbl.innerHTML = "Current: LOADING";
 	
 	setTimeout(function(){
-		get_current_radio_config()	
-		get_current_radio_config_other()
+		get_current_radio_config();	
+		get_current_radio_config_other();
 	}, 2500);
 }
 
@@ -151,18 +153,43 @@ function other_user_message_cb(data, timestamp){
 
 var markers = {}; //a dictionary of location markers for other users
 
+function fix_coords(coords,d=5){
+	return coords[0].toFixed(d) + ', ' + coords[1].toFixed(d);
+}
+
 function generate_user_tooltip_contents(username, last_location_beacon_time=null, coords=null){
 	if (username == my_username){
-		return '(Me) ' + username  + ' ' + coords;
+		return '(Me) ' + username  + '\n' + fix_coords(coords);
 	} else {
-		return username + ' ' + iso_to_time(last_location_beacon_time) + ' ' + coords;
+		return username + ' ' + iso_to_time(last_location_beacon_time) + '\n' + fix_coords(coords);
 	}
 	return to_return;
+}
+
+//calculate the distance between two markers
+function get_distance(from, to){
+	if ((from === undefined) || (to === undefined)) {return -1;}
+	to_return = from.getLatLng().distanceTo(to.getLatLng());
+	if (to_return > 10000){return -1;} //return invalid if greater than 100km
+	//console.log('get_distance()->' + to_return);
+	return to_return.toFixed(0);
+}
+
+function randfloat(min, max){
+	return (Math.random() * (max-min) + min);
 }
 
 function other_user_location_cb(data, timestamp){
 	if (data == null){return;}
 	if (data.username == my_username){return;}
+	if (user_list_loaded == false){console.log('user list not loaded yet'); return;}
+	/////////////////////////////////////
+	//add some error to the coordinates//
+	/////////////////////////////////////
+	//new_lat = data.coords[0]+randfloat(-0.01,0.01);
+	//new_lon = data.coords[1]+randfloat(-0.01,0.01);
+	//data.coords = [new_lat, new_lon];
+	
 	//console.log("other_user_location_cb");
 	//console.log(data);
 	updateUser(data.username, data.coords, timestamp, type=data.type, function(user){
@@ -173,18 +200,14 @@ function other_user_location_cb(data, timestamp){
 		if (user.username in markers){
 			markers[data.username].setLatLng(data.coords);
 			markers[data.username]._tooltip._content = generate_user_tooltip_contents(data.username, data.last_location_beacon_time, data.coords);
+
+			update_span_time(user.username, iso_to_time(user.last_location_beacon_time));
+			update_span_distance(user.username, get_distance(markers[data.username], markers[my_username]) + 'm');
 			
-			let e = $('#'+user.username+'.user-entry-time');
-			e.html(iso_to_time(user.last_location_beacon_time));
 			//console.log($("#userList")[0]);
 		} else {
-			const i = Object.keys(markers).length;
-			var user_icon = user_icon_factory(i, data.type);
-			markers[data.username] = L.marker(data.coords, {icon: user_icon}).addTo(map);
-			markers[data.username].bindTooltip(generate_user_tooltip_contents(user.username, user.last_location_beacon_time, data.coords),
-				{permanent: false, direction: 'right', className: 'leaflet-tooltip'}
-			);
-			add_user_to_list(user, i, me=false, stale=false, type=data.type);
+			//const cnt = Object.keys(markers).length+1;
+			load_user(user);
 		}
 	});
 }
@@ -204,6 +227,7 @@ function set_tab_pending(tabname){
 function go_to_user(username) {
 	const marker = markers[username]
 	if (marker === undefined) {return;}
+	if ((marker._latlng.lat == 0) && (marker._latlng.lng == 0)) {return;}
 	var popup = L.popup({className: "leaflet-tooltip"}).setLatLng(marker._latlng).setContent('<p>'+username+'</p>').openOn(map);
 	setTimeout(function(){popup.close()}, 1500);
 }
@@ -211,14 +235,70 @@ function go_to_user(username) {
 function go_to_waypoint(username) {
 	const w = waypoints[username]
 	if (w === undefined) {return;}
+	if ((w._latlng.lat == 0) && (w._latlng.lng == 0)) {return;}
 	var popup = L.popup({className: "leaflet-tooltip"}).setLatLng(w._latlng).setContent('<p>'+w._tooltip._content+'</p>').openOn(map);
 	setTimeout(function(){popup.close()}, 1500);
 }
 
+function randint(max) {
+  return Math.floor(Math.random() * max);
+}
+
+function update_span_ping(user, new_text){
+	let e = $('#'+user+'.user-entry-ping');
+	e.html(new_text);
+	if (new_text.includes('REQ')){e.css("color","red");}
+	else if (new_text.includes('RSP')){
+		e.css("color","green");
+		e.css("font-weight","bold");
+		setTimeout(function(){
+			e.css("font-weight","normal");
+		}, 2000);
+	}
+}
+
+function update_span_time(user, new_text){
+	let e = $('#'+user+'.user-entry-time');
+	e.html(new_text);	
+	e.css("font-weight","bold");
+	setTimeout(function(){
+		e.css("font-weight","normal");
+	}, 2000);
+}
+
+function update_span_distance(user, new_text){
+	let e = $('#'+user+'.user-entry-distance');
+	e.html(new_text);	
+}
+
+function update_span_name(user, new_text){
+	let e = $('#'+user+'.user-entry-name');
+	e.html(new_text);
+}
+
+function update_span_waypoint(user, new_text){
+	let e = $('#'+user+'.user-entry-waypoint');
+	e.html(new_text);
+}
+
 var user_last_grey = false;
 
-function add_user_to_list(user, index, me=false, stale=false, type=null){
+var ping_requests = {}; //dictionary of ping requests keys are user id's and values are the time of the last request
+
+function add_user_to_list(user, index, stale=false){
+	//console.log('add_user_to_list('+user.username+')');
+
+	if ((user.type == 'station') && (properties.list_stations == false)) {return;}
+	if ((user.type != 'station') && (properties.list_users == false)) {return;}
 	
+	//check for duplicates
+	let e = $('#'+user.username+'.user-entry');
+	if (e.length > 0){
+		console.log('duplicate user entry');
+		return;
+	}
+	
+	let me = user.username == my_username;
 	var color = (me == false) ? user_color_by_id(index) : "ME";
 	//console.log(index + ' ' + color);
 	var time  =  ((stale == true)&&(me==false)) ?  "INACTIVE " : iso_to_time(user.last_location_beacon_time);
@@ -233,26 +313,55 @@ function add_user_to_list(user, index, me=false, stale=false, type=null){
 			"id" : user.username,
 			"text" : index + '.'
 		});
+	
+	let display_name = user.username;
+	if ((user.type == 'station') && (user.username == properties.station_callsign)){
+		display_name = user.username + '(My Sta.)';
+	}
+	else if (user.type == 'station') {
+		display_name = user.username + '(Station)';
+	}
+	else if (user.username == my_username){
+		display_name = user.username + '(Me)';
+	}
+	
 	var span_name = $("<td></td>",{
 			"class": "user-entry-name",
 			"id" : user.username,
-			"text" : user.username
+			"text" : display_name
 		});
 	var span_time = $("<td></td>",{
 			"class": "user-entry-time",
 			"id" : user.username,
 			"text" : time
 		});
+	var span_distance = $("<td></td>",{
+			"class": "user-entry-distance",
+			"id" : user.username,
+			"text" : get_distance(markers[user.username], markers[my_username])+'m'
+		}); 
+		
+	let waypoint_text = "WAYPOINT " + get_distance(waypoints[user.username], markers[my_username])+'m';
+	if (user.type == 'station'){
+		waypoint_text = 'NA';
+	}
 	var span_waypoint = $("<td></td>",{
 			"class": "user-entry-waypoint",
 			"id" : user.username,
-			"text" : "WAYPOINT"
+			"text" : waypoint_text
+		});
+	var span_ping = $("<td></td>",{
+			"class": "user-entry-ping",
+			"id" : user.username,
+			"text" : 'PING'
 		});
 	
 	li.append(span_id);
 	li.append(span_name);
+	li.append(span_distance);
 	li.append(span_time);
 	li.append(span_waypoint);
+	li.append(span_ping);
     $("#userList").append(li);
     user_last_grey = !user_last_grey;
 
@@ -271,12 +380,28 @@ function add_user_to_list(user, index, me=false, stale=false, type=null){
 	$("#"+user.username+" .user-entry-waypoint").click(function(e) {
 		go_to_waypoint(e.currentTarget.id);
 	});
+
+	$("#"+user.username+" .user-entry-ping").click(function(e) {
+		let ping_id = randint(256);
+		let now = Date.now();
+		if (ping_requests[e.currentTarget.id] !== undefined){
+			if ((now - ping_requests[e.currentTarget.id]) < 5000){
+				console.log('ping request suppressed, wait');
+				return;
+			}
+		}
+		ping_requests[e.currentTarget.id] = now;
+		messenger.postMessage(["ping_request",{'src':my_username, 'dst': e.currentTarget.id, 'ping_id':ping_id}]);
+		update_span_ping(e.currentTarget.id, 'REQ ' + ping_id);
+	});
 	
     //scroll to bottom of div with scroll bar
     //setting position:fixed for this div is important
     //in adding a scroll bar to it
     $("#userPane").scrollTop($("#userPane")[0].scrollHeight);		
 }
+
+
 
 var user_colors = {
 	0 : "Crimson",
@@ -297,8 +422,8 @@ function user_color_by_id(id){
 
 const HTML_TRIANGLE_1 = `
 			<svg
-			  width="24"
-			  height="36"
+			  width="12"
+			  height="24"
 			  viewBox="0 0 100 100"
 			  version="1.1"
 			  preserveAspectRatio="none"
@@ -307,10 +432,22 @@ const HTML_TRIANGLE_1 = `
 				<path d="M0 0 L50 100 L100 0 Z" fill="#7A8BE7"></path>
 			</svg>`;
 
-const HTML_CIRCLE_1 = `
+const HTML_SQUARE_1 = `
 			<svg
 			  width="26"
 			  height="26"
+			  viewBox="0 0 100 100"
+			  version="1.1"
+			  preserveAspectRatio="none"
+			  xmlns="http://www.w3.org/2000/svg"
+			>
+				<rect x="25" y="25" width="50" height="50" fill="blue" />
+			</svg>`;
+
+const HTML_CIRCLE_1 = `
+			<svg
+			  width="18"
+			  height="18"
 			  viewBox="0 0 100 100"
 			  version="1.1"
 			  preserveAspectRatio="none"
@@ -332,10 +469,11 @@ const HTML_CIRCLE_2 = `
 			</svg>`;
 			
 const ICON_BY_USER_TYPE = {
-	'station' : {'html' : HTML_CIRCLE_2, 'size': [14, 14],'anchor' : [7, 7]},
-	'self' : {'html' : HTML_CIRCLE_1, 'size': [24, 36],'anchor' : [12, 36]},
-	null : {'html' : HTML_TRIANGLE_1, 'size': [24, 36],'anchor' : [12, 36]},
-	undefined : {'html' : HTML_TRIANGLE_1, 'size': [24, 36],'anchor' : [12, 36]},
+	'station' : {'html' : HTML_TRIANGLE_1, 'size': [12, 24],'anchor' : [6,24]},
+	'self' : {'html' : HTML_CIRCLE_1, 'size': [18, 18],'anchor' : [9, 9]},
+	null : {'html' : HTML_CIRCLE_2, 'size': [14, 14],'anchor' : [7, 7]},
+	undefined : {'html' : HTML_CIRCLE_2, 'size': [14, 14],'anchor' : [7, 7]},
+	//undefined : {'html' : HTML_TRIANGLE_1, 'size': [24, 36],'anchor' : [12, 36]},
 };
 
 function user_icon_factory(id, type=null){
@@ -355,8 +493,8 @@ function circle_icon_factory(){
 	var to_return = L.divIcon({
 		html: `
 			<svg
-			  width="26"
-			  height="26"
+			  width="18"
+			  height="18"
 			  viewBox="0 0 100 100"
 			  version="1.1"
 			  preserveAspectRatio="none"
@@ -365,31 +503,52 @@ function circle_icon_factory(){
 				<circle r="45" cx="50" cy="50" fill="red" /></circle>
 			</svg>`,
 		className: class_name,
-		iconSize: [26, 26],
-		iconAnchor: [13, 13]
+		iconSize: [18, 18],
+		iconAnchor: [9, 9]
 	});	
 	return to_return;
 }
 
+function load_user(user){	
+	const index = Object.keys(markers).length+1;
+	var user_icon = user_icon_factory(index, user.type);
+	if ((user.lat !== undefined) && (user.lon !== undefined) && (user.username != my_username)) {
+		var coords = [user.lat, user.lon]
+		markers[user.username] = L.marker(coords, {icon: user_icon}).addTo(map);
+		markers[user.username].bindTooltip( generate_user_tooltip_contents(user.username, user.last_location_beacon_time, coords),
+			{permanent: false, direction: 'right', className: 'leaflet-tooltip'}
+		);
+	}
+	add_user_to_list(user, index, stale=true);	
+	
+}
+
 function users_loaded_cb(users){
 	//console.log(users)
-	for (i in users) {
-		if (users[i].username == my_username){ 
-			add_user_to_list(users[i], i, me=true, stale=true, type=users[i].type);
-		}
-		else {
-			var user_icon = user_icon_factory(i, users[i].type);
-			if ((users[i].lat !== undefined) && (users[i].lon !== undefined)) {
-				var coords = [users[i].lat, users[i].lon]
-				markers[users[i].username] = L.marker(coords, {icon: user_icon}).addTo(map);
-				markers[users[i].username].bindTooltip( generate_user_tooltip_contents(users[i].username, users[i].last_location_beacon_time, coords),
-					{permanent: false, direction: 'right', className: 'leaflet-tooltip'}
-				);
-			}
+	setTimeout(function(){
+		let cnt = 0; //variable used to set the user color and placement in list
 		
-			add_user_to_list(users[i], i, me=false, stale=true, type=users[i].type);
+		for (i in users){ //add me
+			if (users[i].username == my_username){ 
+				load_user(users[i]);
+			}
 		}
-	}
+		for (i in users){ //addmy station 
+			if ((users[i].type == 'station') && (users[i].username == properties.station_callsign)){
+				load_user(users[i]);
+			}	
+		}
+		
+		for (i in users) {
+			if (users[i].username == my_username){ continue;}			
+			else if ((users[i].type == 'station') && (users[i].username == properties.station_callsign)){continue;}
+			else {
+				load_user(users[i]);
+			}
+		}
+		user_list_loaded = true;
+		
+	}, LOAD_WAIT_MS);
 	
 }
 
@@ -401,13 +560,14 @@ function load_complete_cb(messages) {
 	}
 	
 	setTimeout(function(){
+		add_unsaved_message('Iris', 'Connected to Station: "' + properties.station_callsign + '"');
 		if (default_username == true){
 			add_unsaved_message('Iris', "Welcome! Your temporary username is " + my_username + " To change it navigate to \"Settings\"");
 		} else {
 			add_unsaved_message('Iris', "Welcome Back \"" + my_username + "\"");
 			const notification = new Notification("Welcome Back: " + my_username);
 		}	
-	}, 500);
+	}, LOAD_WAIT_MS);
 	
 }
 
@@ -462,10 +622,34 @@ function open_tab(target) {
 	}
 }
 
+function list_map_elements(target){
+	var load = true;
+	//console.log('list_map_elements('+target+')');
+	b = document.getElementById(target);
+	if (b.className.includes('untoggled_button')) {
+		b.className = b.className.replace(" untoggled_button", "");
+		load = true;
+	} else {
+		b.className += " untoggled_button";
+		load = false;
+	}
+	Cookies.set(target,load.toString(), {expires:COOKIE_EXP});
+}
 
 $("input[name=load_on_start]").click(function(){
 	//console.log($(this).val());
 	Cookies.set('load_on_start',$(this).val(), {expires:COOKIE_EXP})
+});
+
+$("input[name=list_users]").click(function(){
+	console.log($(this).val());
+	consoel.log($(this));
+	Cookies.set('list_users',$(this).val(), {expires:COOKIE_EXP})
+});
+
+$("input[name=list_stations]").click(function(){
+	console.log($(this).val());
+	Cookies.set('list_stations',$(this).val(), {expires:COOKIE_EXP})
 });
 
 function get_message_to_send() {
@@ -527,9 +711,7 @@ function set_username(){
 				getUser(old, function(old_user) {
 					updateUser(my_username, coords=[old_user.lat,old_user.lon], timestamp=null);
 					delete_user(old, function() {
-						let e = $('#'+old+' .user-entry-name');
-						e.text(my_username);
-						e.attr("id",my_username);
+						update_span_name(old, my_username)
 						//console.log(e);
 						messenger.postMessage(["username",my_username]);
 						messenger.postMessage(["newMessage",{'username': "Iris", 'message': old + " changed username to " + my_username}]);
@@ -659,6 +841,36 @@ function current_radio_config_other_received(current_config){
 	txt.innerHTML = current_config[2];
 }
 
+function ping_request_cb(msg){
+	if ((msg['dst'] === undefined) || (msg['src'] === undefined)){return;}
+	if (msg['dst'] != my_username) {return;}
+	console.log('Ping Request Received from ' + msg['src'] + ' id:' + msg['ping_id'])
+	messenger.postMessage(["ping_response",{'src':my_username, 'dst': msg['src'], 'ping_id': msg['ping_id']}]);
+}
+
+function ping_response_cb(msg){
+	if ((msg['dst'] === undefined) || (msg['src'] === undefined)){return;}
+	if (msg['dst'] != my_username) {return;}
+	if (ping_requests[msg.src] === undefined){
+		console.log('unknown ping response received ' + msg);
+		return;
+	} else {
+		let diff = Date.now() - ping_requests[msg.src];
+		update_span_ping(msg['src'], 'RSP ' + diff + 'ms');
+		ping_requests[msg.src] = undefined;
+	}
+}
+
+var properties = {};
+
+function properties_cb(msg){
+	if (msg.name === undefined) {return;}
+	if (msg.name == 'station_callsign'){
+		console.log('Station Callsign: ' + msg.value);
+		properties['station_callsign'] = msg.value;
+	}
+}
+
 function retrieve_username(){
 	my_username = Cookies.get('username');
 	if (my_username === undefined){
@@ -700,7 +912,10 @@ handlers = {
 	"waypoint"   : other_user_waypoint_cb,
 	"get_radio_configs" : radio_configs_received,
 	"get_current_radio_config" : current_radio_config_received,
-	"get_current_radio_config_other" : current_radio_config_other_received
+	"get_current_radio_config_other" : current_radio_config_other_received,
+	"ping_request" : ping_request_cb,
+	"ping_response" : ping_response_cb,
+	"properties" : properties_cb
 };
 
 var messenger = new Worker("message_worker.js");
@@ -712,6 +927,15 @@ messenger.onmessage = (e) => {
 	}
 	handler(e.data[1],e.data[2]);
 };
+
+function get_cookie(name, default_return){
+	var val = Cookies.get(name);
+	if (val === undefined){
+		Cookies.set(name,default_return, {expires:COOKIE_EXP});
+		return default_return;
+	} 
+	return val;
+}
 
 function user_accepted() {
 	messenger.postMessage(["start",{'username':retrieve_username(),'location_beacon_ms':retrieve_location_beacon_ms()}]);
@@ -889,7 +1113,8 @@ function user_accepted() {
 	setup_waypoints(map);
 	setup_button_callbacks();
 	get_current_radio_config();
-	get_current_radio_config_other()
+	get_current_radio_config_other();
+	messenger.postMessage(["properties",{'name':'station_callsign'}]);
 	
 	///end of map setup///////////////////////////
 	
@@ -907,6 +1132,17 @@ function user_accepted() {
 	}
 	else {
 		$('#map_button').click();
+	}
+	
+	properties.list_users 		= get_cookie('list_users', 'true')=='true';
+	properties.list_stations 	= get_cookie('list_stations', 'true')=='true';
+	if (properties.list_users == false){
+		b = document.getElementById('list_users');
+		b.className += " untoggled_button";
+	}
+	if (properties.list_stations == false){
+		b = document.getElementById('list_stations');
+		b.className += " untoggled_button";
 	}
 	
 	setup_notifications();

@@ -157,6 +157,13 @@ if __name__ == "__main__":
 		os.system('ip link set dev %s mtu %d' % (slip_if, args['mtu']))
 		os.system('ip link set dev %s up' % (slip_if,))
 		os.system('ip route add 10.0.0.0/8 dev %s' % (slip_if,)) #add a general route
+		
+		#add a local route on the loopback interface, this is needed to receive broadcast UDP packets
+		octets = args['host_ip'].split('.')
+		lo_ip 	  = '%s.%s.%s.1/24' % (octets[0], octets[1], octets[2])
+		lo_subnet = '%s.%s.%s.0/24' % (octets[0], octets[1], octets[2])
+		os.system('ip addr add %s dev lo' % (lo_ip,))
+		os.system('ip route add %s dev lo' % (lo_subnet,))
 
 		config['interface']['name'] = slip_if
 		config['interface']['ip']	= args['host_ip']

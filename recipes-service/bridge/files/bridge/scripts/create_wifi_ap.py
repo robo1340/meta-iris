@@ -166,7 +166,7 @@ if __name__ == "__main__":
 	create_hostapd_conf(attributes=hostapd_conf, path=conf_path)
 	
 	dnsmasq_conf = []
-	dnsmasq_conf.append("interface=br0")
+	dnsmasq_conf.append("interface=%s" % (config['interface'],))
 	#dnsmasq_conf.append("interface=%s" % (config['interface'],))
 	dnsmasq_conf.append("dhcp-range=%s.%s.%s.5,%s.%s.%s.30,255.255.255.0,12h" % (ips[0],ips[1],ips[2],ips[0],ips[1],ips[2]))
 	dnsmasq_conf.append("dhcp-option=3,%s" % (config['ip'],))
@@ -181,14 +181,9 @@ if __name__ == "__main__":
 	os.system('hostapd -B %s' % (conf_path,))
 	
 	#configure the bridge and add end1 and wlu1 to the bridge
-	os.system('ip link add name br0 type bridge')
-	#os.system('ip addr flush dev end1')
-	os.system('ip addr flush dev br0')
-	os.system('ip addr add dev br0 %s.%s.%s.%d/24' % (ips[0],ips[1],ips[2],int(ips[3])+2))
-	#os.system('ip addr add dev end1 %s.%s.%s.%d/24' % (ips[0],ips[1],ips[2],int(ips[3])+1))
-	#os.system('ip link set end1 master br0')
-	os.system('ip link set %s master br0' % (config['interface'],))
-	os.system('ip link set dev br0 up')
+	#os.system('ip addr flush dev %s' % (config['interface'],)
+	#os.system('ip addr add dev %s %s.%s.%s.%d/24' % (config['interface'],ips[0],ips[1],ips[2],int(ips[3])+1))
+	#os.system('ip link set dev %s up' % (config['interface'],))
 	
 	os.system('ip addr flush dev %s > /dev/null 2>&1' % (config['interface'],))
 	os.system('ip addr add %s/24 dev %s > /dev/null 2>&1' % (config['ip'], config['interface']))

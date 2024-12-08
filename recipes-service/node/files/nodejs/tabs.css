@@ -19,6 +19,11 @@
 	font-size: 1.5em;
 }
 
+.untoggled_button { 
+	color: grey;
+	background-color: #eee;
+}
+
 /*
 .tab #chat_button {
 	background-image:url('/images/chat.png');
@@ -184,7 +189,7 @@
 	display:table-cell; 
 	text-align:left;
 	height: 100%;
-	font-size: 2em;
+	font-size: 1.5em;
 	padding: 1px;
 }
 

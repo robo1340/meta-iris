@@ -277,18 +277,21 @@ var last_location_tx = -1;
 
 const position_received_cb = (position) => {
 	var coords = [position.coords.latitude,position.coords.longitude];
+	if ((coords[0] == 0) && (coords[1] == 0)){return;}
 
 	my_location = {'username':my_username, 'coords':coords};
 	messenger.postMessage(["my_location",my_location]);
 	//console.log(my_location);
-	updateUser(my_username, my_location.coords);
-	
-	if (first_map_update == false){
-		first_map_update = true;
-		set_map_location(coords);
-	} else {
-		markers[my_username].setLatLng(coords);
-	}
+	updateUser(my_username, my_location.coords, null, 'self', function(user) {
+		if (first_map_update == false){
+			first_map_update = true;
+			set_map_location(coords);
+			load_user(user);
+			
+		} else {
+			markers[my_username].setLatLng(coords);
+		}
+	});
 }
 
 const DEFAULT_COORDS = [37.54557, -97.26893];
