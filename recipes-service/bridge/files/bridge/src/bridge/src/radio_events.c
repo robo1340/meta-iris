@@ -41,7 +41,14 @@
 bool radio_preamble_detect_callback(state_t * state){
 #ifdef RADIO_PREAMBE_INFO
 	printf("INFO: preamble\n");
+
 #endif
+	if (state_transmitting(state)){
+		printf("WARNING: received my own preamble\n");
+		printf("radio->%s\n", radio_get_state_string(radio_get_modem_state()));
+		//si446x_change_state(0x7); //change to transmitting state
+		return true;
+	}
 	if (state_receiving(state)){ //this shouldn't happen
 		return true;
 		//printf("WARNING: throwing away radio frame mid reception\n");
@@ -62,13 +69,21 @@ bool radio_sync_cb(state_t * state){
 bool radio_receive_pending_callback(state_t * state){
 #ifdef RADIO_RECEIVE_PEDNING_INFO
 	printf("INFO: radio_receive_pending_callback()\n");
-#endif
+	if (!state_receiving(state)){
+		printf("not receiving\n");
+		return true;
+	}
+
+#endif 
+	if (state_transmitting(state)) { //ignore if transmitting
+		return true;
+	}
 	int remaining = radio_frame_bytes_remaining(state->receiving);
 	if (remaining < 0){ return true;} //this was a false interrupt
 	else if (remaining > RADIO_MAX_PACKET_LENGTH){
-		//printf("WARNING: %d bytes remain unfilled in radio_frame_t but frame is ended\n", remaining);
+		printf("WARNING: %d bytes remain unfilled in radio_frame_t but frame is ended\n", remaining);
 		//remaining = RADIO_MAX_PACKET_LENGTH;
-		//state_abort_transceiving(state);
+		state_abort_transceiving(state);
 		//return false;
 		return true;
 	}
@@ -117,7 +132,7 @@ bool radio_receive_fifo_almost_full_callback(state_t * state, uint32_t rx_almost
 		state->receiving->frame_position += rx_almost_full_threshhold;
 		
 	}else{
-		//printf("ERROR: radio frame longer than radio_frame_t memory allocated\n");
+		printf("ERROR: radio frame longer than radio_frame_t memory allocated\n");
 		//si446x_read_rx_fifo(remaining, state->receiving->frame_position);
 		//state->receiving->frame_position += remaining;
 		state_abort_transceiving(state);
@@ -264,19 +279,26 @@ bool radio_event_callback(state_t * state) {
 		handled = true;
 		//printf("WARNING: TX/RX FIFO overflow detected! at %lld\n", zclock_usecs());
 		//printf("WARNING: FIFO overflow detected! prem:%u, sync:%u\n", (PREAMBLE_DETECTED!=0),(SYNC_DETECTED!=0));
+		if (state_receiving(state) && state_transmitting(state)){
+			printf("wtf\n");
+		}
+		
 		if (state_receiving(state)){
-			int remaining = radio_frame_bytes_remaining(state->transmitting);
-			if (remaining > 0){
-				printf("WARNING: FIFO overflow while RECEIVING! %d bytes remained\n", remaining);
-			}
+			int remaining = radio_frame_bytes_remaining(state->receiving);
+			//if (remaining > 0){
+			printf("WARNING: FIFO overflow while RECEIVING! %d/%u bytes remained\n", remaining, state->receiving->frame_len);
+			state_abort_transceiving(state);
+			//}
 		}
 		else if (state_transmitting(state)){
 			printf("WARNING: FIFO overflow while TRANSMITTING!\n");
+			state_abort_transceiving(state);
 		}
 		else {
-			printf("WARNING: FIFO overflow in non txrx state!\n");
+			//ignore
+			//printf("WARNING: FIFO overflow in non txrx state!\n");
 		}
-		state_abort_transceiving(state);
+		
 	}
 	
 	if (STATE_CHANGE){

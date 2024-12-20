@@ -117,7 +117,8 @@ bool radio_comm_PollCTS(void){
 
 	while (rx[1] != 0xFF){
 		if (radio_hal_transfer(tx, rx, 2) < 0){
-			printf("ERROR: spi_xfer() failed\n");
+			printf("CRITICAL ERROR: spi_xfer() failed\n");
+			exit(1);
 			break;
 		}
 	}

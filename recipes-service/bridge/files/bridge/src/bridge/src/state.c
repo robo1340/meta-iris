@@ -1,4 +1,4 @@
-#include "turbo_wrapper.h"
+//#include "turbo_wrapper.h"
 #include "state.h"
 #include "print_util.h"
 #include "json_util.h"
@@ -26,12 +26,13 @@
 
 #include "radio.h"
 #include "csma.h"
+#include "turbo_encoder.h"
 
 //reporting debug definitions
 #define DEBUG
 //#define OBJECT_DESTROY_DEBUG
 //#define PACKAGE_TYPE_DEBUG
-//#define TX_START_DEBUG
+#define TX_START_DEBUG
 
 state_t * global_state;
 
@@ -197,6 +198,8 @@ state_t * state(void){
 	to_return->low_priority_queue = zlistx_new();
 	if (to_return->low_priority_queue == NULL) {return NULL;}
 	zlistx_set_destructor(to_return->low_priority_queue, (zlistx_destructor_fn*)zchunk_destroy);
+	
+	to_return->encoder = turbo_encoder(0);
 	
 	global_state = to_return; //set the global state object, this is ok since this is a singleton class
 	
@@ -511,7 +514,7 @@ void state_abort_transceiving(state_t * state){
 		radio_frame_destroy(&state->transmitting);
 	}
 	radio_start_rx(state->current_channel, sizeof(coded_block_t));
-	si446x_change_state(SI446X_CMD_REQUEST_DEVICE_STATE_REP_CURR_STATE_MAIN_STATE_ENUM_READY); //change to ready state
+	//si446x_change_state(SI446X_CMD_REQUEST_DEVICE_STATE_REP_CURR_STATE_MAIN_STATE_ENUM_READY); //change to ready state
 }
 
 #define TXRX_TIMEOUT_MS 4000 ///<timeout value used to detect when the program is in a locked state
@@ -881,6 +884,8 @@ void state_destroy(state_t ** to_destroy){
 	zhashx_destroy(&(*to_destroy)->radio_config);	
 	zlistx_destroy(&(*to_destroy)->low_priority_queue);
 	
+	turbo_encoder_destroy(&(*to_destroy)->encoder);
+	
 	free(*to_destroy); //free the state_t from memory
 	*to_destroy = NULL; //set the state_t* to be a NULL pointer
 	return;	
@@ -1081,10 +1086,13 @@ radio_frame_t * packed_frame_encode(packed_frame_t ** to_encode){
 	
 	//frame_header_print(&(*to_encode)->hdr);
 
-	if(!turbo_wrapper_encode((uncoded_block_t*)(*to_encode), (coded_block_t*)to_return->frame_ptr)){
+	uint8_t * encoded = turbo_encoder_encode(global_state->encoder, (uint8_t*)(*to_encode), sizeof(packed_frame_t));
+	if (encoded == NULL){
+	//if(!turbo_wrapper_encode((uncoded_block_t*), (coded_block_t*)to_return->frame_ptr)){
 		radio_frame_destroy(&to_return);
 		return NULL;
 	}
+	memcpy(to_return->frame_ptr, encoded, sizeof(coded_block_t));
 	
 	packed_frame_destroy(to_encode);
 	return to_return;
@@ -1180,6 +1188,16 @@ bool radio_frame_transmit_start(radio_frame_t * frame, uint8_t channel){
 #endif
 	
 	if (frame->frame_ptr == NULL) {return false;} //nothing to transmit
+	
+	uint8_t new_state=0;
+	
+	//while (new_state != SI446X_CMD_REQUEST_DEVICE_STATE_REP_CURR_STATE_MAIN_STATE_ENUM_READY){
+	//	si446x_change_state(SI446X_CMD_REQUEST_DEVICE_STATE_REP_CURR_STATE_MAIN_STATE_ENUM_READY); //change to ready state
+	//	zclock_sleep(1);
+	//	new_state = radio_get_modem_state();
+	//	//printf("radio->%s\n", radio_get_state_string(new_state));	
+	//}
+	
 	frame->frame_position = frame->frame_ptr;
 	
 	si446x_fifo_info(SI446X_CMD_FIFO_INFO_ARG_FIFO_TX_BIT|SI446X_CMD_FIFO_INFO_ARG_FIFO_RX_BIT); // Reset TX FIFO
@@ -1194,8 +1212,21 @@ bool radio_frame_transmit_start(radio_frame_t * frame, uint8_t channel){
 		frame->frame_position += frame->frame_len;
 	}
 	
+	//printf("start tx\n");
+	
 	// Start sending packet, channel 0, START immediately, Packet length of the frame
 	si446x_start_tx(channel, 0x30,  frame->frame_len);
+
+	//while (new_state != SI446X_CMD_REQUEST_DEVICE_STATE_REP_CURR_STATE_MAIN_STATE_ENUM_TX){
+	//	si446x_start_tx(channel, 0x00,  frame->frame_len);
+	//	//si446x_start_tx(channel, 0x30,  frame->frame_len);
+	//	new_state = radio_get_modem_state();
+	//	printf("radio->%s\n", radio_get_state_string(new_state));
+	//	zclock_sleep(1);
+	//	printf("radio->%s\n", radio_get_state_string(radio_get_modem_state()));
+	//}
+	//printf("started tx\n");
+	
 	return true;
 }
 
@@ -1220,11 +1251,13 @@ packed_frame_t * radio_frame_decode(radio_frame_t * to_decode){
 	packed_frame_t * to_return = (packed_frame_t*)malloc(sizeof(packed_frame_t));
 	if (to_return == NULL) {return NULL;}
 	
-	if(!turbo_wrapper_decode((coded_block_t*)to_decode->frame_ptr, (uncoded_block_t*)to_return)){
+	uint8_t * decoded = turbo_encoder_decode(global_state->encoder, (uint8_t*)to_decode->frame_ptr, sizeof(coded_block_t));
+	if (decoded == NULL){
+	//if(!turbo_wrapper_decode((coded_block_t*)to_decode->frame_ptr, (uncoded_block_t*)to_return)){
 		free(to_return);
 		return NULL;
 	}
-	
+	memcpy((uint8_t*)to_return, decoded, sizeof(packed_frame_t));
 	//frame_header_print(&to_return->hdr);
 	//printArrHex(to_return->payload, sizeof(to_return->payload));
 

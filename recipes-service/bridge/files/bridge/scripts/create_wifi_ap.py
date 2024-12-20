@@ -140,6 +140,8 @@ if __name__ == "__main__":
 	config = parser.parse_args().__dict__
 	log.basicConfig(level=lvl==log.DEBUG if config['verbose'] else log.INFO)
 	os.system('killall hostapd > /dev/null 2>&1')
+	os.system('killall wpa_supplicant > /dev/null 2>&1')
+	os.system('ip addr flush dev %s' % (config['interface'],))
 	if (config['kill'] == True):
 		log.info('Hostapd killed')
 		sys.exit(0)

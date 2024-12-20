@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "turbofec/turbo.h"
 #include "turbo_wrapper.h"
@@ -82,16 +83,15 @@ int bits2bytes(uint8_t * bits, size_t bits_len, uint8_t * bytes, size_t bytes_le
 
 bool turbo_wrapper_encode(uncoded_block_t * input, coded_block_t * output){
 	int rc;
-	
 	rc = bytes2bits(input->data, sizeof(input->data), ubits, UNCODED_BIT_LEN); //bit-lify the input byte array and store in ubits
 	if (rc != UNCODED_BIT_LEN) {return false;}
-	
+
 	rc = lte_turbo_encode(&lte_turbo, ubits, &cbits[0], &cbits[UNCODED_BIT_LEN+4], &cbits[UNCODED_BIT_LEN+UNCODED_BIT_LEN+8]);
 	if (rc != CODED_BIT_LEN) {
 		printf("ERROR turbo_wrapper_encode() failed encoding length check %d\n", rc);
 		return false;
 	}
-	
+
 	rc = bits2bytes(cbits, CODED_BIT_LEN, output->data, CODED_LEN); //debit-lify the input byte array and store in output
 	if (rc != CODED_LEN) {return false;}
 	return true;
@@ -101,16 +101,19 @@ static struct tdecoder *tdec = NULL;
 static int tdec_iterations = TURBO_DECODE_DEFAULT_ITER;
 
 bool turbo_wrapper_init(int iterations){
+	turbo_wrapper_deinit();
 	if ((iterations > TURBO_DECODE_MAX_ITER) || (iterations < TURBO_DECODE_MIN_ITER)) {
 		tdec_iterations = TURBO_DECODE_DEFAULT_ITER;
 	}
+	if (tdec != NULL) {return true;}
 	tdec = alloc_tdec();
 	return (tdec != NULL);
 }
 
 bool turbo_wrapper_deinit(void){
 	if (tdec != NULL){
-		free_tdec(tdec);
+		free(tdec);
+		tdec = NULL;
 	}
 	return true;
 }

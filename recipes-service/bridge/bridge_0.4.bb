@@ -85,6 +85,10 @@ do_install(){
         rm si446x_patch.h	
         ln -s si446x_patch_revC.h si446x_patch.h
 	cd -
+
+        cd ${D}/bridge/scripts
+        chmod +x *.sh
+        cd -
 	
 	#install the service file to /etc/systemd/system
 	install -Dm 644 ${prj}.service ${D}${service_dir}/${prj}.service

@@ -166,6 +166,7 @@ uint8_t radio_get_rssi(void){
 }
 
 bool radio_start_rx(uint8_t channel, size_t recv_len){
+	//printf("INFO: radio_start_rx()\n");
 	//si446x_get_int_status(0u, 0u, 0u);
 	si446x_fifo_info(SI446X_CMD_FIFO_INFO_ARG_FIFO_RX_BIT|SI446X_CMD_FIFO_INFO_ARG_FIFO_TX_BIT); //Reset FIFO
 	si446x_get_int_status(0u, 0u, 0u); // Read ITs, clear pending ones

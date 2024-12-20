@@ -1,0 +1,614 @@
+Archive member included to satisfy reference by file (symbol)
+
+/bridge/src/test-rs/test.a(main.o)
+                              /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o (main)
+/bridge/src/test-rs/test.a(util.o)
+                              /bridge/src/test-rs/test.a(main.o) (matrix_new)
+
+Discarded input sections
+
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-rs/test.a(main.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-rs/test.a(util.o)
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+LOAD /bridge/src/test-rs/test.a
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libm.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libturbofec.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+LOAD /lib/libgcc_s.so
+START GROUP
+LOAD /lib/libgcc_s.so.1
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+END GROUP
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libc.so
+START GROUP
+LOAD /lib/libc.so.6
+LOAD /usr/lib/libc_nonshared.a
+LOAD /lib/ld-linux-armhf.so.3
+END GROUP
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+LOAD /lib/libgcc_s.so
+START GROUP
+LOAD /lib/libgcc_s.so.1
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+END GROUP
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                [!provide]                        PROVIDE (__executable_start = SEGMENT_START ("text-segment", 0x10000))
+                0x00010154                        . = (SEGMENT_START ("text-segment", 0x10000) + SIZEOF_HEADERS)
+
+.interp         0x00010154       0x19
+ *(.interp)
+ .interp        0x00010154       0x19 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.note.gnu.build-id
+                0x00010170       0x24
+ *(.note.gnu.build-id)
+ .note.gnu.build-id
+                0x00010170       0x24 linker stubs
+
+.note.ABI-tag   0x00010194       0x20
+ .note.ABI-tag  0x00010194       0x20 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.hash
+ *(.hash)
+
+.gnu.hash       0x000101b4       0x60
+ *(.gnu.hash)
+ .gnu.hash      0x000101b4       0x60 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.dynsym         0x00010214      0x110
+ *(.dynsym)
+ .dynsym        0x00010214      0x110 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.dynstr         0x00010324       0xe1
+ *(.dynstr)
+ .dynstr        0x00010324       0xe1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.gnu.version    0x00010406       0x22
+ *(.gnu.version)
+ .gnu.version   0x00010406       0x22 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.gnu.version_d  0x00010428        0x0
+ *(.gnu.version_d)
+ .gnu.version_d
+                0x00010428        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.gnu.version_r  0x00010428       0x30
+ *(.gnu.version_r)
+ .gnu.version_r
+                0x00010428       0x30 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.rel.dyn        0x00010458       0x10
+ *(.rel.init)
+ *(.rel.text .rel.text.* .rel.gnu.linkonce.t.*)
+ *(.rel.fini)
+ *(.rel.rodata .rel.rodata.* .rel.gnu.linkonce.r.*)
+ *(.rel.data.rel.ro .rel.data.rel.ro.* .rel.gnu.linkonce.d.rel.ro.*)
+ .rel.data.rel.ro
+                0x00010458        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.rel.data .rel.data.* .rel.gnu.linkonce.d.*)
+ *(.rel.tdata .rel.tdata.* .rel.gnu.linkonce.td.*)
+ *(.rel.tbss .rel.tbss.* .rel.gnu.linkonce.tb.*)
+ *(.rel.ctors)
+ *(.rel.dtors)
+ *(.rel.got)
+ .rel.got       0x00010458        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*)
+ .rel.bss       0x00010460        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                [!provide]                        PROVIDE (__rel_iplt_start = .)
+ *(.rel.iplt)
+ .rel.iplt      0x00010468        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                [!provide]                        PROVIDE (__rel_iplt_end = .)
+
+.rela.dyn       0x00010468        0x0
+ *(.rela.init)
+ *(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)
+ *(.rela.fini)
+ *(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r.*)
+ *(.rela.data .rela.data.* .rela.gnu.linkonce.d.*)
+ *(.rela.tdata .rela.tdata.* .rela.gnu.linkonce.td.*)
+ *(.rela.tbss .rela.tbss.* .rela.gnu.linkonce.tb.*)
+ *(.rela.ctors)
+ *(.rela.dtors)
+ *(.rela.got)
+ *(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*)
+                [!provide]                        PROVIDE (__rela_iplt_start = .)
+ *(.rela.iplt)
+                [!provide]                        PROVIDE (__rela_iplt_end = .)
+
+.rel.plt        0x00010468       0x68
+ *(.rel.plt)
+ .rel.plt       0x00010468       0x68 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.rela.plt
+ *(.rela.plt)
+
+.init           0x000104d0        0xc
+ *(SORT_NONE(.init))
+ .init          0x000104d0        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x000104d0                _init
+ .init          0x000104d8        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.plt            0x000104dc       0xb0
+ *(.plt)
+ .plt           0x000104dc       0xb0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x000104f0                calloc@@GLIBC_2.4
+                0x000104fc                __libc_start_main@@GLIBC_2.34
+                0x00010508                printf@@GLIBC_2.4
+                0x00010514                free@@GLIBC_2.4
+                0x00010520                memcpy@@GLIBC_2.4
+                0x0001052c                memcmp@@GLIBC_2.4
+                0x00010538                puts@@GLIBC_2.4
+                0x00010550                exit@@GLIBC_2.4
+                0x0001055c                fprintf@@GLIBC_2.4
+                0x00010568                putchar@@GLIBC_2.4
+                0x00010574                abort@@GLIBC_2.4
+                0x00010580                __assert_fail@@GLIBC_2.4
+
+.iplt           0x0001058c        0x0
+ *(.iplt)
+ .iplt          0x0001058c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.text           0x0001058c     0x2d5c
+ *(.text.unlikely .text.*_unlikely .text.unlikely.*)
+ *(.text.exit .text.exit.*)
+ *(.text.startup .text.startup.*)
+ *(.text.hot .text.hot.*)
+ *(SORT_BY_NAME(.text.sorted.*))
+ *(.text .stub .text.* .gnu.linkonce.t.*)
+ .text          0x0001058c       0x34 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x0001058c                _start
+ .text          0x000105c0       0x24 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .text          0x000105e4       0x6c /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .text          0x00010650     0x2314 /bridge/src/test-rs/test.a(main.o)
+                0x00010650                fail
+                0x00010690                pass
+                0x000106d0                REQUIRE
+                0x0001072c                AR_EQ
+                0x000107b8                STR_EQ
+                0x0001083c                MX_EQ
+                0x00010944                generate_gf
+                0x00010b28                gf_mul
+                0x00010bbc                gf_div
+                0x00010c58                gf_sum
+                0x00010c88                gf_polydiv_recursive
+                0x00010e98                gf_polydiv
+                0x00010ef0                gf_matr_det
+                0x00010fb4                gf_matr_mul
+                0x0001115c                gf_matr_mul_vector
+                0x000112bc                gf_matr_inv
+                0x00011424                generating_polynomial
+                0x00011520                shift_msg_to_vec
+                0x000115f8                calculate_check_symbols
+                0x000116fc                calculate_syndrome
+                0x0001183c                extract_message
+                0x000118a0                encode_message
+                0x00011a34                decode_message
+                0x000122ac                main
+ .text          0x00012964      0x984 /bridge/src/test-rs/test.a(util.o)
+                0x00012964                vector_print
+                0x000129d8                matrix_new
+                0x00012a64                matrix_free
+                0x00012ad8                matrix_copy
+                0x00012ba8                fatal
+                0x00012be4                swap
+                0x00012c30                vector_new
+                0x00012c5c                vector_copy
+                0x00012cdc                vector_free
+                0x00012d00                stack
+                0x00012de8                submatrix
+                0x00012e80                pow2
+                0x00012eac                vector_sum
+                0x00012f88                vector_to_str
+                0x00013018                str_to_vector
+                0x00013098                sum
+                0x00013110                substring
+                0x000131f8                strlength
+                0x00013260                count
+ .text          0x000132e8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .text          0x000132e8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ *(.gnu.warning)
+ *(.glue_7t)
+ .glue_7t       0x000132e8        0x0 linker stubs
+ *(.glue_7)
+ .glue_7        0x000132e8        0x0 linker stubs
+ *(.vfp11_veneer)
+ .vfp11_veneer  0x000132e8        0x0 linker stubs
+ *(.v4_bx)
+ .v4_bx         0x000132e8        0x0 linker stubs
+
+.fini           0x000132e8        0x8
+ *(SORT_NONE(.fini))
+ .fini          0x000132e8        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x000132e8                _fini
+ .fini          0x000132ec        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                [!provide]                        PROVIDE (__etext = .)
+                [!provide]                        PROVIDE (_etext = .)
+                [!provide]                        PROVIDE (etext = .)
+
+.rodata         0x000132f0      0x3b0
+ *(.rodata .rodata.* .gnu.linkonce.r.*)
+ .rodata.cst4   0x000132f0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x000132f0                _IO_stdin_used
+ .rodata        0x000132f4       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .rodata        0x00013384      0x235 /bridge/src/test-rs/test.a(main.o)
+ *fill*         0x000135b9        0x3 
+ .rodata        0x000135bc       0x52 /bridge/src/test-rs/test.a(util.o)
+ *fill*         0x0001360e        0x2 
+ .rodata        0x00013610       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+
+.rodata1
+ *(.rodata1)
+
+.ARM.extab      0x000136a0        0x0
+ *(.ARM.extab* .gnu.linkonce.armextab.*)
+ .ARM.extab     0x000136a0        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.ARM.exidx      0x000136a0        0x8
+                [!provide]                        PROVIDE (__exidx_start = .)
+ *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+ .ARM.exidx     0x000136a0        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                [!provide]                        PROVIDE (__exidx_end = .)
+
+.eh_frame_hdr
+ *(.eh_frame_hdr)
+ *(.eh_frame_entry .eh_frame_entry.*)
+
+.eh_frame       0x000136a8        0x4
+ *(.eh_frame)
+ .eh_frame      0x000136a8        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ *(.eh_frame.*)
+
+.sframe
+ *(.sframe)
+ *(.sframe.*)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.gnu_extab
+ *(.gnu_extab*)
+
+.exception_ranges
+ *(.exception_ranges*)
+                0x00014f00                        . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
+
+.eh_frame
+ *(.eh_frame)
+ *(.eh_frame.*)
+
+.sframe
+ *(.sframe)
+ *(.sframe.*)
+
+.gnu_extab
+ *(.gnu_extab)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.exception_ranges
+ *(.exception_ranges*)
+
+.tdata          0x00014f00        0x0
+                [!provide]                        PROVIDE (__tdata_start = .)
+ *(.tdata .tdata.* .gnu.linkonce.td.*)
+
+.tbss
+ *(.tbss .tbss.* .gnu.linkonce.tb.*)
+ *(.tcommon)
+
+.preinit_array  0x00014f00        0x0
+                [!provide]                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array)
+                [!provide]                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x00014f00        0x4
+                [!provide]                        PROVIDE (__init_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
+ *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
+ .init_array    0x00014f00        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                [!provide]                        PROVIDE (__init_array_end = .)
+
+.fini_array     0x00014f04        0x4
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
+ *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
+ .fini_array    0x00014f04        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                [!provide]                        PROVIDE (__fini_array_end = .)
+
+.ctors
+ *crtbegin.o(.ctors)
+ *crtbegin?.o(.ctors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+ *(SORT_BY_NAME(.ctors.*))
+ *(.ctors)
+
+.dtors
+ *crtbegin.o(.dtors)
+ *crtbegin?.o(.dtors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+ *(SORT_BY_NAME(.dtors.*))
+ *(.dtors)
+
+.jcr
+ *(.jcr)
+
+.data.rel.ro    0x00014f08        0x0
+ *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
+ *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
+ .data.rel.ro   0x00014f08        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.dynamic        0x00014f08       0xf8
+ *(.dynamic)
+ .dynamic       0x00014f08       0xf8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00014f08                _DYNAMIC
+                0x00015000                        . = DATA_SEGMENT_RELRO_END (., 0x0)
+
+.got            0x00015000       0x48
+ *(.got.plt)
+ .got.plt       0x00015000       0x40 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00015000                _GLOBAL_OFFSET_TABLE_
+ *(.igot.plt)
+ .igot.plt      0x00015040        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.got)
+ .got           0x00015040        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.igot)
+
+.data           0x00015048       0x2c
+                [!provide]                        PROVIDE (__data_start = .)
+ *(.data .data.* .gnu.linkonce.d.*)
+ .data          0x00015048        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00015048                data_start
+                0x00015048                __data_start
+ .data          0x0001504c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .data          0x0001504c        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                0x0001504c                __dso_handle
+ .data          0x00015050       0x24 /bridge/src/test-rs/test.a(main.o)
+                0x00015050                p
+ .data          0x00015074        0x0 /bridge/src/test-rs/test.a(util.o)
+ .data          0x00015074        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .data          0x00015074        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.tm_clone_table
+                0x00015074        0x0
+ .tm_clone_table
+                0x00015074        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .tm_clone_table
+                0x00015074        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+
+.data1
+ *(.data1)
+                0x00015074                        _edata = .
+                [!provide]                        PROVIDE (edata = .)
+                0x00015074                        . = .
+                0x00015074                        __bss_start = .
+                0x00015074                        __bss_start__ = .
+
+.bss            0x00015078      0x810
+ *(.dynbss)
+ *fill*         0x00015078        0x0 
+ .dynbss        0x00015078        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00015078                stderr@@GLIBC_2.4
+ *(.bss .bss.* .gnu.linkonce.b.*)
+ .bss           0x0001507c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .bss           0x0001507c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .bss           0x0001507c        0x1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ *fill*         0x0001507d        0x3 
+ .bss           0x00015080      0x808 /bridge/src/test-rs/test.a(main.o)
+                0x00015080                test_n
+                0x00015084                total
+                0x00015088                alpha_of
+                0x00015488                index_of
+ .bss           0x00015888        0x0 /bridge/src/test-rs/test.a(util.o)
+ .bss           0x00015888        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .bss           0x00015888        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ *(COMMON)
+                0x00015888                        . = ALIGN ((. != 0x0)?0x4:0x1)
+                0x00015888                        _bss_end__ = .
+                0x00015888                        __bss_end__ = .
+                0x00015888                        . = ALIGN (0x4)
+                0x00015888                        . = SEGMENT_START ("ldata-segment", .)
+                0x00015888                        . = ALIGN (0x4)
+                0x00015888                        __end__ = .
+                0x00015888                        _end = .
+                [!provide]                        PROVIDE (end = .)
+                0x00015888                        . = DATA_SEGMENT_END (.)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x00000000       0x12
+ *(.comment)
+ .comment       0x00000000       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                                 0x39 (size before relaxing)
+ .comment       0x00000012       0x13 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .comment       0x00000012       0x13 /bridge/src/test-rs/test.a(main.o)
+ .comment       0x00000012       0x13 /bridge/src/test-rs/test.a(util.o)
+ .comment       0x00000012       0x13 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+
+.ARM.attributes
+                0x00000000       0x3b
+ .ARM.attributes
+                0x00000000       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .ARM.attributes
+                0x0000003b       0x2b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .ARM.attributes
+                0x00000066       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .ARM.attributes
+                0x000000a1       0x39 /bridge/src/test-rs/test.a(main.o)
+ .ARM.attributes
+                0x000000da       0x39 /bridge/src/test-rs/test.a(util.o)
+ .ARM.attributes
+                0x00000113       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .ARM.attributes
+                0x0000014e       0x2b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.gnu.build.attributes
+ *(.gnu.build.attributes .gnu.build.attributes.*)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x00000000       0xa8
+ *(.debug_aranges)
+ .debug_aranges
+                0x00000000       0x50 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_aranges
+                0x00000050       0x30 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_aranges
+                0x00000080       0x28 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info     0x00000000      0x564
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x00000000      0x51e /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_info    0x0000051e       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_info    0x00000541       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_abbrev   0x00000000      0x198
+ *(.debug_abbrev)
+ .debug_abbrev  0x00000000      0x174 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_abbrev  0x00000174       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_abbrev  0x00000186       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_line     0x00000000      0x2b9
+ *(.debug_line .debug_line.* .debug_line_end)
+ .debug_line    0x00000000      0x1f1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_line    0x000001f1       0x70 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_line    0x00000261       0x58 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str      0x00000000      0x485
+ *(.debug_str)
+ .debug_str     0x00000000      0x459 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                                0x76c (size before relaxing)
+ .debug_str     0x00000459       0x16 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                                 0x43 (size before relaxing)
+ .debug_str     0x0000046f       0x16 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                                 0x43 (size before relaxing)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges
+ *(.debug_ranges)
+
+.debug_addr
+ *(.debug_addr)
+
+.debug_line_str
+                0x00000000       0x46
+ *(.debug_line_str)
+ .debug_line_str
+                0x00000000       0x38 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_line_str
+                0x00000038        0x7 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                                 0x37 (size before relaxing)
+ .debug_line_str
+                0x0000003f        0x7 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                                 0x37 (size before relaxing)
+
+.debug_loclists
+ *(.debug_loclists)
+
+.debug_macro
+ *(.debug_macro)
+
+.debug_names
+ *(.debug_names)
+
+.debug_rnglists
+                0x00000000       0x38
+ *(.debug_rnglists)
+ .debug_rnglists
+                0x00000000       0x1f /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_rnglists
+                0x0000001f       0x19 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_str_offsets
+ *(.debug_str_offsets)
+
+.debug_sup
+ *(.debug_sup)
+
+.gnu.attributes
+ *(.gnu.attributes)
+
+.note.gnu.arm.ident
+ *(.note.gnu.arm.ident)
+
+/DISCARD/
+ *(.note.GNU-stack)
+ *(.gnu_debuglink)
+ *(.gnu.lto_*)
+OUTPUT(/bridge/src/test-rs/test elf32-littlearm)
+LOAD linker stubs

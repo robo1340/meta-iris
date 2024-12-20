@@ -14,6 +14,17 @@ mport = '/dev/ttySTM1'                     #choose your com port on which you co
 GPS_PATH = '/tmp/gps.json'
 DELETION_TIME_S = 30
 
+#a simple task scheduler class because I don't want to use Timer to schedule tasks
+class Task:
+	def __init__(self, period, callback):
+		self.period = period
+		self.callback = callback
+		self.last_update = time.monotonic()
+	def run(self):
+		if ((time.monotonic() - self.last_update) > self.period):
+			self.last_update = time.monotonic()
+			self.callback()
+
 def configure_logging(verbose=True):
 	lvl = log.DEBUG if (verbose) else log.INFO
 	handler = RotatingFileHandler('/var/log/gps.log', maxBytes=10*10000, backupCount=5)
@@ -53,6 +64,11 @@ def write(path, contents):
 	except BaseException as ex:
 		print(ex)
 
+def delete_known_hosts():
+	k = '/home/root/.ssh/known_hosts'
+	if (os.path.isfile(k)):
+		os.remove(k)
+
 if __name__=="__main__":
 	if ((len(sys.argv) > 1) and (sys.argv[1] == '-F')): #log everything to stdout
 		configure_logging_commandline(verbose=True)
@@ -62,6 +78,7 @@ if __name__=="__main__":
 	log.info('GPS Service Starting')
 	delete(GPS_PATH)
 	last_update = -1
+	delete_known_hosts = Task(30, delete_known_hosts)
 	
 	while True:
 		try:
@@ -78,6 +95,8 @@ if __name__=="__main__":
 					delete(GPS_PATH)
 					last_update = -1
 					log.info('Lock Lost')
+				delete_known_hosts.run()
+				time.sleep(1)
 		except KeyboardInterrupt:
 			print("stopping")
 			break

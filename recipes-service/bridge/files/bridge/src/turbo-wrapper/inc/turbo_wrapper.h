@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  *
  * This file is part of pyA20.
@@ -21,8 +23,8 @@
  * MA 02110-1301, USA.
  */
 
-#ifndef _SPI_LIB_H
-#define _SPI_LIB_H
+#ifndef _TURBO_WRAPPER_H
+#define _TURBO_WRAPPER_H
 #endif 
 
 #include <stddef.h>
@@ -61,6 +63,13 @@ bool turbo_wrapper_encode(uncoded_block_t * input, coded_block_t * output);
  */
 bool turbo_wrapper_decode(coded_block_t * input, uncoded_block_t * output);
 
+/**@brief convert an array of bytes to an array of bits that is 8 times the length
+ * @param bytes pointer to the byte array to be converted
+ * @param bytes_len the length of bytes
+ * @param bits pointer to the byte array where the bit values will be stored
+ * @param bits_len the length of the bits array, must be at least bytes_len*8
+ * @return returns the number of bits written into the bits array on success, returns -1 on failure
+*/
 int bytes2bits(uint8_t * bytes, size_t bytes_len, uint8_t * bits, size_t bits_len);
 int bytes2bits_ranged(uint8_t * bytes, size_t bytes_len, int8_t * bits, size_t bits_len);
 int bits2bytes(uint8_t * bits, size_t bits_len, uint8_t * bytes, size_t bytes_len);

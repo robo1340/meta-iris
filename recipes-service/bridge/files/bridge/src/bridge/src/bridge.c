@@ -79,8 +79,8 @@ bridge_t * bridge_create(bool no_slip, bool no_gpio_events, bool no_incoming_soc
 	}
 
 	//init the turbo encoder
-	if (!turbo_wrapper_init(4)) {return NULL;}
-	assert(sizeof(uncoded_block_t)==sizeof(packed_frame_t));
+	//if (!turbo_wrapper_init(4)) {return NULL;}
+	assert(br->my_state->encoder->frame_bytes_len==sizeof(packed_frame_t));
 	
 
 	return br;	
