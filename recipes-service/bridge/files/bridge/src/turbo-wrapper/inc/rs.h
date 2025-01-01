@@ -1,8 +1,13 @@
 #pragma once
 
+//#ifndef _RS_H
+//#define _RS_H
+//#else
+
 #include "rs_internal.h"
 #include "test.h"
 #include <stdio.h>
+#include <stdint.h>
 
 uint8_t *encode_message(uint8_t *msg, uint32_t msg_len, uint32_t t, uint32_t *output_len);
 uint8_t *decode_message(uint8_t *codeword, uint32_t c_len, uint32_t t, uint32_t *output_len);
@@ -206,3 +211,5 @@ uint8_t *decode_message(uint8_t *codeword, uint32_t c_len, uint32_t t, uint32_t 
 	vector_free(e_fix);
 	return ret;
 }
+
+//#endif

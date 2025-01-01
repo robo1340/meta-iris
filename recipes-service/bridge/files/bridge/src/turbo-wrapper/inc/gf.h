@@ -1,7 +1,11 @@
 #pragma once
 
+//#ifndef _GF_H
+//#define _GF_H
+//#else
+
 #include "util.h"
-#include "types.h"
+#include <stdint.h>
 
 #define GFsize 256
 #define m 8 // степень RS-полинома (согласно Стандарта ECMA-130 - восемь)
@@ -203,3 +207,5 @@ uint32_t **gf_matr_inv(uint32_t **a, uint32_t a_rows, uint32_t a_cols)
 
     return a0inv;
 }
+
+//#endif 

@@ -180,7 +180,8 @@ bool radio_state_change_callback(state_t * state){
 	
 	//if READY go to the receive state now
 	if (new_state == SI446X_CMD_REQUEST_DEVICE_STATE_REP_CURR_STATE_MAIN_STATE_ENUM_READY){
-		if (!radio_start_rx(state->current_channel, sizeof(coded_block_t))){return false;}
+		//if (!radio_start_rx(state->current_channel, sizeof(coded_block_t))){return false;}
+		if (!radio_start_rx(state->current_channel, state->receiving->frame_len)){return false;}
 	}
 
 	return true;

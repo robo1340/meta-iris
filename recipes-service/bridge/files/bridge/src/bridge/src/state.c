@@ -28,6 +28,7 @@
 #include "csma.h"
 #include "turbo_encoder.h"
 
+
 //reporting debug definitions
 #define DEBUG
 //#define OBJECT_DESTROY_DEBUG
@@ -164,9 +165,6 @@ state_t * state(void){
 	to_return->loading_dock.frame = NULL;
 	to_return->loading_dock.max_idle_ms = to_return->max_loading_dock_idle_ms;
 	
-	to_return->transmitting = NULL;
-	to_return->receiving	= radio_frame(sizeof(coded_block_t));
-	
 	timer_init(&to_return->beacon_transmit, 	true, 	to_return->beacon_period_ms, to_return->beacon_period_variance_ms);
 	timer_init(&to_return->transmit_send_queue, true,   to_return->transmit_queue_period_ms, to_return->transmit_queue_variance_ms);
 	timer_charge(&to_return->beacon_transmit, RANDINT(4000,6000)); //charge up the first beacon to happen within a specified amount of time
@@ -199,7 +197,20 @@ state_t * state(void){
 	if (to_return->low_priority_queue == NULL) {return NULL;}
 	zlistx_set_destructor(to_return->low_priority_queue, (zlistx_destructor_fn*)zchunk_destroy);
 	
+#ifdef USE_CONV_ENCODER
+	//GSM_xCCH
+	//WiMax_FCH
+	to_return->encoder = conv_encoder(WiMax_FCH);
+#else
 	to_return->encoder = turbo_encoder(0);
+#endif
+	
+	to_return->transmitting = NULL;
+#ifdef USE_CONV_ENCODER
+	to_return->receiving	= radio_frame(to_return->encoder->coded_bytes_len*to_return->encoder->conv_blocks);
+#else
+	to_return->receiving	= radio_frame(sizeof(coded_block_t));
+#endif
 	
 	global_state = to_return; //set the global state object, this is ok since this is a singleton class
 	
@@ -467,6 +478,7 @@ bool state_append_loading_dock(state_t * state, uint8_t type, uint16_t len, uint
 }
 
 bool state_append_low_priority_packet(state_t * state, uint8_t type, uint16_t len, uint8_t * value){
+	//printf("INFO: state_append_low_priority_packet(%u,%u)\n", type, len);
 	
 	tlv_t * to_append = tlv(type, len, value);
 	if (to_append == NULL) {
@@ -513,11 +525,15 @@ void state_abort_transceiving(state_t * state){
 	if (state->transmitting != NULL){
 		radio_frame_destroy(&state->transmitting);
 	}
-	radio_start_rx(state->current_channel, sizeof(coded_block_t));
+//#ifdef USE_CONV_ENCODER
+	radio_start_rx(state->current_channel, state->receiving->frame_len);
+//#else
+//	radio_start_rx(state->current_channel, sizeof(coded_block_t));
+//#endif
 	//si446x_change_state(SI446X_CMD_REQUEST_DEVICE_STATE_REP_CURR_STATE_MAIN_STATE_ENUM_READY); //change to ready state
 }
 
-#define TXRX_TIMEOUT_MS 4000 ///<timeout value used to detect when the program is in a locked state
+#define TXRX_TIMEOUT_MS 16000 ///<timeout value used to detect when the program is in a locked state
 
 #define RSSI_THRESHHOLD 10 ///<only transmit if AVG RSSI plus this is lower than this
 
@@ -983,7 +999,7 @@ frame_t * frame(char * callsign, uint8_t opt1, uint8_t * mac){
 }
 
 bool frame_append(frame_t * frame, uint8_t type, uint16_t len, uint8_t * value){
-	if ((frame_len(frame) + tlv_len(len)) > FRAME_LEN_MAX){ //cannot append value, frame would be too large
+	if ((frame_len(frame) + tlv_len(len)) > (int)sizeof(packed_frame_t)){ //cannot append value, frame would be too large
 		return false;
 	}
 	
@@ -1001,7 +1017,7 @@ bool frame_append(frame_t * frame, uint8_t type, uint16_t len, uint8_t * value){
 }
 
 bool frame_append_tlv(frame_t * frame, tlv_t * to_append){
-	if ((frame_len(frame) + to_append->len) > FRAME_LEN_MAX){ //cannot append value, frame would be too large
+	if ((frame_len(frame) + to_append->len) > (int)sizeof(packed_frame_t)){ //cannot append value, frame would be too large
 		return false;
 	}
 	
@@ -1030,14 +1046,15 @@ packed_frame_t * frame_pack(frame_t ** frame){
 		printf("ERROR: frame_pack() length check failed\n");
 		return NULL;
 	}
-#ifdef DEBUG_FRAME_LOAD_RATIO
-	float flen = len;
-	float fsz = sizeof(packed_frame_t);
-	printf("DEBUG: frame_pack %d/%u %4.1f%%\n", len, sizeof(packed_frame_t), (flen/fsz)*100);
-#endif
 	
 	packed_frame_t * to_return = (packed_frame_t*)malloc(sizeof(packed_frame_t));
 	if (to_return == NULL) {return NULL;}
+	
+#ifdef DEBUG_FRAME_LOAD_RATIO
+	float flen = len;
+	float fsz = sizeof(to_return->payload);
+	printf("DEBUG: frame_pack %d/%u %4.1f%%\n", len, sizeof(to_return->payload), (flen/fsz)*100);
+#endif
 	
 	memcpy(&to_return->hdr, &(*frame)->hdr, sizeof(to_return->hdr)); //copy header directly
 	memset(to_return->payload, 0, sizeof(to_return->payload));
@@ -1078,7 +1095,11 @@ static void packed_frame_generate_crc(packed_frame_t * frame){
 
 radio_frame_t * packed_frame_encode(packed_frame_t ** to_encode){
 	//printf("DEBUG: packed_frame_encode()\n");
+#ifdef USE_CONV_ENCODER
+	radio_frame_t * to_return = radio_frame(global_state->encoder->coded_bytes_len*global_state->encoder->conv_blocks);
+#else
 	radio_frame_t * to_return = radio_frame(sizeof(coded_block_t));
+#endif
 	if (to_return == NULL) {return NULL;}
 	
 	(*to_encode)->hdr.len = sizeof((*to_encode)->payload);
@@ -1086,13 +1107,23 @@ radio_frame_t * packed_frame_encode(packed_frame_t ** to_encode){
 	
 	//frame_header_print(&(*to_encode)->hdr);
 
+#ifdef USE_CONV_ENCODER
+	uint8_t * encoded = conv_encoder_encode(global_state->encoder, (uint8_t*)(*to_encode), sizeof(packed_frame_t));
+#else
 	uint8_t * encoded = turbo_encoder_encode(global_state->encoder, (uint8_t*)(*to_encode), sizeof(packed_frame_t));
+#endif
 	if (encoded == NULL){
 	//if(!turbo_wrapper_encode((uncoded_block_t*), (coded_block_t*)to_return->frame_ptr)){
 		radio_frame_destroy(&to_return);
 		return NULL;
 	}
+
+#ifdef USE_CONV_ENCODER
+	memcpy(to_return->frame_ptr, encoded, global_state->encoder->coded_bytes_len*global_state->encoder->conv_blocks);
+#else
 	memcpy(to_return->frame_ptr, encoded, sizeof(coded_block_t));
+#endif
+	
 	
 	packed_frame_destroy(to_encode);
 	return to_return;
@@ -1216,16 +1247,6 @@ bool radio_frame_transmit_start(radio_frame_t * frame, uint8_t channel){
 	
 	// Start sending packet, channel 0, START immediately, Packet length of the frame
 	si446x_start_tx(channel, 0x30,  frame->frame_len);
-
-	//while (new_state != SI446X_CMD_REQUEST_DEVICE_STATE_REP_CURR_STATE_MAIN_STATE_ENUM_TX){
-	//	si446x_start_tx(channel, 0x00,  frame->frame_len);
-	//	//si446x_start_tx(channel, 0x30,  frame->frame_len);
-	//	new_state = radio_get_modem_state();
-	//	printf("radio->%s\n", radio_get_state_string(new_state));
-	//	zclock_sleep(1);
-	//	printf("radio->%s\n", radio_get_state_string(radio_get_modem_state()));
-	//}
-	//printf("started tx\n");
 	
 	return true;
 }
@@ -1243,15 +1264,19 @@ void radio_frame_reset(radio_frame_t * frame){
 }
 
 packed_frame_t * radio_frame_decode(radio_frame_t * to_decode){
-	if (to_decode->frame_len != sizeof(coded_block_t)) {
-		printf("ERROR: radio_frame_decode() length check failed!\n");
-		return NULL;
-	}
+	//if (to_decode->frame_len != sizeof(coded_block_t)) {
+	//	printf("ERROR: radio_frame_decode() length check failed!\n");
+	//	return NULL;
+	//}
 	
 	packed_frame_t * to_return = (packed_frame_t*)malloc(sizeof(packed_frame_t));
 	if (to_return == NULL) {return NULL;}
-	
+
+#ifdef USE_CONV_ENCODER
+	uint8_t * decoded = conv_encoder_decode(global_state->encoder, (uint8_t*)to_decode->frame_ptr, to_decode->frame_len);
+#else
 	uint8_t * decoded = turbo_encoder_decode(global_state->encoder, (uint8_t*)to_decode->frame_ptr, sizeof(coded_block_t));
+#endif
 	if (decoded == NULL){
 	//if(!turbo_wrapper_decode((coded_block_t*)to_decode->frame_ptr, (uncoded_block_t*)to_return)){
 		free(to_return);

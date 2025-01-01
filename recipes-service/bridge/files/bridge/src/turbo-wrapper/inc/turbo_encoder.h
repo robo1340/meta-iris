@@ -34,7 +34,7 @@
 #include "turbo_wrapper.h"
 
 #include <turbofec/conv.h>
-
+#include "conv_wrapper.h"
 
 typedef struct turbo_encoder_DEFINITION turbo_encoder_t; 					///<definition for a sub-payload making up a part of the payload of a frame
 
@@ -77,6 +77,42 @@ uint8_t * turbo_encoder_encode(turbo_encoder_t * encoder, uint8_t * input, uint3
 uint8_t * turbo_encoder_decode(turbo_encoder_t * encoder, uint8_t * input, uint32_t input_len);
 
 void turbo_encoder_destroy(turbo_encoder_t ** to_destroy);
+
+
+
+typedef struct conv_encoder_DEFINITION conv_encoder_t; 					///<definition for a sub-payload making up a part of the payload of a frame
+
+struct __attribute__((__packed__)) conv_encoder_DEFINITION {
+	uint8_t conv_blocks; ///<the number of convolutional code blocks
+	encoder_t * enc; ///<the convolutional encoder object
+	uint16_t rs_blocks; //the number of reed solomon blocks in the encoder
+	uint16_t rs_block_len;
+	uint32_t frame_bytes_len; //length of the dataframe before RS encoding and turbo encoding
+	uint8_t * uncoded_bytes;
+	uint32_t uncoded_bytes_len; //length of the dataframe after RS encoding but before turbo encoding
+	uint32_t uncoded_bits_len_padded;
+	uint8_t * coded_bytes;
+	uint32_t coded_bytes_len;
+	uint32_t coded_bits_len_padded;
+};
+
+conv_encoder_t * conv_encoder(uint8_t type);
+
+/** @brief encoder encode
+ *  @param encoder the encoder object
+ *  @param input
+ *  @param input_len must be the same value as encoder->uncoded_bytes_len
+ */
+uint8_t * conv_encoder_encode(conv_encoder_t * encoder, uint8_t * input, uint32_t input_len);
+
+/** @brief encoder decode
+ *  @param encoder the encoder object
+ *  @param input
+ *  @param input_len must be the same value as encoder->coded_bytes_len
+ */
+uint8_t * conv_encoder_decode(conv_encoder_t * encoder, uint8_t * input, uint32_t input_len);
+
+void conv_encoder_destroy(conv_encoder_t ** to_destroy);
 
 
 

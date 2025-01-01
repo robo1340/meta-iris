@@ -1,10 +1,13 @@
 #pragma once
 
+//#ifndef _RS_UTIL_H
+//#define _RS_UTIL_H
+//#else
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-#include "types.h"
+#include <stdint.h>
 
 #define LEN(x) (sizeof(x) / sizeof(x[0]))
 
@@ -55,3 +58,5 @@ uint8_t *substring(uint8_t *s, uint32_t start, uint32_t end, uint32_t *new_size)
 uint32_t strlength(uint8_t *s);
 
 uint32_t count(uint32_t *v, uint32_t len, uint32_t item);
+
+//#endif

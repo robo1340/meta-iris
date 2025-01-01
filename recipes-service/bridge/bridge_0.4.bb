@@ -14,6 +14,7 @@ RDEPENDS:${PN} += " libgpiod  libgpiod-dev "
 RDEPENDS:${PN} += " libserialport libserialport-dev "
 RDEPENDS:${PN} += " libturbofec libturbofec-dev "
 RDEPENDS:${PN} += " net-tools socat hostapd dnsmasq wifi-reset logrotate "
+RDEPENDS:${PN} += " iproute2 iw busybox  "
 DEPENDS = " zeromq czmq libgpiod libturbofec libserialport net-tools socat "
 
 #src uri's for the source code and .service conf file

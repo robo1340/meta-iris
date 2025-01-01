@@ -1,8 +1,12 @@
 #pragma once
 
+//#ifndef _RS_INTERNAL_H
+//#define _RS_INTERNAL_H
+//#else
+
 #include "gf.h"
 #include "util.h"
-#include "types.h"
+#include <stdint.h>
 
 // returns G - generating polynomial for specific t
 uint32_t *generating_polynomial(uint32_t t, uint32_t *len)
@@ -129,3 +133,5 @@ uint8_t *extract_message(uint32_t *c1, uint32_t c_len, uint32_t t, uint32_t *out
 	free(M);
 	return ret;
 }
+
+//#endif

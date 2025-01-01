@@ -14,6 +14,8 @@
 
 #include "turbo_encoder.h"
 
+#define USE_CONV_ENCODER
+
 //max tx queue wait time is a=1000, minimum is b=50
 //TRANSMIT_SEND_QUEUE=((a-b)/2)+a, TRANSMIT_SEND_QUEUE_VARY_MS=a-TRANSMIT_SEND_QUEUE
 
@@ -155,7 +157,11 @@ struct state_t_DEFINITION {
 
 	//settings derives from config contents
 	uint8_t tx_backoff_min_ms;
+#ifdef USE_CONV_ENCODER
+	conv_encoder_t * encoder;
+#else
 	turbo_encoder_t * encoder;
+#endif
 
 	//si4463 config settings
 	zhashx_t * radio_config; ///<keys are defines from a radio config, values are zchunk_t containing the definition
@@ -326,7 +332,11 @@ void frame_destroy(frame_t ** to_destroy);
 struct __attribute__((__packed__)) packed_frame_DEFINITION {
 	frame_header_t hdr;
 	//uint8_t payload[750];
+#ifdef USE_CONV_ENCODER
+	uint8_t payload[270]; //288-18
+#else
 	uint8_t payload[622]; //640-18
+#endif
 };
 
 /** @brief encode a packed radio frame and return a new radio_frame_t

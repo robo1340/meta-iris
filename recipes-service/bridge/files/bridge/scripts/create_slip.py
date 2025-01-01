@@ -90,7 +90,7 @@ if __name__ == "__main__":
 	parser.add_argument('-ip', '--host-ip', type=str, default='', help='the IP address to assign to the slip interface')
 	parser.add_argument('-d', '--dst-subnet', type=str, default='', help='add destination class C subnet to add to the slip interface ex. 10.0.0.0')
 	parser.add_argument('-k',   '--kill', action='store_true', help='kill all slip processes and destroy all slip interfaces')
-	parser.add_argument('-m',   '--mtu', type=int, default=600, help='the MTU size of the slip interface')
+	parser.add_argument('-m',   '--mtu', type=int, default=265, help='the MTU size of the slip interface')
 	parser.add_argument('-r',   '--record-path', type=str, default='/tmp/slip_if.json', help='path to the slip interface record file')
 	args = parser.parse_args().__dict__
 	

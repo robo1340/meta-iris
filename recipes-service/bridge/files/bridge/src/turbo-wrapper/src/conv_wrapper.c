@@ -560,6 +560,7 @@ extern uint8_t ubits[]; //uncoded bit buffer
 extern uint8_t cbits[]; //coded bit buffer
 
 uint8_t * encoder_encode(encoder_t * encoder, uint8_t * input, uint32_t input_len){
+	//printf("encoder_encode(%u)\n",input_len);
 	int rc;
 	
 	if (input_len != encoder->uncoded_bytes_len){
@@ -588,6 +589,7 @@ uint8_t * encoder_encode(encoder_t * encoder, uint8_t * input, uint32_t input_le
 }
 
 uint8_t * encoder_decode(encoder_t * encoder, uint8_t * input, uint32_t input_len){
+	//printf("encoder_decode(%u)\n",input_len);
 	int rc;
 	if (input_len != encoder->coded_bytes_len){
 		printf("WARNING: encoder_decode(%u) expected input length of %u\n", encoder->type, encoder->coded_bytes_len);

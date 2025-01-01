@@ -1,4 +1,10 @@
 #include "util.h"
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <assert.h>
 
 void vector_print(uint32_t *a, uint32_t size)
 {
