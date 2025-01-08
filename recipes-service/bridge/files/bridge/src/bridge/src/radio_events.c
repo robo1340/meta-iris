@@ -27,7 +27,8 @@
 
 //#define RADIO_EVENTS_DEBUG
 #define RADIO_EVENTS_INFO
-//#define RADIO_PRINT_STATE_CHANGE_INFO
+//#define RADIO_PRINT_STATE_CHANGE_INFO 
+//#define RADIO_PRINT_TX_TIME
 //#define RADIO_RECEIVE_PEDNING_INFO
 //#define RADIO_SYNC_INFO
 //#define RADIO_PREAMBE_INFO
@@ -173,9 +174,22 @@ bool radio_transmit_fifo_almost_full_callback(state_t * state, uint32_t tx_almos
 }
 
 bool radio_state_change_callback(state_t * state){
+	
 	uint8_t new_state = radio_get_modem_state();
 #ifdef RADIO_PRINT_STATE_CHANGE_INFO
 	printf("radio->%s\n", radio_get_state_string(new_state));	
+#endif
+
+#ifdef RADIO_PRINT_TX_TIME	
+	static int tx_time_ms = -1;
+	if (new_state == SI446X_CMD_REQUEST_DEVICE_STATE_REP_CURR_STATE_MAIN_STATE_ENUM_TX){
+		tx_time_ms = zclock_mono();
+	}
+	else if (tx_time_ms > 0){
+		//printf("tx time %" PRId64 " ms\n",(zclock_mono()-tx_time_ms));
+		printf("tx time %d ms\n",(int)(zclock_mono()-tx_time_ms));
+		tx_time_ms = -1;
+	}
 #endif
 	
 	//if READY go to the receive state now

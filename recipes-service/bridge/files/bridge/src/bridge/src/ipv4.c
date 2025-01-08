@@ -10,6 +10,12 @@
 static bool compute_udp_checksum(udp_datagram_t * udp);
 
 bool ipv4_check_dst(state_t * state, ipv4_hdr_t * ipv4){
+	
+	if ((ipv4->version_ihl & 0xF0) != 0x40){
+		//printf("not ipv4 %x\n",ipv4->version_ihl);
+		return false;
+	}
+	
 	//return true if the first two bytes of the destination IP address matches the address of this node
 	if (memcmp(state->ip, &ipv4->dst, 3)==0) {
 		return true;

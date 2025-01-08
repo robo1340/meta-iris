@@ -30,9 +30,7 @@
 #include "turbofec/turbo.h"
 #include "turbo_wrapper.h"
 
-static uint8_t ubits[UNCODED_BIT_LEN+4]; //uncoded bit buffer
-static uint8_t cbits[CODED_BIT_LEN_PAD]; //coded bit buffer
-
+/*
 ///<3GPP LTE turbo,
 const struct lte_turbo_code lte_turbo = {
 	.n = 2,
@@ -41,6 +39,7 @@ const struct lte_turbo_code lte_turbo = {
 	.rgen = 013,
 	.gen = 015,
 };
+*/
 
 int bytes2bits(uint8_t * bytes, size_t bytes_len, uint8_t * bits, size_t bits_len){
 	if (bits_len < (bytes_len*8)) {return -1;}
@@ -81,6 +80,7 @@ int bits2bytes(uint8_t * bits, size_t bits_len, uint8_t * bytes, size_t bytes_le
 	return (int)to_return;
 }
 
+/*
 bool turbo_wrapper_encode(uncoded_block_t * input, coded_block_t * output){
 	int rc;
 	rc = bytes2bits(input->data, sizeof(input->data), ubits, UNCODED_BIT_LEN); //bit-lify the input byte array and store in ubits
@@ -96,28 +96,9 @@ bool turbo_wrapper_encode(uncoded_block_t * input, coded_block_t * output){
 	if (rc != CODED_LEN) {return false;}
 	return true;
 }
+*/
 
-static struct tdecoder *tdec = NULL;
-static int tdec_iterations = TURBO_DECODE_DEFAULT_ITER;
-
-bool turbo_wrapper_init(int iterations){
-	turbo_wrapper_deinit();
-	if ((iterations > TURBO_DECODE_MAX_ITER) || (iterations < TURBO_DECODE_MIN_ITER)) {
-		tdec_iterations = TURBO_DECODE_DEFAULT_ITER;
-	}
-	if (tdec != NULL) {return true;}
-	tdec = alloc_tdec();
-	return (tdec != NULL);
-}
-
-bool turbo_wrapper_deinit(void){
-	if (tdec != NULL){
-		free(tdec);
-		tdec = NULL;
-	}
-	return true;
-}
-
+/*
 bool turbo_wrapper_decode(coded_block_t * input, uncoded_block_t * output){
 	if (tdec == NULL) {return false;}
 	int rc;
@@ -132,3 +113,4 @@ bool turbo_wrapper_decode(coded_block_t * input, uncoded_block_t * output){
 
 	return true;
 }
+*/

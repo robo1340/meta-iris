@@ -39,15 +39,17 @@
 typedef struct turbo_encoder_DEFINITION turbo_encoder_t; 					///<definition for a sub-payload making up a part of the payload of a frame
 
 typedef struct turbo_encoder_attributes_DEF {
-	const char name[24];
-	const char spec[128];
-	const struct lte_turbo_code *code;
+	char name[24];
+	char spec[128];
+	struct lte_turbo_code *code;
 	int in_len; //uncoded length in bits
 	int out_len; //coded length in bits
 } turbo_encoder_attributes_t;
 
 struct __attribute__((__packed__)) turbo_encoder_DEFINITION {
-	uint8_t type;
+	uint16_t type;
+	uint8_t conv_blocks;
+	int iterations;
 	turbo_encoder_attributes_t attr;
 	uint16_t rs_blocks; //the number of reed solomon blocks in the encoder
 	uint16_t rs_block_len;
@@ -60,7 +62,7 @@ struct __attribute__((__packed__)) turbo_encoder_DEFINITION {
 	uint32_t coded_bits_len_padded;
 };
 
-turbo_encoder_t * turbo_encoder(uint8_t type);
+turbo_encoder_t * turbo_encoder(uint16_t block_size_bits, int min_rs_block_size_bytes, int iterations);
 
 /** @brief encoder encode
  *  @param encoder the encoder object

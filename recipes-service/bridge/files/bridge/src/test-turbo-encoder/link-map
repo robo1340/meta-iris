@@ -5,11 +5,13 @@ Archive member included to satisfy reference by file (symbol)
 /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
                               /bridge/src/test-turbo-encoder/test.a(main.o) (turbo_encoder)
 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
-                              /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o) (turbo_wrapper_encode)
+                              /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o) (bytes2bits)
 /bridge/src/test-turbo-encoder/test.a(util.o)
                               /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o) (matrix_new)
+/bridge/src/test-turbo-encoder/test.a(conv_wrapper.o)
+                              /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o) (encoder)
 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
-                              /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o) (turbo_interleaver_init)
+                              /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o) (turbo_interleave)
 
 Discarded input sections
 
@@ -27,6 +29,8 @@ Discarded input sections
                 0x00000000        0x0 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
  .note.GNU-stack
                 0x00000000        0x0 /bridge/src/test-turbo-encoder/test.a(util.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-turbo-encoder/test.a(conv_wrapper.o)
  .note.GNU-stack
                 0x00000000        0x0 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
  .note.GNU-stack
@@ -86,55 +90,55 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 .hash
  *(.hash)
 
-.gnu.hash       0x000101b4       0xb8
+.gnu.hash       0x000101b4       0xc0
  *(.gnu.hash)
- .gnu.hash      0x000101b4       0xb8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .gnu.hash      0x000101b4       0xc0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.dynsym         0x0001026c      0x190
+.dynsym         0x00010274      0x1b0
  *(.dynsym)
- .dynsym        0x0001026c      0x190 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .dynsym        0x00010274      0x1b0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.dynstr         0x000103fc      0x12e
+.dynstr         0x00010424      0x14e
  *(.dynstr)
- .dynstr        0x000103fc      0x12e /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .dynstr        0x00010424      0x14e /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.gnu.version    0x0001052a       0x32
+.gnu.version    0x00010572       0x36
  *(.gnu.version)
- .gnu.version   0x0001052a       0x32 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .gnu.version   0x00010572       0x36 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.gnu.version_d  0x0001055c        0x0
+.gnu.version_d  0x000105a8        0x0
  *(.gnu.version_d)
  .gnu.version_d
-                0x0001055c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x000105a8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.gnu.version_r  0x0001055c       0x30
+.gnu.version_r  0x000105a8       0x30
  *(.gnu.version_r)
  .gnu.version_r
-                0x0001055c       0x30 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x000105a8       0x30 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.rel.dyn        0x0001058c       0x10
+.rel.dyn        0x000105d8       0x10
  *(.rel.init)
  *(.rel.text .rel.text.* .rel.gnu.linkonce.t.*)
  *(.rel.fini)
  *(.rel.rodata .rel.rodata.* .rel.gnu.linkonce.r.*)
  *(.rel.data.rel.ro .rel.data.rel.ro.* .rel.gnu.linkonce.d.rel.ro.*)
  .rel.data.rel.ro
-                0x0001058c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x000105d8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
  *(.rel.data .rel.data.* .rel.gnu.linkonce.d.*)
  *(.rel.tdata .rel.tdata.* .rel.gnu.linkonce.td.*)
  *(.rel.tbss .rel.tbss.* .rel.gnu.linkonce.tb.*)
  *(.rel.ctors)
  *(.rel.dtors)
  *(.rel.got)
- .rel.got       0x0001058c        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .rel.got       0x000105d8        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
  *(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*)
- .rel.bss       0x00010594        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .rel.bss       0x000105e0        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
                 [!provide]                        PROVIDE (__rel_iplt_start = .)
  *(.rel.iplt)
- .rel.iplt      0x0001059c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .rel.iplt      0x000105e8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
                 [!provide]                        PROVIDE (__rel_iplt_end = .)
 
-.rela.dyn       0x0001059c        0x0
+.rela.dyn       0x000105e8        0x0
  *(.rela.init)
  *(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)
  *(.rela.fini)
@@ -150,181 +154,209 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(.rela.iplt)
                 [!provide]                        PROVIDE (__rela_iplt_end = .)
 
-.rel.plt        0x0001059c       0xa8
+.rel.plt        0x000105e8       0xb8
  *(.rel.plt)
- .rel.plt       0x0001059c       0xa8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .rel.plt       0x000105e8       0xb8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
 .rela.plt
  *(.rela.plt)
 
-.init           0x00010644        0xc
+.init           0x000106a0        0xc
  *(SORT_NONE(.init))
- .init          0x00010644        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
-                0x00010644                _init
- .init          0x0001064c        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .init          0x000106a0        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x000106a0                _init
+ .init          0x000106a8        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
-.plt            0x00010650      0x110
+.plt            0x000106ac      0x128
  *(.plt)
- .plt           0x00010650      0x110 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00010664                calloc@@GLIBC_2.4
-                0x00010670                __libc_start_main@@GLIBC_2.34
-                0x0001067c                printf@@GLIBC_2.4
-                0x00010688                free@@GLIBC_2.4
-                0x00010694                memcpy@@GLIBC_2.4
-                0x000106a0                time@@GLIBC_2.4
-                0x000106ac                memcmp@@GLIBC_2.4
-                0x000106b8                alloc_tdec
-                0x000106c4                puts@@GLIBC_2.4
-                0x000106d0                malloc@@GLIBC_2.4
-                0x000106e8                exit@@GLIBC_2.4
-                0x000106f4                srand@@GLIBC_2.4
-                0x00010700                fprintf@@GLIBC_2.4
-                0x0001070c                memset@@GLIBC_2.4
-                0x00010718                putchar@@GLIBC_2.4
-                0x00010724                rand@@GLIBC_2.4
-                0x00010730                lte_turbo_decode_unpack
-                0x0001073c                abort@@GLIBC_2.4
-                0x00010748                lte_turbo_encode
-                0x00010754                __assert_fail@@GLIBC_2.4
+ .plt           0x000106ac      0x128 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x000106c0                calloc@@GLIBC_2.4
+                0x000106cc                __libc_start_main@@GLIBC_2.34
+                0x000106d8                printf@@GLIBC_2.4
+                0x000106e4                free@@GLIBC_2.4
+                0x000106f0                memcpy@@GLIBC_2.4
+                0x000106fc                time@@GLIBC_2.4
+                0x00010708                memcmp@@GLIBC_2.4
+                0x00010714                alloc_tdec
+                0x00010720                lte_conv_encode
+                0x0001072c                puts@@GLIBC_2.4
+                0x00010738                lte_conv_decode
+                0x00010744                malloc@@GLIBC_2.4
+                0x0001075c                exit@@GLIBC_2.4
+                0x00010768                srand@@GLIBC_2.4
+                0x00010774                fprintf@@GLIBC_2.4
+                0x00010780                memset@@GLIBC_2.4
+                0x0001078c                putchar@@GLIBC_2.4
+                0x00010798                rand@@GLIBC_2.4
+                0x000107a4                lte_turbo_decode_unpack
+                0x000107b0                abort@@GLIBC_2.4
+                0x000107bc                lte_turbo_encode
+                0x000107c8                __assert_fail@@GLIBC_2.4
 
-.iplt           0x00010760        0x0
+.iplt           0x000107d4        0x0
  *(.iplt)
- .iplt          0x00010760        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .iplt          0x000107d4        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.text           0x00010760     0x3e38
+.text           0x000107d4     0x505c
  *(.text.unlikely .text.*_unlikely .text.unlikely.*)
  *(.text.exit .text.exit.*)
  *(.text.startup .text.startup.*)
  *(.text.hot .text.hot.*)
  *(SORT_BY_NAME(.text.sorted.*))
  *(.text .stub .text.* .gnu.linkonce.t.*)
- .text          0x00010760       0x34 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00010760                _start
- .text          0x00010794       0x24 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .text          0x000107b8       0x6c /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
- .text          0x00010824      0x4dc /bridge/src/test-turbo-encoder/test.a(main.o)
-                0x00010c14                main
- .text          0x00010d00     0x24f0 /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
-                0x00010d00                generate_gf
-                0x00010ee4                gf_mul
-                0x00010f78                gf_div
-                0x00011014                gf_sum
-                0x00011044                gf_polydiv_recursive
-                0x00011254                gf_polydiv
-                0x000112ac                gf_matr_det
-                0x00011370                gf_matr_mul
-                0x00011518                gf_matr_mul_vector
-                0x00011678                gf_matr_inv
-                0x000117e0                generating_polynomial
-                0x000118dc                shift_msg_to_vec
-                0x0001199c                calculate_check_symbols
-                0x00011aa0                calculate_syndrome
-                0x00011be0                extract_message
-                0x00011c44                fail
-                0x00011c84                pass
-                0x00011cc4                REQUIRE
-                0x00011d20                AR_EQ
-                0x00011dac                STR_EQ
-                0x00011e30                MX_EQ
-                0x00011f38                encode_message
-                0x0001206c                decode_message
-                0x000129e4                turbo_encoder
-                0x00012d88                turbo_encoder_encode
-                0x00012f3c                turbo_encoder_decode
-                0x00013128                turbo_encoder_destroy
- .text          0x000131f0      0x554 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
-                0x000131f0                bytes2bits
-                0x000132b8                bytes2bits_ranged
-                0x00013394                bits2bytes
-                0x00013490                turbo_wrapper_encode
-                0x00013574                turbo_wrapper_init
-                0x00013608                turbo_wrapper_deinit
-                0x00013654                turbo_wrapper_decode
- .text          0x00013744      0x980 /bridge/src/test-turbo-encoder/test.a(util.o)
-                0x00013744                vector_print
-                0x000137b8                matrix_new
-                0x00013844                matrix_free
-                0x000138b8                matrix_copy
-                0x00013988                fatal
-                0x000139c4                swap
-                0x00013a10                vector_new
-                0x00013a3c                vector_copy
-                0x00013abc                vector_free
-                0x00013ae0                stack
-                0x00013bc8                submatrix
-                0x00013c60                pow2
-                0x00013c8c                vector_sum
-                0x00013d68                vector_to_str
-                0x00013df8                str_to_vector
-                0x00013e78                sum
-                0x00013ef0                substring
-                0x00013fd4                strlength
-                0x0001403c                count
- .text          0x000140c4      0x4d4 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
-                0x00014148                turbo_interleave
-                0x000142c4                turbo_deinterleave
-                0x000144e8                turbo_interleaver_init
-                0x00014540                turbo_interleaver_deinit
- .text          0x00014598        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
- .text          0x00014598        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .text          0x000107d4       0x34 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x000107d4                _start
+ .text          0x00010808       0x24 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .text          0x0001082c       0x6c /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .text          0x00010898      0x5bc /bridge/src/test-turbo-encoder/test.a(main.o)
+                0x00010b28                main
+ .text          0x00010e54     0x32ac /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
+                0x00010e54                generate_gf
+                0x00011038                gf_mul
+                0x000110cc                gf_div
+                0x00011168                gf_sum
+                0x00011198                gf_polydiv_recursive
+                0x000113a8                gf_polydiv
+                0x00011400                gf_matr_det
+                0x000114c4                gf_matr_mul
+                0x0001166c                gf_matr_mul_vector
+                0x000117cc                gf_matr_inv
+                0x00011934                generating_polynomial
+                0x00011a30                shift_msg_to_vec
+                0x00011af0                calculate_check_symbols
+                0x00011bf4                calculate_syndrome
+                0x00011d34                extract_message
+                0x00011d98                fail
+                0x00011dd8                pass
+                0x00011e18                REQUIRE
+                0x00011e74                AR_EQ
+                0x00011f00                STR_EQ
+                0x00011f84                MX_EQ
+                0x0001208c                encode_message
+                0x000121c0                decode_message
+                0x00012c14                turbo_encoder
+                0x000130d0                turbo_encoder_encode
+                0x00013354                turbo_encoder_decode
+                0x0001363c                turbo_encoder_destroy
+                0x000136cc                conv_encoder
+                0x00013b14                conv_encoder_encode
+                0x00013d88                conv_encoder_decode
+                0x0001405c                conv_encoder_destroy
+ .text          0x00014100      0x2a0 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
+                0x00014100                bytes2bits
+                0x000141c8                bytes2bits_ranged
+                0x000142a4                bits2bytes
+ .text          0x000143a0      0x980 /bridge/src/test-turbo-encoder/test.a(util.o)
+                0x000143a0                vector_print
+                0x00014414                matrix_new
+                0x000144a0                matrix_free
+                0x00014514                matrix_copy
+                0x000145e4                fatal
+                0x00014620                swap
+                0x0001466c                vector_new
+                0x00014698                vector_copy
+                0x00014718                vector_free
+                0x0001473c                stack
+                0x00014824                submatrix
+                0x000148bc                pow2
+                0x000148e8                vector_sum
+                0x000149c4                vector_to_str
+                0x00014a54                str_to_vector
+                0x00014ad4                sum
+                0x00014b4c                substring
+                0x00014c30                strlength
+                0x00014c98                count
+ .text          0x00014d20      0x63c /bridge/src/test-turbo-encoder/test.a(conv_wrapper.o)
+                0x00014d20                encoder
+                0x00014fa0                encoder_bits_in_padded
+                0x00014fc8                encoder_bits_out_padded
+                0x00014ff0                encoder_encode
+                0x00015178                encoder_decode
+                0x000152d4                encoder_destroy
+ .text          0x0001535c      0x4d4 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
+                0x000153e0                turbo_interleave
+                0x0001555c                turbo_deinterleave
+                0x00015780                turbo_interleaver_init
+                0x000157d8                turbo_interleaver_deinit
+ .text          0x00015830        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .text          0x00015830        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(.gnu.warning)
  *(.glue_7t)
- .glue_7t       0x00014598        0x0 linker stubs
+ .glue_7t       0x00015830        0x0 linker stubs
  *(.glue_7)
- .glue_7        0x00014598        0x0 linker stubs
+ .glue_7        0x00015830        0x0 linker stubs
  *(.vfp11_veneer)
- .vfp11_veneer  0x00014598        0x0 linker stubs
+ .vfp11_veneer  0x00015830        0x0 linker stubs
  *(.v4_bx)
- .v4_bx         0x00014598        0x0 linker stubs
+ .v4_bx         0x00015830        0x0 linker stubs
 
-.fini           0x00014598        0x8
+.fini           0x00015830        0x8
  *(SORT_NONE(.fini))
- .fini          0x00014598        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
-                0x00014598                _fini
- .fini          0x0001459c        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .fini          0x00015830        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x00015830                _fini
+ .fini          0x00015834        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
                 [!provide]                        PROVIDE (__etext = .)
                 [!provide]                        PROVIDE (_etext = .)
                 [!provide]                        PROVIDE (etext = .)
 
-.rodata         0x000145a0      0x6c8
+.rodata         0x00015838     0x1960
  *(.rodata .rodata.* .gnu.linkonce.r.*)
- .rodata.cst4   0x000145a0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x000145a0                _IO_stdin_used
- .rodata        0x000145a4       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
- .rodata        0x00014634      0x10f /bridge/src/test-turbo-encoder/test.a(main.o)
- *fill*         0x00014743        0x1 
- .rodata        0x00014744      0x3c9 /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
-                0x0001490c                lte_turbo2
- *fill*         0x00014b0d        0x3 
- .rodata        0x00014b10       0x52 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
-                0x00014b10                lte_turbo
- *fill*         0x00014b62        0x2 
- .rodata        0x00014b64       0x52 /bridge/src/test-turbo-encoder/test.a(util.o)
- *fill*         0x00014bb6        0x2 
- .rodata        0x00014bb8       0x1e /bridge/src/test-turbo-encoder/test.a(interleaver.o)
- *fill*         0x00014bd6        0x2 
- .rodata        0x00014bd8       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .rodata.cst4   0x00015838        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00015838                _IO_stdin_used
+ .rodata        0x0001583c       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .rodata        0x000158cc       0xa1 /bridge/src/test-turbo-encoder/test.a(main.o)
+ *fill*         0x0001596d        0x3 
+ .rodata        0x00015970      0x5ac /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
+ .rodata        0x00015f1c       0x52 /bridge/src/test-turbo-encoder/test.a(util.o)
+ *fill*         0x00015f6e        0x2 
+ .rodata        0x00015f70     0x1175 /bridge/src/test-turbo-encoder/test.a(conv_wrapper.o)
+                0x00015f70                gsm_conv_xcch
+                0x00015f98                gsm_conv_cs2
+                0x00015fc0                gsm_conv_cs3
+                0x00015fe8                gsm_conv_rach
+                0x00016010                gsm_conv_sch
+                0x00016038                gsm_conv_tch_fr
+                0x00016060                gsm_conv_tch_hr
+                0x00016088                gsm_conv_tch_afs_12_2
+                0x000160b0                gsm_conv_tch_afs_10_2
+                0x000160d8                gsm_conv_tch_afs_7_95
+                0x00016100                gsm_conv_tch_afs_7_4
+                0x00016128                gsm_conv_tch_afs_6_7
+                0x00016150                gsm_conv_tch_afs_5_9
+                0x00016178                gsm_conv_tch_ahs_7_95
+                0x000161a0                gsm_conv_tch_ahs_7_4
+                0x000161c8                gsm_conv_tch_ahs_6_7
+                0x000161f0                gsm_conv_tch_ahs_5_9
+                0x00016218                gsm_conv_tch_ahs_5_15
+                0x00016240                gsm_conv_tch_ahs_4_75
+                0x00016268                wimax_conv_fch
+                0x00016290                lte_conv_pbch
+                0x000162b8                types
+ *fill*         0x000170e5        0x3 
+ .rodata        0x000170e8       0x1e /bridge/src/test-turbo-encoder/test.a(interleaver.o)
+ *fill*         0x00017106        0x2 
+ .rodata        0x00017108       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
 
 .rodata1
  *(.rodata1)
 
-.ARM.extab      0x00014c68        0x0
+.ARM.extab      0x00017198        0x0
  *(.ARM.extab* .gnu.linkonce.armextab.*)
- .ARM.extab     0x00014c68        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .ARM.extab     0x00017198        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.ARM.exidx      0x00014c68        0x8
+.ARM.exidx      0x00017198        0x8
                 [!provide]                        PROVIDE (__exidx_start = .)
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
- .ARM.exidx     0x00014c68        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .ARM.exidx     0x00017198        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
                 [!provide]                        PROVIDE (__exidx_end = .)
 
 .eh_frame_hdr
  *(.eh_frame_hdr)
  *(.eh_frame_entry .eh_frame_entry.*)
 
-.eh_frame       0x00014c70        0x4
+.eh_frame       0x000171a0        0x4
  *(.eh_frame)
- .eh_frame      0x00014c70        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .eh_frame      0x000171a0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
  *(.eh_frame.*)
 
 .sframe
@@ -339,7 +371,7 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
 .exception_ranges
  *(.exception_ranges*)
-                0x00015f00                        . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
+                0x00018f00                        . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
 
 .eh_frame
  *(.eh_frame)
@@ -358,7 +390,7 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 .exception_ranges
  *(.exception_ranges*)
 
-.tdata          0x00015f00        0x0
+.tdata          0x00018f00        0x0
                 [!provide]                        PROVIDE (__tdata_start = .)
  *(.tdata .tdata.* .gnu.linkonce.td.*)
 
@@ -366,23 +398,23 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(.tbss .tbss.* .gnu.linkonce.tb.*)
  *(.tcommon)
 
-.preinit_array  0x00015f00        0x0
+.preinit_array  0x00018f00        0x0
                 [!provide]                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array)
                 [!provide]                        PROVIDE (__preinit_array_end = .)
 
-.init_array     0x00015f00        0x4
+.init_array     0x00018f00        0x4
                 [!provide]                        PROVIDE (__init_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
  *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
- .init_array    0x00015f00        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .init_array    0x00018f00        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
                 [!provide]                        PROVIDE (__init_array_end = .)
 
-.fini_array     0x00015f04        0x4
+.fini_array     0x00018f04        0x4
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
  *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
- .fini_array    0x00015f04        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .fini_array    0x00018f04        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
                 [!provide]                        PROVIDE (__fini_array_end = .)
 
 .ctors
@@ -402,93 +434,97 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 .jcr
  *(.jcr)
 
-.data.rel.ro    0x00015f08        0x0
+.data.rel.ro    0x00018f08        0x0
  *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
  *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
- .data.rel.ro   0x00015f08        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .data.rel.ro   0x00018f08        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.dynamic        0x00015f08       0xf8
+.dynamic        0x00018f08       0xf8
  *(.dynamic)
- .dynamic       0x00015f08       0xf8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00015f08                _DYNAMIC
-                0x00016000                        . = DATA_SEGMENT_RELRO_END (., 0x0)
+ .dynamic       0x00018f08       0xf8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00018f08                _DYNAMIC
+                0x00019000                        . = DATA_SEGMENT_RELRO_END (., 0x0)
 
-.got            0x00016000       0x68
+.got            0x00019000       0x70
  *(.got.plt)
- .got.plt       0x00016000       0x60 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00016000                _GLOBAL_OFFSET_TABLE_
+ .got.plt       0x00019000       0x68 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00019000                _GLOBAL_OFFSET_TABLE_
  *(.igot.plt)
- .igot.plt      0x00016060        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .igot.plt      0x00019068        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
  *(.got)
- .got           0x00016060        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .got           0x00019068        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
  *(.igot)
 
-.data           0x00016068      0xca4
+.data           0x00019070     0x1cec
                 [!provide]                        PROVIDE (__data_start = .)
  *(.data .data.* .gnu.linkonce.d.*)
- .data          0x00016068        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00016068                data_start
-                0x00016068                __data_start
- .data          0x0001606c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .data          0x0001606c        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
-                0x0001606c                __dso_handle
- .data          0x00016070        0x0 /bridge/src/test-turbo-encoder/test.a(main.o)
- .data          0x00016070       0xc8 /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
-                0x00016070                p
-                0x00016094                turbo_attr
- .data          0x00016138        0x4 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
- .data          0x0001613c        0x0 /bridge/src/test-turbo-encoder/test.a(util.o)
- .data          0x0001613c      0xbd0 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
- .data          0x00016d0c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
- .data          0x00016d0c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .data          0x00019070        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00019070                data_start
+                0x00019070                __data_start
+ .data          0x00019074        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .data          0x00019074        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                0x00019074                __dso_handle
+ .data          0x00019078       0x40 /bridge/src/test-turbo-encoder/test.a(main.o)
+                0x00019078                tvs
+ .data          0x000190b8       0xdc /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
+                0x000190b8                p
+                0x000190dc                lte_turbo
+                0x000190f0                turbo_attr
+ .data          0x00019194        0x0 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
+ .data          0x00019194        0x0 /bridge/src/test-turbo-encoder/test.a(util.o)
+ .data          0x00019194      0xff8 /bridge/src/test-turbo-encoder/test.a(conv_wrapper.o)
+ .data          0x0001a18c      0xbd0 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
+ .data          0x0001ad5c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .data          0x0001ad5c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
 .tm_clone_table
-                0x00016d0c        0x0
+                0x0001ad5c        0x0
  .tm_clone_table
-                0x00016d0c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                0x0001ad5c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
  .tm_clone_table
-                0x00016d0c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+                0x0001ad5c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
 
 .data1
  *(.data1)
-                0x00016d0c                        _edata = .
+                0x0001ad5c                        _edata = .
                 [!provide]                        PROVIDE (edata = .)
-                0x00016d0c                        . = .
-                0x00016d0c                        __bss_start = .
-                0x00016d0c                        __bss_start__ = .
+                0x0001ad5c                        . = .
+                0x0001ad5c                        __bss_start = .
+                0x0001ad5c                        __bss_start__ = .
 
-.bss            0x00016d10     0x6b20
+.bss            0x0001ad60     0xcb34
  *(.dynbss)
- *fill*         0x00016d10        0x0 
- .dynbss        0x00016d10        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00016d10                stderr@@GLIBC_2.4
+ *fill*         0x0001ad60        0x0 
+ .dynbss        0x0001ad60        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x0001ad60                stderr@@GLIBC_2.4
  *(.bss .bss.* .gnu.linkonce.b.*)
- .bss           0x00016d14        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
- .bss           0x00016d14        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .bss           0x00016d14        0x1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
- .bss           0x00016d15        0x0 /bridge/src/test-turbo-encoder/test.a(main.o)
- *fill*         0x00016d15        0x3 
- .bss           0x00016d18      0x80c /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
-                0x00016d18                alpha_of
-                0x00017118                index_of
-                0x00017518                test_n
-                0x0001751c                total
- .bss           0x00017524     0x6018 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
- .bss           0x0001d53c        0x0 /bridge/src/test-turbo-encoder/test.a(util.o)
- .bss           0x0001d53c      0x2f4 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
- .bss           0x0001d830        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
- .bss           0x0001d830        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .bss           0x0001ad64        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .bss           0x0001ad64        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .bss           0x0001ad64        0x1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .bss           0x0001ad65        0x0 /bridge/src/test-turbo-encoder/test.a(main.o)
+ *fill*         0x0001ad65        0x3 
+ .bss           0x0001ad68     0x6824 /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
+                0x0001ad68                alpha_of
+                0x0001b168                index_of
+                0x0001b568                test_n
+                0x0001b56c                total
+ .bss           0x0002158c        0x0 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
+ .bss           0x0002158c        0x0 /bridge/src/test-turbo-encoder/test.a(util.o)
+ .bss           0x0002158c     0x6014 /bridge/src/test-turbo-encoder/test.a(conv_wrapper.o)
+ .bss           0x000275a0      0x2f4 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
+ .bss           0x00027894        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .bss           0x00027894        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(COMMON)
-                0x0001d830                        . = ALIGN ((. != 0x0)?0x4:0x1)
-                0x0001d830                        _bss_end__ = .
-                0x0001d830                        __bss_end__ = .
-                0x0001d830                        . = ALIGN (0x4)
-                0x0001d830                        . = SEGMENT_START ("ldata-segment", .)
-                0x0001d830                        . = ALIGN (0x4)
-                0x0001d830                        __end__ = .
-                0x0001d830                        _end = .
+                0x00027894                        . = ALIGN ((. != 0x0)?0x4:0x1)
+                0x00027894                        _bss_end__ = .
+                0x00027894                        __bss_end__ = .
+                0x00027894                        . = ALIGN (0x4)
+                0x00027894                        . = SEGMENT_START ("ldata-segment", .)
+                0x00027894                        . = ALIGN (0x4)
+                0x00027894                        __end__ = .
+                0x00027894                        _end = .
                 [!provide]                        PROVIDE (end = .)
-                0x0001d830                        . = DATA_SEGMENT_END (.)
+                0x00027894                        . = DATA_SEGMENT_END (.)
 
 .stab
  *(.stab)
@@ -517,6 +553,7 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  .comment       0x00000012       0x13 /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
  .comment       0x00000012       0x13 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
  .comment       0x00000012       0x13 /bridge/src/test-turbo-encoder/test.a(util.o)
+ .comment       0x00000012       0x13 /bridge/src/test-turbo-encoder/test.a(conv_wrapper.o)
  .comment       0x00000012       0x13 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
  .comment       0x00000012       0x13 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
 
@@ -537,11 +574,13 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  .ARM.attributes
                 0x0000014c       0x39 /bridge/src/test-turbo-encoder/test.a(util.o)
  .ARM.attributes
-                0x00000185       0x39 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
+                0x00000185       0x39 /bridge/src/test-turbo-encoder/test.a(conv_wrapper.o)
  .ARM.attributes
-                0x000001be       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+                0x000001be       0x39 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
  .ARM.attributes
-                0x000001f9       0x2b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                0x000001f7       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .ARM.attributes
+                0x00000232       0x2b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
 .gnu.build.attributes
  *(.gnu.build.attributes .gnu.build.attributes.*)
@@ -558,86 +597,46 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000      0x148
+.debug_aranges  0x00000000       0xa8
  *(.debug_aranges)
  .debug_aranges
                 0x00000000       0x50 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
  .debug_aranges
                 0x00000050       0x30 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
  .debug_aranges
-                0x00000080       0x20 /bridge/src/test-turbo-encoder/test.a(main.o)
- .debug_aranges
-                0x000000a0       0x20 /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
- .debug_aranges
-                0x000000c0       0x20 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
- .debug_aranges
-                0x000000e0       0x20 /bridge/src/test-turbo-encoder/test.a(util.o)
- .debug_aranges
-                0x00000100       0x20 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
- .debug_aranges
-                0x00000120       0x28 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                0x00000080       0x28 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x3070
+.debug_info     0x00000000      0x564
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x51e /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
  .debug_info    0x0000051e       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .debug_info    0x00000541      0x456 /bridge/src/test-turbo-encoder/test.a(main.o)
- .debug_info    0x00000997     0x1525 /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
- .debug_info    0x00001ebc      0x508 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
- .debug_info    0x000023c4      0x96a /bridge/src/test-turbo-encoder/test.a(util.o)
- .debug_info    0x00002d2e      0x31f /bridge/src/test-turbo-encoder/test.a(interleaver.o)
- .debug_info    0x0000304d       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .debug_info    0x00000541       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
-.debug_abbrev   0x00000000      0xb5b
+.debug_abbrev   0x00000000      0x198
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x174 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
  .debug_abbrev  0x00000174       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .debug_abbrev  0x00000186      0x1a9 /bridge/src/test-turbo-encoder/test.a(main.o)
- .debug_abbrev  0x0000032f      0x299 /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
- .debug_abbrev  0x000005c8      0x1d1 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
- .debug_abbrev  0x00000799      0x203 /bridge/src/test-turbo-encoder/test.a(util.o)
- .debug_abbrev  0x0000099c      0x1ad /bridge/src/test-turbo-encoder/test.a(interleaver.o)
- .debug_abbrev  0x00000b49       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .debug_abbrev  0x00000186       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
-.debug_line     0x00000000     0x1d48
+.debug_line     0x00000000      0x2b9
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x1f1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
  .debug_line    0x000001f1       0x70 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .debug_line    0x00000261      0x2b2 /bridge/src/test-turbo-encoder/test.a(main.o)
- .debug_line    0x00000513      0xdc0 /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
- .debug_line    0x000012d3      0x31c /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
- .debug_line    0x000015ef      0x45b /bridge/src/test-turbo-encoder/test.a(util.o)
- .debug_line    0x00001a4a      0x2a6 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
- .debug_line    0x00001cf0       0x58 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .debug_line    0x00000261       0x58 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
-.debug_frame    0x00000000      0x804
+.debug_frame
  *(.debug_frame)
- .debug_frame   0x00000000       0x54 /bridge/src/test-turbo-encoder/test.a(main.o)
- .debug_frame   0x00000054      0x384 /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
- .debug_frame   0x000003d8       0xec /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
- .debug_frame   0x000004c4      0x270 /bridge/src/test-turbo-encoder/test.a(util.o)
- .debug_frame   0x00000734       0xd0 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
 
-.debug_str      0x00000000      0xda5
+.debug_str      0x00000000      0x485
  *(.debug_str)
  .debug_str     0x00000000      0x459 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
                                 0x76c (size before relaxing)
  .debug_str     0x00000459       0x16 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
                                  0x43 (size before relaxing)
- .debug_str     0x0000046f      0x21b /bridge/src/test-turbo-encoder/test.a(main.o)
-                                0x349 (size before relaxing)
- .debug_str     0x0000068a      0x3dd /bridge/src/test-turbo-encoder/test.a(turbo_encoder.o)
-                                0x6fd (size before relaxing)
- .debug_str     0x00000a67       0xb8 /bridge/src/test-turbo-encoder/test.a(turbo_wrapper.o)
-                                0x2e5 (size before relaxing)
- .debug_str     0x00000b1f      0x1da /bridge/src/test-turbo-encoder/test.a(util.o)
-                                0x3db (size before relaxing)
- .debug_str     0x00000cf9       0x96 /bridge/src/test-turbo-encoder/test.a(interleaver.o)
-                                0x1fa (size before relaxing)
- .debug_str     0x00000d8f       0x16 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .debug_str     0x0000046f       0x16 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
                                  0x43 (size before relaxing)
 
 .debug_loc

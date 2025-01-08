@@ -47,7 +47,7 @@ int main(void) {
 	radio_print_func_info();
 	
 	//kick start the radio into receive mode
-	radio_start_rx(br->my_state->current_channel, sizeof(coded_block_t));
+	radio_start_rx(br->my_state->current_channel, br->my_state->receiving->frame_len); 
 	
 	printf("entering loop, press ctrl+c to exit\n");
 	

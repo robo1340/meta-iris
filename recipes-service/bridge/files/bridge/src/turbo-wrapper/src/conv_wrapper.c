@@ -30,8 +30,8 @@
 #include "turbofec/turbo.h"
 #include "conv_wrapper.h"
 
-static uint8_t ubits[UNCODED_BIT_LEN+4]; //uncoded bit buffer
-static uint8_t cbits[CODED_BIT_LEN_PAD]; //coded bit buffer
+static uint8_t ubits[6144+4]; //uncoded bit buffer
+static uint8_t cbits[6144*3+16]; //coded bit buffer
 
 
 /* GSM XCCH */

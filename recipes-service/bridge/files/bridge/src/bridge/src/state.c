@@ -28,12 +28,15 @@
 #include "csma.h"
 #include "turbo_encoder.h"
 
+#include <linux/if.h>
+#include <linux/if_tun.h>
+
 
 //reporting debug definitions
 #define DEBUG
 //#define OBJECT_DESTROY_DEBUG
 //#define PACKAGE_TYPE_DEBUG
-#define TX_START_DEBUG
+//#define TX_START_DEBUG
 
 state_t * global_state;
 
@@ -84,10 +87,42 @@ static void state_check_for_ip_collision(state_t * state, uint8_t ip[4], uint8_t
 	}
 }
 
+static int tun_open(char *devname){
+    struct ifreq ifr;
+    int fd, err;
+
+    if ((fd = open("/dev/net/tun", O_RDWR | O_NONBLOCK)) == -1) {
+        perror("open /dev/net/tun");
+        exit(1);
+    }
+    memset(&ifr, 0, sizeof(ifr));
+    ifr.ifr_flags = IFF_TUN;
+    strncpy(ifr.ifr_name, devname, IFNAMSIZ);
+
+    if ((err = ioctl(fd, TUNSETIFF, (void *)&ifr)) == -1) {
+        perror("ioctl TUNSETIFF");
+        close(fd);
+        exit(1);
+    }
+    return fd;
+}
+
+static int tun_init(state_t * state, char * ip){
+	char str[128];
+	system("python3 /bridge/scripts/create_tun.py -k");
+	snprintf(str, sizeof(str), "python3 /bridge/scripts/create_tun.py -ip %s -m %u", ip, (sizeof(packed_frame_t)-sizeof(frame_header_t)-4));
+	system(str);
+	
+	int to_return = tun_open("tun0");
+	ioctl(to_return, TUNSETNOCSUM, 1);
+	return to_return;
+}
+
+/*
 static int slip_init(state_t * state, char * ip){
 	char str[128];
 	system("python3 /bridge/scripts/create_slip.py -k");
-	snprintf(str, sizeof(str), "python3 /bridge/scripts/create_slip.py -ip %s", ip);
+	snprintf(str, sizeof(str), "python3 /bridge/scripts/create_slip.py -ip %s -m %u", ip, (sizeof(packed_frame_t)-sizeof(frame_header_t)-4));
 	FILE * fp = popen(str, "r");
 	if (fp == NULL) {return -1;}
 	fgets(str, sizeof(str), fp); //ex. {"interface": "sl0", "serial_device": "/dev/ttyV1"}
@@ -115,14 +150,7 @@ static int slip_init(state_t * state, char * ip){
 	}
 	return to_return;
 }
-
-bool state_restart_wifi_ap(state_t * state){
-	//char str[256];
-	//snprintf(str, sizeof(str), "python3 /bridge/scripts/create_wifi_ap.py -ip 192.168.3.1 -s %s -p %s", state->wifi_ssid, state->wifi_passphrase);
-	//snprintf(str, sizeof(str), "python3 /bridge/scripts/create_wifi_ap.py -ip %u.%u.%u.1 -s %s -p %s", state->ip[0], state->ip[1], state->ip[2], state->wifi_ssid, state->wifi_passphrase);
-	//system(str);
-	return true;
-}
+*/
 
 state_t * state(void){
 	state_t * to_return = (state_t*)malloc(sizeof(state_t));
@@ -154,7 +182,8 @@ state_t * state(void){
 	
 	to_return->tx_backoff_min_ms = to_return->transmit_queue_period_ms - to_return->transmit_queue_variance_ms;
 	
-	to_return->slip = slip_init(to_return, to_return->ip_str);
+	//to_return->slip = slip_init(to_return, to_return->ip_str);
+	to_return->tun = tun_init(to_return, to_return->ip_str);
 	
 	////create a radio frame send queue
 	to_return->send_queue = zlistx_new();
@@ -202,15 +231,12 @@ state_t * state(void){
 	//WiMax_FCH
 	to_return->encoder = conv_encoder(WiMax_FCH);
 #else
-	to_return->encoder = turbo_encoder(0);
+	//to_return->encoder = turbo_encoder(3072, 48, 8); //block size bits, reed solomon block size in bytes, turbo iterations
+	to_return->encoder = turbo_encoder(1536, 80, 8); //block size bits, reed solomon block size in bytes, turbo iterations
 #endif
 	
 	to_return->transmitting = NULL;
-#ifdef USE_CONV_ENCODER
 	to_return->receiving	= radio_frame(to_return->encoder->coded_bytes_len*to_return->encoder->conv_blocks);
-#else
-	to_return->receiving	= radio_frame(sizeof(coded_block_t));
-#endif
 	
 	global_state = to_return; //set the global state object, this is ok since this is a singleton class
 	
@@ -218,7 +244,7 @@ state_t * state(void){
 }
 
 bool state_process_receive_frame(state_t * state, frame_t ** received_frame){
-	static uint8_t slip_tx_buf[1500];
+	//static uint8_t slip_tx_buf[1500];
 	static uint8_t buf[1500]; //buffer for decompressed packets, too large at the moment
 	static uint32_t len;
 	static int slip_tx_len;
@@ -256,30 +282,8 @@ bool state_process_receive_frame(state_t * state, frame_t ** received_frame){
 				}
 				break;
 			case TYPE_IPV4:
-				printf("->");
-				ipv4_print((ipv4_hdr_t*)tlv->value);
-				if (ipv4_check_dst(state, (ipv4_hdr_t*)tlv->value)){ //this packet was addressed to my subnet
-					//printArrHex(tlv->value, tlv->len);
-					//encode to slip send over virtual serial terminal
-					slip_tx_len = slip_encode(tlv->value, tlv->len, slip_tx_buf, sizeof(slip_tx_buf));
-					if (slip_tx_len < 0){
-						printf("ERROR: slip_encode() failed!\n");
-						break;
-					}
-					if (state->slip < 0){
-						printf("ERROR: slip port not initialized!\n");
-						break;
-					}
-					if (serial_write(state->slip, slip_tx_buf, slip_tx_len) < 0){
-						printf("ERROR: sp_nonblocking_write() failed!\n");
-						break;
-					}
-				}
-				else if (ipv4_ttl_decrement(state, (ipv4_hdr_t*)tlv->value)){ //re-transmit this packet
-					//if (!state_append_loading_dock(state, tlv->type, tlv->len, tlv->value)) {
-					//	printf("WARNING: state_append_loading_dock() failed!\n");
-					//	break;
-					//}
+				if (write(state->tun, tlv->value, tlv->len) < 0){
+					printf("write to tun interface failed!\n");
 				}
 				break;
 			case TYPE_IPV4_COMPRESSED:
@@ -288,29 +292,10 @@ bool state_process_receive_frame(state_t * state, frame_t ** received_frame){
 					printf("WARNING: failed to decompress IPV4 packed\n");
 					break;
 				}
-				printf("-->"); ipv4_print((ipv4_hdr_t*)buf);
-				if (ipv4_check_dst(state, (ipv4_hdr_t*)buf)){ //this packet was addressed to my subnet
-					//printArrHex(buf, len);
-					//encode to slip send over virtual serial terminal
-					slip_tx_len = slip_encode(buf, len, slip_tx_buf, sizeof(slip_tx_buf));
-					if (slip_tx_len < 0){
-						printf("ERROR: slip_encode() failed!\n");
-						break;
-					}
-					if (state->slip < 0){
-						printf("ERROR: slip port not initialized!\n");
-						break;
-					}
-					if (serial_write(state->slip, slip_tx_buf, slip_tx_len) < 0){
-						printf("ERROR: sp_nonblocking_write() failed!\n");
-						break;
-					}
-				}
-				else if (ipv4_ttl_decrement(state, (ipv4_hdr_t*)buf)){ //re-transmit this packet
-					//if (!state_append_loading_dock(state, tlv->type, tlv->len, tlv->value)) {
-					//	printf("WARNING: state_append_loading_dock() failed!\n");
-					//	break;
-					//}
+				//printf("RX: \n");printArrHex(buf,len);
+				ipv4_check_dst(state, (ipv4_hdr_t*)&buf[4]);
+				if (write(state->tun, buf, len) < 0){
+					printf("write to tun interface failed!\n");
 				}
 				break;
 			default:
@@ -525,11 +510,7 @@ void state_abort_transceiving(state_t * state){
 	if (state->transmitting != NULL){
 		radio_frame_destroy(&state->transmitting);
 	}
-//#ifdef USE_CONV_ENCODER
 	radio_start_rx(state->current_channel, state->receiving->frame_len);
-//#else
-//	radio_start_rx(state->current_channel, sizeof(coded_block_t));
-//#endif
 	//si446x_change_state(SI446X_CMD_REQUEST_DEVICE_STATE_REP_CURR_STATE_MAIN_STATE_ENUM_READY); //change to ready state
 }
 
@@ -618,8 +599,9 @@ void state_run(state_t * state){
 	if (timer_run(&state->beacon_transmit)){ //add a beacon to the transmit queue
 		printf("INFO: beacon transmit\n");
 		beacon_init(&my_beacon, state);
-		if (!state_append_loading_dock(state, TYPE_BEACON, sizeof(beacon_t), (uint8_t*)&my_beacon)){
-			printf("ERROR: state_append_loading_dock() failed!\n");
+		if (!state_append_low_priority_packet(state, TYPE_BEACON, sizeof(beacon_t), (uint8_t*)&my_beacon)){
+		//if (!state_append_loading_dock(state, TYPE_BEACON, sizeof(beacon_t), (uint8_t*)&my_beacon)){
+			printf("ERROR: state_append_low_priority_packet() failed!\n");
 		}
 	}
 	
@@ -711,13 +693,11 @@ bool state_write_ip(state_t * state, char * path, char * ip_str){
 
 void state_ip_changed_callback(state_t * state){
 	printf("INFO: state_ip_changed_callback()\n");
-	char cmd[128];
-	snprintf(cmd, sizeof(cmd), "python3 /bridge/scripts/create_slip.py -ip %s", state->ip_str);
-	system(cmd);
-	
-	//if (!state_restart_wifi_ap(state)){ // reconfigure wifi AP here
-	//	printf("WARNING: failed to start wifi AP!\n");
-	//}
+	printf("WARNING bugs likely follow\n");
+	//char cmd[128];
+	//snprintf(cmd, sizeof(cmd), "python3 /bridge/scripts/create_slip.py -ip %s", state->ip_str);
+	//system(cmd);
+	state->tun = tun_init(state, state->ip_str);
 }
 
 bool state_read_mac(state_t * state, char * path){
@@ -848,8 +828,8 @@ static bool state_read_config_settings(state_t * state, char * path){
 	state->current_channel					= (val != NULL) ? strtol(val, NULL, 10) : RADIO_DEFAULT_CHANNEL;
 	val = jsmn_json_lookup(tokens, num_toks, json_str, "compress_ipv4");
 	state->compress_ipv4					= (val != NULL) ? (memcmp(val,"true",4)==0) : DEFAULT_COMPRESS_IPV4;
-	val = jsmn_json_lookup(tokens, num_toks, json_str, "slip_mtu");
-	state->slip_mtu							= (val != NULL) ? strtol(val, NULL, 10) : false;
+	//val = jsmn_json_lookup(tokens, num_toks, json_str, "slip_mtu");
+	//state->slip_mtu							= (val != NULL) ? strtol(val, NULL, 10) : false;
 	val = jsmn_json_lookup(tokens, num_toks, json_str, "wifi_ssid");
 	if (val == NULL){
 		strncpy(state->wifi_ssid, DEFAULT_WIFI_SSID, sizeof(state->wifi_ssid));
@@ -883,7 +863,8 @@ void state_destroy(state_t ** to_destroy){
 #ifdef OBJECT_DESTROY_DEBUG
     printf("destroying state_t at 0x%p\n", (void*)*to_destroy);
 #endif
-	system("python3 /bridge/scripts/create_slip.py -k");
+	//system("python3 /bridge/scripts/create_slip.py -k");
+	system("python3 /bridge/scripts/create_tun.py -k");
 	radio_hal_deinit();
 	zlistx_destroy(&(*to_destroy)->send_queue);
 	
@@ -899,8 +880,14 @@ void state_destroy(state_t ** to_destroy){
 	zhashx_destroy(&(*to_destroy)->peers_by_callsign);
 	zhashx_destroy(&(*to_destroy)->radio_config);	
 	zlistx_destroy(&(*to_destroy)->low_priority_queue);
-	
+
+
+#ifdef USE_CONV_ENCODER
+	conv_encoder_destroy(&(*to_destroy)->encoder);
+#else
 	turbo_encoder_destroy(&(*to_destroy)->encoder);
+#endif	
+	
 	
 	free(*to_destroy); //free the state_t from memory
 	*to_destroy = NULL; //set the state_t* to be a NULL pointer
@@ -1095,11 +1082,7 @@ static void packed_frame_generate_crc(packed_frame_t * frame){
 
 radio_frame_t * packed_frame_encode(packed_frame_t ** to_encode){
 	//printf("DEBUG: packed_frame_encode()\n");
-#ifdef USE_CONV_ENCODER
 	radio_frame_t * to_return = radio_frame(global_state->encoder->coded_bytes_len*global_state->encoder->conv_blocks);
-#else
-	radio_frame_t * to_return = radio_frame(sizeof(coded_block_t));
-#endif
 	if (to_return == NULL) {return NULL;}
 	
 	(*to_encode)->hdr.len = sizeof((*to_encode)->payload);
@@ -1113,16 +1096,11 @@ radio_frame_t * packed_frame_encode(packed_frame_t ** to_encode){
 	uint8_t * encoded = turbo_encoder_encode(global_state->encoder, (uint8_t*)(*to_encode), sizeof(packed_frame_t));
 #endif
 	if (encoded == NULL){
-	//if(!turbo_wrapper_encode((uncoded_block_t*), (coded_block_t*)to_return->frame_ptr)){
 		radio_frame_destroy(&to_return);
 		return NULL;
 	}
 
-#ifdef USE_CONV_ENCODER
 	memcpy(to_return->frame_ptr, encoded, global_state->encoder->coded_bytes_len*global_state->encoder->conv_blocks);
-#else
-	memcpy(to_return->frame_ptr, encoded, sizeof(coded_block_t));
-#endif
 	
 	
 	packed_frame_destroy(to_encode);
@@ -1275,10 +1253,9 @@ packed_frame_t * radio_frame_decode(radio_frame_t * to_decode){
 #ifdef USE_CONV_ENCODER
 	uint8_t * decoded = conv_encoder_decode(global_state->encoder, (uint8_t*)to_decode->frame_ptr, to_decode->frame_len);
 #else
-	uint8_t * decoded = turbo_encoder_decode(global_state->encoder, (uint8_t*)to_decode->frame_ptr, sizeof(coded_block_t));
+	uint8_t * decoded = turbo_encoder_decode(global_state->encoder, (uint8_t*)to_decode->frame_ptr, to_decode->frame_len);
 #endif
 	if (decoded == NULL){
-	//if(!turbo_wrapper_decode((coded_block_t*)to_decode->frame_ptr, (uncoded_block_t*)to_return)){
 		free(to_return);
 		return NULL;
 	}
@@ -1393,7 +1370,8 @@ bool peer_open_slip(peer_t * p){
 	}
 	
 	char str[128];
-	snprintf(str, sizeof(str), "python3 /bridge/scripts/create_slip.py -d %s", peer_ip_str(p));
+	//snprintf(str, sizeof(str), "python3 /bridge/scripts/create_slip.py -d %s", peer_ip_str(p));
+	snprintf(str, sizeof(str), "python3 /bridge/scripts/create_tun.py -d %s", peer_ip_str(p));
 	system(str);
 	p->slip = true;
 	return true;

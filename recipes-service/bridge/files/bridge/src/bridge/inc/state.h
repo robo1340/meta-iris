@@ -149,7 +149,7 @@ struct state_t_DEFINITION {
 	uint16_t max_loading_dock_idle_ms;	///<the time a non-empty transmit loading dock will wait for additional packets before being added to the transmit queue
 	uint8_t  current_channel;			///<the currently selected radio channel, defaults to RADIO_DEFAULT_CHANNEL
 	bool     compress_ipv4;				///<set to true to compress ipv4 packets
-	uint16_t slip_mtu;					///<MTU for the slip interface 
+	//uint16_t slip_mtu;					///<MTU for the slip interface 
 	char wifi_ssid[64];					///<wifi AP SSID
 	char wifi_passphrase[64];			///<wifi AP passphrase
 	zlistx_t * si4463_load_order; ///<a list of si4463 config settings to load first
@@ -170,8 +170,9 @@ struct state_t_DEFINITION {
 	//Dynamic State Variables
 	//////////////////////////////////////////	
 	int slip; 			///<file descriptor for a slip serial port
-	char slip_if[8];
-	char serial_path[12];
+	int tun;	///<file descriptor for the tun interface
+	//char slip_if[8];
+	//char serial_path[12];
 	
 	timed_frame_t loading_dock; ///<the current frame being filled with payload data that will be added to the send queue on a counter or when full
 	
@@ -333,9 +334,12 @@ struct __attribute__((__packed__)) packed_frame_DEFINITION {
 	frame_header_t hdr;
 	//uint8_t payload[750];
 #ifdef USE_CONV_ENCODER
-	uint8_t payload[270]; //288-18
+	uint8_t payload[270]; //336-(4*(336/(24+4))) - 18
+	//uint8_t payload[198]; //240-(4*(240/(36+4))) - 18
+	//uint8_t payload[286]; //336-(4*(336/(38+4))) - 18
 #else
-	uint8_t payload[622]; //640-18
+	//uint8_t payload[352-18]; //352-18
+	uint8_t payload[184-18]; //352-18
 #endif
 };
 

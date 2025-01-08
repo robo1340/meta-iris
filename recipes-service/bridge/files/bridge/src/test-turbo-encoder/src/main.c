@@ -13,22 +13,17 @@
 //int r = rand();      // Returns a pseudo-random integer between 0 and RAND_MAX.
 
 /* Bit error rate test */
-static int error_test(uint8_t type){
+static int error_test(turbo_encoder_t * enc){
 	int i, ober = 0;
-	printf("\nerror_test(%u,", type);
+	//printf("error_test(");
+	//printf("\"%s\")\n", enc->attr.name);
+	//printf("\"%s\" %d->%d\n", enc->attr.spec, enc->attr.in_len, enc->attr.out_len);
 	
-	turbo_encoder_t * enc = turbo_encoder(0);
-	assert(enc != NULL);
-	printf("\"%s\")\n", enc->attr.name);
-	printf("\"%s\" %d->%d\n", enc->attr.spec, enc->attr.in_len, enc->attr.out_len);
-	printf("frame len: %u\n", enc->frame_bytes_len);
-	printf("%u -> %u bytes\n", enc->uncoded_bytes_len, enc->coded_bytes_len);
-	
-	uint8_t input[640];
+	uint8_t input[768];
 	//uint8_t * input = malloc(enc->frame_bytes_len);
 
 	for (i=0; i<enc->frame_bytes_len; i++){
-		input[i] = i%255;
+		input[i] = rand();
 	}
 	//printArrHex(input, enc->frame_bytes_len);
 
@@ -55,14 +50,14 @@ static int error_test(uint8_t type){
 	//the channel
 	*/
 	
-	//random
+	//random 
 	int r;
 	for (i=0; i<enc->coded_bytes_len; i++){
 		r = rand() % 100;
-		if (r > 96){
+		if (r > 97){
 			coded[i] = ~coded[i];
 		}
-		else if (r > 80) {
+		else if (r > 60) {
 			coded[i] ^= 1 << (rand()%8);
 		}
 		
@@ -71,43 +66,79 @@ static int error_test(uint8_t type){
 
 	uint8_t * decoded = turbo_encoder_decode(enc, coded, enc->coded_bytes_len);
 	if (decoded == NULL){
-		printf("Reed Solomon Decoding Failed\n");
+		//printf("Reed Solomon Decoding Failed\n");
 		return -1;
 	}
-	assert(decoded != NULL);
+	//assert(decoded != NULL);
 	for (i=0, ober=0; i<enc->frame_bytes_len; i++) {
 		if (decoded[i] != input[i]) {
 			printf("%d\n",i);
 			ober++;
 		}
 	}
-	printf("FER....%d\n", ober);
+	
+	if (ober != 0){
+		printf("FER....%d\n", ober);
+	}
 
 	//printArrHex(input, enc->frame_bytes_len);
 	//printArrHex(decoded, enc->frame_bytes_len);
 	int rc = memcmp(decoded, input, enc->frame_bytes_len);
 	if (rc == 0){
-		printf("SUCCESS on type %d\n", type);
+		//printf("SUCCESS\n");
 	} else {
-		printf("FAILURE on type %d\n", type);
+		//printf("FAILURE\n");
 	}
 	
-	turbo_encoder_destroy(&enc);
 	return rc;
 }
 
-int main(void) {
+typedef struct test_vector_t {
+	uint16_t block_size;
+	uint16_t rs_block_size;
+	int iterations;
+	float s;
+	float f;
+} test_vector_t;
 
+test_vector_t tvs[] = {
+	//{3072, 4, 8, 0, 0},
+	//{3072, 8, 8, 0, 0},
+	//{3072, 12, 8, 0, 0},
+	//{768, 24, 2, 0, 0},
+	//{6144, 24, 2, 0, 0},
+	{3072, 24, 2, 0, 0},
+	{3072, 48, 2, 0, 0},
+	{3072, 96, 2, 0, 0},
+	{3072, 192, 2, 0, 0},
+};
+
+int main(void) {
+	int seed = 42;
 	srand(time(NULL));   // Initialization, should only be called once.
 	//srand(2);
 
-	int i,rc;
-	float s,f;
-	float iters = 100;
-	for (i=0; i<(int)iters; i++){
-		rc = error_test(0);
-		if (rc == 0){s++;}
-		else {f++;}
+	int i,j,rc;
+	float iters = 25;
+	turbo_encoder_t * enc = NULL;
+	
+	for (j=0; j<sizeof(tvs)/sizeof(test_vector_t); j++){
+		srand(seed);
+		
+		enc = turbo_encoder(tvs[j].block_size, tvs[j].rs_block_size, tvs[j].iterations); 
+		assert(enc != NULL);
+		printf("frame len: %u\n", enc->frame_bytes_len);
+		printf("%u -> %u bytes\n", enc->uncoded_bytes_len, enc->coded_bytes_len);
+		
+		for (i=0; i<(int)iters; i++){
+			rc = error_test(enc);
+			if (rc == 0){tvs[j].s++;}
+			else {tvs[j].f++;}
+		}
+		turbo_encoder_destroy(&enc);
 	}
-	printf("%2.0f successes, %2.0f failures, %3.1f%%\n", s, f, (s/iters)*100);
+	
+	for (j=0; j<sizeof(tvs)/sizeof(test_vector_t); j++){
+		printf("(%u,%u,%d) %2.0f successes, %2.0f failures, %3.1f%%\n", tvs[j].block_size, tvs[j].rs_block_size, tvs[j].iterations, tvs[j].s, tvs[j].f, (tvs[j].s/iters)*100);
+	}
 }

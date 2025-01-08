@@ -110,11 +110,11 @@ int main(void) {
 	float s,f;
 	float s2,f2;
 	
-	for (i=0; i<(int)iters; i++){
-		rc = error_test(GSM_xCCH);
-		if (rc == 0){s++;}
-		else {f++;}
-	}
+	//for (i=0; i<(int)iters; i++){
+	//	rc = error_test(GSM_xCCH);
+	//	if (rc == 0){s++;}
+	//	else {f++;}
+	//}
 
 	for (i=0; i<(int)iters; i++){
 		rc = error_test(WiMax_FCH);
@@ -122,6 +122,6 @@ int main(void) {
 		else {f2++;}
 	}
 	
-	printf("GSM_xCCH:  %2.0f successes, %2.0f failures, %3.1f%%\n", s, f, (s/iters)*100);
+	//printf("GSM_xCCH:  %2.0f successes, %2.0f failures, %3.1f%%\n", s, f, (s/iters)*100);
 	printf("WiMax_FCH: %2.0f successes, %2.0f failures, %3.1f%%\n", s2, f2, (s2/iters)*100);
 }

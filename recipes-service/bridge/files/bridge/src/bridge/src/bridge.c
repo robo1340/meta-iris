@@ -74,14 +74,8 @@ bridge_t * bridge_create(bool no_slip, bool no_gpio_events, bool no_incoming_soc
 	srand(time(NULL));   // seed random number generator
 	br->my_state = state();
 	if (br->my_state == NULL){return NULL;}
-	if (!state_restart_wifi_ap(br->my_state)){
-		printf("WARNING: failed to start wifi AP!\n");
-	}
 
-	//init the turbo encoder
-	//if (!turbo_wrapper_init(4)) {return NULL;}
-	assert(br->my_state->encoder->frame_bytes_len==sizeof(packed_frame_t));
-	
+	assert(br->my_state->encoder->frame_bytes_len==sizeof(packed_frame_t));	
 
 	return br;	
 }
@@ -102,12 +96,13 @@ bool bridge_slip_run(bridge_t * b){
 				return false;
 			}
 			
-			printf("to tx: len %u ", zchunk_size(packet));
+			//printf("to tx: len %u ", zchunk_size(packet));
 			ipv4_print((ipv4_hdr_t*)zchunk_data(packet));
 			
 			ipv4_set_ttl((ipv4_hdr_t*)zchunk_data(packet), b->my_state->ttl_set);
 			len = sizeof(buf); //compress sets len so set it now
-			low_priority = check_udp_dst_port((udp_datagram_t*)zchunk_data(packet), b->my_state->low_priority_udp_port);
+			low_priority = false;
+			//low_priority = check_udp_dst_port((udp_datagram_t*)zchunk_data(packet), b->my_state->low_priority_udp_port);
 			//printf("low priority %u\n", low_priority);
 			if ((b->my_state->compress_ipv4) && (compress(buf, (uLongf*)&len, zchunk_data(packet), zchunk_size(packet)) == Z_OK )){
 				if (!low_priority){
@@ -134,6 +129,52 @@ bool bridge_slip_run(bridge_t * b){
 	return true;
 }
 
+bool bridge_tun_run(bridge_t * b){
+	static uint32_t len;
+	static bool low_priority;
+	bool success;
+	int rc;
+	
+	static uint8_t packet[1500];
+	//static uint8_t * ipv4;
+	//static uint32_t ipv4_len;
+	
+	rc = read(b->my_state->tun, packet, sizeof(packet));
+	if (rc <= 0){return true;} //nothing received
+	
+	//ipv4 = &packet[5];
+	//ipv4_len = rc - 4;
+
+	//printf("to tx: len %u ", ipv4_len);
+	//printf("\nTO TX: ");
+	//printArrHex(packet,rc);
+	//ipv4_print((ipv4_hdr_t*)ipv4);
+	
+	//ipv4_set_ttl((ipv4_hdr_t*)ipv4, b->my_state->ttl_set);
+	len = sizeof(buf); //compress sets len so set it now
+	low_priority = false;
+	//low_priority = check_udp_dst_port((udp_datagram_t*)zchunk_data(packet), b->my_state->low_priority_udp_port);
+	//printf("low priority %u\n", low_priority);
+	if ((b->my_state->compress_ipv4) && (compress(buf, (uLongf*)&len, packet, (uint32_t)rc) == Z_OK )){
+		if (!low_priority){
+			success = state_append_loading_dock(b->my_state, TYPE_IPV4_COMPRESSED, len, buf);
+		} else {
+			success = state_append_low_priority_packet(b->my_state, TYPE_IPV4_COMPRESSED, len, buf);
+		}
+	} else {
+		if (!low_priority){
+			success = state_append_loading_dock(b->my_state, TYPE_IPV4, (uint32_t)rc, packet);
+		} else {
+			success = state_append_low_priority_packet(b->my_state, TYPE_IPV4_COMPRESSED, len, buf);
+		}
+	}
+	//printArrHex(packet, rc);
+	if (!success){
+		printf("ERROR: state_append_loading_dock() failed!\n");
+	}
+	return success;
+}
+
 bool bridge_run(bridge_t * b){	
 	if (gpio_poll()){
 		if(!radio_event_callback(b->my_state)){
@@ -148,7 +189,8 @@ bool bridge_run(bridge_t * b){
 	if (state_transceiving(b->my_state)) {
 		return true;
 	}
-	else if (!bridge_slip_run(b)){
+	else if (!bridge_tun_run(b)){
+	//else if (!bridge_slip_run(b)){
 		printf("ERROR: bridge_slip_run() failed\n");
 		return false;
 	}
@@ -164,9 +206,6 @@ void bridge_destroy(bridge_t ** to_destroy){
 	
 	printf("gpio_deinit\n");
 	gpio_deinit();
-	
-	printf("turbo_wrapper_deinit\n");
-	turbo_wrapper_deinit();
 	
 	state_destroy(&(*to_destroy)->my_state);
 

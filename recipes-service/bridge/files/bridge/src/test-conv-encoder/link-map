@@ -11,7 +11,7 @@ Archive member included to satisfy reference by file (symbol)
 /bridge/src/test-conv-encoder/test.a(conv_wrapper.o)
                               /bridge/src/test-conv-encoder/test.a(turbo_encoder.o) (encoder)
 /bridge/src/test-conv-encoder/test.a(interleaver.o)
-                              /bridge/src/test-conv-encoder/test.a(turbo_encoder.o) (turbo_interleaver_init)
+                              /bridge/src/test-conv-encoder/test.a(turbo_encoder.o) (turbo_interleave)
 
 Discarded input sections
 
@@ -197,7 +197,7 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(.iplt)
  .iplt          0x000107d4        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.text           0x000107d4     0x4f1c
+.text           0x000107d4     0x4f04
  *(.text.unlikely .text.*_unlikely .text.unlikely.*)
  *(.text.exit .text.exit.*)
  *(.text.startup .text.startup.*)
@@ -208,163 +208,163 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
                 0x000107d4                _start
  .text          0x00010808       0x24 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
  .text          0x0001082c       0x6c /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
- .text          0x00010898      0x5e4 /bridge/src/test-conv-encoder/test.a(main.o)
+ .text          0x00010898      0x538 /bridge/src/test-conv-encoder/test.a(main.o)
                 0x00010ce4                main
- .text          0x00010e7c     0x2e90 /bridge/src/test-conv-encoder/test.a(turbo_encoder.o)
-                0x00010e7c                generate_gf
-                0x00011060                gf_mul
-                0x000110f4                gf_div
-                0x00011190                gf_sum
-                0x000111c0                gf_polydiv_recursive
-                0x000113d0                gf_polydiv
-                0x00011428                gf_matr_det
-                0x000114ec                gf_matr_mul
-                0x00011694                gf_matr_mul_vector
-                0x000117f4                gf_matr_inv
-                0x0001195c                generating_polynomial
-                0x00011a58                shift_msg_to_vec
-                0x00011b18                calculate_check_symbols
-                0x00011c1c                calculate_syndrome
-                0x00011d5c                extract_message
-                0x00011dc0                fail
-                0x00011e00                pass
-                0x00011e40                REQUIRE
-                0x00011e9c                AR_EQ
-                0x00011f28                STR_EQ
-                0x00011fac                MX_EQ
-                0x000120b4                encode_message
-                0x000121e8                decode_message
-                0x00012b60                turbo_encoder
-                0x00012f04                turbo_encoder_encode
-                0x000130b8                turbo_encoder_decode
-                0x000132a4                turbo_encoder_destroy
-                0x0001336c                conv_encoder
-                0x00013788                conv_encoder_encode
-                0x000139c8                conv_encoder_decode
-                0x00013c68                conv_encoder_destroy
- .text          0x00013d0c      0x554 /bridge/src/test-conv-encoder/test.a(turbo_wrapper.o)
-                0x00013d0c                bytes2bits
-                0x00013dd4                bytes2bits_ranged
-                0x00013eb0                bits2bytes
-                0x00013fac                turbo_wrapper_encode
-                0x00014090                turbo_wrapper_init
-                0x00014124                turbo_wrapper_deinit
-                0x00014170                turbo_wrapper_decode
- .text          0x00014260      0x980 /bridge/src/test-conv-encoder/test.a(util.o)
-                0x00014260                vector_print
-                0x000142d4                matrix_new
-                0x00014360                matrix_free
-                0x000143d4                matrix_copy
-                0x000144a4                fatal
-                0x000144e0                swap
-                0x0001452c                vector_new
-                0x00014558                vector_copy
-                0x000145d8                vector_free
-                0x000145fc                stack
-                0x000146e4                submatrix
-                0x0001477c                pow2
-                0x000147a8                vector_sum
-                0x00014884                vector_to_str
-                0x00014914                str_to_vector
-                0x00014994                sum
-                0x00014a0c                substring
-                0x00014af0                strlength
-                0x00014b58                count
- .text          0x00014be0      0x63c /bridge/src/test-conv-encoder/test.a(conv_wrapper.o)
-                0x00014be0                encoder
-                0x00014e60                encoder_bits_in_padded
-                0x00014e88                encoder_bits_out_padded
-                0x00014eb0                encoder_encode
-                0x00015038                encoder_decode
-                0x00015194                encoder_destroy
- .text          0x0001521c      0x4d4 /bridge/src/test-conv-encoder/test.a(interleaver.o)
-                0x000152a0                turbo_interleave
-                0x0001541c                turbo_deinterleave
-                0x00015640                turbo_interleaver_init
-                0x00015698                turbo_interleaver_deinit
- .text          0x000156f0        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
- .text          0x000156f0        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .text          0x00010dd0     0x2f24 /bridge/src/test-conv-encoder/test.a(turbo_encoder.o)
+                0x00010dd0                generate_gf
+                0x00010fb4                gf_mul
+                0x00011048                gf_div
+                0x000110e4                gf_sum
+                0x00011114                gf_polydiv_recursive
+                0x00011324                gf_polydiv
+                0x0001137c                gf_matr_det
+                0x00011440                gf_matr_mul
+                0x000115e8                gf_matr_mul_vector
+                0x00011748                gf_matr_inv
+                0x000118b0                generating_polynomial
+                0x000119ac                shift_msg_to_vec
+                0x00011a6c                calculate_check_symbols
+                0x00011b70                calculate_syndrome
+                0x00011cb0                extract_message
+                0x00011d14                fail
+                0x00011d54                pass
+                0x00011d94                REQUIRE
+                0x00011df0                AR_EQ
+                0x00011e7c                STR_EQ
+                0x00011f00                MX_EQ
+                0x00012008                encode_message
+                0x0001213c                decode_message
+                0x00012ab4                turbo_encoder
+                0x00012e58                turbo_encoder_encode
+                0x0001300c                turbo_encoder_decode
+                0x000131f8                turbo_encoder_destroy
+                0x000132c0                conv_encoder
+                0x00013708                conv_encoder_encode
+                0x0001397c                conv_encoder_decode
+                0x00013c50                conv_encoder_destroy
+ .text          0x00013cf4      0x554 /bridge/src/test-conv-encoder/test.a(turbo_wrapper.o)
+                0x00013cf4                bytes2bits
+                0x00013dbc                bytes2bits_ranged
+                0x00013e98                bits2bytes
+                0x00013f94                turbo_wrapper_encode
+                0x00014078                turbo_wrapper_init
+                0x0001410c                turbo_wrapper_deinit
+                0x00014158                turbo_wrapper_decode
+ .text          0x00014248      0x980 /bridge/src/test-conv-encoder/test.a(util.o)
+                0x00014248                vector_print
+                0x000142bc                matrix_new
+                0x00014348                matrix_free
+                0x000143bc                matrix_copy
+                0x0001448c                fatal
+                0x000144c8                swap
+                0x00014514                vector_new
+                0x00014540                vector_copy
+                0x000145c0                vector_free
+                0x000145e4                stack
+                0x000146cc                submatrix
+                0x00014764                pow2
+                0x00014790                vector_sum
+                0x0001486c                vector_to_str
+                0x000148fc                str_to_vector
+                0x0001497c                sum
+                0x000149f4                substring
+                0x00014ad8                strlength
+                0x00014b40                count
+ .text          0x00014bc8      0x63c /bridge/src/test-conv-encoder/test.a(conv_wrapper.o)
+                0x00014bc8                encoder
+                0x00014e48                encoder_bits_in_padded
+                0x00014e70                encoder_bits_out_padded
+                0x00014e98                encoder_encode
+                0x00015020                encoder_decode
+                0x0001517c                encoder_destroy
+ .text          0x00015204      0x4d4 /bridge/src/test-conv-encoder/test.a(interleaver.o)
+                0x00015288                turbo_interleave
+                0x00015404                turbo_deinterleave
+                0x00015628                turbo_interleaver_init
+                0x00015680                turbo_interleaver_deinit
+ .text          0x000156d8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .text          0x000156d8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(.gnu.warning)
  *(.glue_7t)
- .glue_7t       0x000156f0        0x0 linker stubs
+ .glue_7t       0x000156d8        0x0 linker stubs
  *(.glue_7)
- .glue_7        0x000156f0        0x0 linker stubs
+ .glue_7        0x000156d8        0x0 linker stubs
  *(.vfp11_veneer)
- .vfp11_veneer  0x000156f0        0x0 linker stubs
+ .vfp11_veneer  0x000156d8        0x0 linker stubs
  *(.v4_bx)
- .v4_bx         0x000156f0        0x0 linker stubs
+ .v4_bx         0x000156d8        0x0 linker stubs
 
-.fini           0x000156f0        0x8
+.fini           0x000156d8        0x8
  *(SORT_NONE(.fini))
- .fini          0x000156f0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
-                0x000156f0                _fini
- .fini          0x000156f4        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .fini          0x000156d8        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x000156d8                _fini
+ .fini          0x000156dc        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
                 [!provide]                        PROVIDE (__etext = .)
                 [!provide]                        PROVIDE (_etext = .)
                 [!provide]                        PROVIDE (etext = .)
 
-.rodata         0x000156f8     0x1968
+.rodata         0x000156e0     0x19c8
  *(.rodata .rodata.* .gnu.linkonce.r.*)
- .rodata.cst4   0x000156f8        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x000156f8                _IO_stdin_used
- .rodata        0x000156fc       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
- .rodata        0x0001578c      0x183 /bridge/src/test-conv-encoder/test.a(main.o)
- *fill*         0x0001590f        0x1 
- .rodata        0x00015910      0x480 /bridge/src/test-conv-encoder/test.a(turbo_encoder.o)
-                0x00015ad8                lte_turbo2
- .rodata        0x00015d90       0x52 /bridge/src/test-conv-encoder/test.a(turbo_wrapper.o)
-                0x00015d90                lte_turbo
- *fill*         0x00015de2        0x2 
- .rodata        0x00015de4       0x52 /bridge/src/test-conv-encoder/test.a(util.o)
- *fill*         0x00015e36        0x2 
- .rodata        0x00015e38     0x1175 /bridge/src/test-conv-encoder/test.a(conv_wrapper.o)
-                0x00015e38                gsm_conv_xcch
-                0x00015e60                gsm_conv_cs2
-                0x00015e88                gsm_conv_cs3
-                0x00015eb0                gsm_conv_rach
-                0x00015ed8                gsm_conv_sch
-                0x00015f00                gsm_conv_tch_fr
-                0x00015f28                gsm_conv_tch_hr
-                0x00015f50                gsm_conv_tch_afs_12_2
-                0x00015f78                gsm_conv_tch_afs_10_2
-                0x00015fa0                gsm_conv_tch_afs_7_95
-                0x00015fc8                gsm_conv_tch_afs_7_4
-                0x00015ff0                gsm_conv_tch_afs_6_7
-                0x00016018                gsm_conv_tch_afs_5_9
-                0x00016040                gsm_conv_tch_ahs_7_95
-                0x00016068                gsm_conv_tch_ahs_7_4
-                0x00016090                gsm_conv_tch_ahs_6_7
-                0x000160b8                gsm_conv_tch_ahs_5_9
-                0x000160e0                gsm_conv_tch_ahs_5_15
-                0x00016108                gsm_conv_tch_ahs_4_75
-                0x00016130                wimax_conv_fch
-                0x00016158                lte_conv_pbch
-                0x00016180                types
- *fill*         0x00016fad        0x3 
- .rodata        0x00016fb0       0x1e /bridge/src/test-conv-encoder/test.a(interleaver.o)
- *fill*         0x00016fce        0x2 
- .rodata        0x00016fd0       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .rodata.cst4   0x000156e0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x000156e0                _IO_stdin_used
+ .rodata        0x000156e4       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .rodata        0x00015774      0x14b /bridge/src/test-conv-encoder/test.a(main.o)
+ *fill*         0x000158bf        0x1 
+ .rodata        0x000158c0      0x518 /bridge/src/test-conv-encoder/test.a(turbo_encoder.o)
+                0x00015a88                lte_turbo2
+ .rodata        0x00015dd8       0x52 /bridge/src/test-conv-encoder/test.a(turbo_wrapper.o)
+                0x00015dd8                lte_turbo
+ *fill*         0x00015e2a        0x2 
+ .rodata        0x00015e2c       0x52 /bridge/src/test-conv-encoder/test.a(util.o)
+ *fill*         0x00015e7e        0x2 
+ .rodata        0x00015e80     0x1175 /bridge/src/test-conv-encoder/test.a(conv_wrapper.o)
+                0x00015e80                gsm_conv_xcch
+                0x00015ea8                gsm_conv_cs2
+                0x00015ed0                gsm_conv_cs3
+                0x00015ef8                gsm_conv_rach
+                0x00015f20                gsm_conv_sch
+                0x00015f48                gsm_conv_tch_fr
+                0x00015f70                gsm_conv_tch_hr
+                0x00015f98                gsm_conv_tch_afs_12_2
+                0x00015fc0                gsm_conv_tch_afs_10_2
+                0x00015fe8                gsm_conv_tch_afs_7_95
+                0x00016010                gsm_conv_tch_afs_7_4
+                0x00016038                gsm_conv_tch_afs_6_7
+                0x00016060                gsm_conv_tch_afs_5_9
+                0x00016088                gsm_conv_tch_ahs_7_95
+                0x000160b0                gsm_conv_tch_ahs_7_4
+                0x000160d8                gsm_conv_tch_ahs_6_7
+                0x00016100                gsm_conv_tch_ahs_5_9
+                0x00016128                gsm_conv_tch_ahs_5_15
+                0x00016150                gsm_conv_tch_ahs_4_75
+                0x00016178                wimax_conv_fch
+                0x000161a0                lte_conv_pbch
+                0x000161c8                types
+ *fill*         0x00016ff5        0x3 
+ .rodata        0x00016ff8       0x1e /bridge/src/test-conv-encoder/test.a(interleaver.o)
+ *fill*         0x00017016        0x2 
+ .rodata        0x00017018       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
 
 .rodata1
  *(.rodata1)
 
-.ARM.extab      0x00017060        0x0
+.ARM.extab      0x000170a8        0x0
  *(.ARM.extab* .gnu.linkonce.armextab.*)
- .ARM.extab     0x00017060        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .ARM.extab     0x000170a8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.ARM.exidx      0x00017060        0x8
+.ARM.exidx      0x000170a8        0x8
                 [!provide]                        PROVIDE (__exidx_start = .)
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
- .ARM.exidx     0x00017060        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .ARM.exidx     0x000170a8        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
                 [!provide]                        PROVIDE (__exidx_end = .)
 
 .eh_frame_hdr
  *(.eh_frame_hdr)
  *(.eh_frame_entry .eh_frame_entry.*)
 
-.eh_frame       0x00017068        0x4
+.eh_frame       0x000170b0        0x4
  *(.eh_frame)
- .eh_frame      0x00017068        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .eh_frame      0x000170b0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
  *(.eh_frame.*)
 
 .sframe
