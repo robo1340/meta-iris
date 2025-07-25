@@ -8,6 +8,7 @@
 #include "turbo_wrapper.h"
 #include "timer.h"
 #include "print_util.h" 
+#include "header.h"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -79,6 +80,7 @@ bool radio_receive_pending_callback(state_t * state){
 	if (state_transmitting(state)) { //ignore if transmitting
 		return true;
 	}
+	/*
 	int remaining = radio_frame_bytes_remaining(state->receiving);
 	if (remaining < 0){ return true;} //this was a false interrupt
 	else if (remaining > RADIO_MAX_PACKET_LENGTH){
@@ -93,6 +95,7 @@ bool radio_receive_pending_callback(state_t * state){
 		si446x_read_rx_fifo(remaining, state->receiving->frame_position);
 		state->receiving->frame_position += remaining;
 	}
+	*/
 
 //#ifdef RADIO_EVENTS_INFO
 //	remaining = radio_frame_bytes_remaining(state->receiving);
@@ -131,6 +134,24 @@ bool radio_receive_fifo_almost_full_callback(state_t * state, uint32_t rx_almost
 	else if ((uint32_t)remaining >= rx_almost_full_threshhold){ // free space in the array is more than the threshold
 		si446x_read_rx_fifo(rx_almost_full_threshhold, state->receiving->frame_position);
 		state->receiving->frame_position += rx_almost_full_threshhold;
+		
+		if ((state->receiving->var_len < 0) && ((state->receiving->frame_position - state->receiving->frame_ptr) >= ENC_HEADER_LEN_BYTES)){
+			frame_header_t * hdr = decode_frame_header(state->hdr_encoder, state->receiving->frame_ptr, ENC_HEADER_LEN_BYTES);
+			if (hdr == NULL){
+				printf("WARNING: failed to decoded header aborting...\n");
+				state_abort_transceiving(state);
+				return false;
+			}
+			printf("hdr: %u\n", hdr->len);
+			state->receiving->var_len = hdr->len;
+		}
+		else if (state->receiving->var_len > 0){
+			if ((state->receiving->frame_position - state->receiving->frame_ptr) > state->receiving->var_len){ //done receiving variable length radio frame
+				radio_receive_pending_callback(state);
+				state_finish_receiving(state);
+				return true;
+			}
+		}
 		
 	}else{
 		printf("ERROR: radio frame longer than radio_frame_t memory allocated\n");

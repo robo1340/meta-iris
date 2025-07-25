@@ -37,7 +37,7 @@ OBJECTS := $(patsubst %.c,%.o,$(notdir $(wildcard $(SRC_DIR)/*.c)))
 
 # rule to compile .c files into .o files
 %.o: $(SRC_DIR)/%.c
-	$(CC) -c $(INCLUDES) $(CPPFLAGS) $(CFLAGS)  -o $@ $<  && \
+	$(CC) -c $(INCLUDES) $(CPPFLAGS) $(CFLAGS) -g  -o $@ $<  && \
 	$(AR) -rcsv $(TARGET) $@                             && \
 	$(RM) -v $@
 

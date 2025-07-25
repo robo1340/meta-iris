@@ -75,7 +75,8 @@ bridge_t * bridge_create(bool no_slip, bool no_gpio_events, bool no_incoming_soc
 	br->my_state = state();
 	if (br->my_state == NULL){return NULL;}
 
-	assert(br->my_state->encoder->frame_bytes_len==sizeof(packed_frame_t));	
+	assert(sizeof(frame_header_t)+(br->my_state->encoder->frame_bytes_len*PAYLOADETS)==sizeof(packed_frame_t));	
+	assert(PAYLOADET_LEN == global_state->encoder->frame_bytes_len);
 
 	return br;	
 }

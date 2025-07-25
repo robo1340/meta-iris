@@ -6,6 +6,7 @@
 
 #include "util.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 #define GFsize 256
 #define m 8 // степень RS-полинома (согласно Стандарта ECMA-130 - восемь)
@@ -34,6 +35,12 @@ uint32_t index_of[GFsize]; // индексная таблица для быст�
 
 void generate_gf()
 {
+	static bool gf_gen = false;
+	if (gf_gen == true){
+		return;
+	} else {
+		gf_gen = true;
+	}
     uint32_t i, mask;
 
     mask = 1;

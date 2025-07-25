@@ -5,12 +5,15 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 #PACKAGECONFIG[networkd] = "-Dnetworkd=false"
 
 SRC_URI += " file://frr.conf "
+SRC_URI += " file://daemons "
 
 FILES:${PN} += " /etc/frr/frr.conf "
+FILES:${PN} += " /etc/frr/daemons "
 
 do_install:append() {
     install -d ${D}/etc/frr
     install -m 0644 ${WORKDIR}/frr.conf ${D}/etc/frr/frr.conf
+    install -m 0644 ${WORKDIR}/daemons ${D}/etc/frr/daemons
 
     #install -d ${D}${sysconfdir}/systemd/network
     #install -m 0644 ${WORKDIR}/20-wired.network ${D}${sysconfdir}/systemd/network/
@@ -20,4 +23,4 @@ do_install:append() {
 
 }
 
-SYSTEMD_SERVICE_${PN} = "enable"
+SYSTEMD_SERVICE_${PN} = "disable"

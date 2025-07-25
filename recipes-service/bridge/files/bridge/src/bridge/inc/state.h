@@ -159,6 +159,7 @@ struct state_t_DEFINITION {
 	uint8_t tx_backoff_min_ms;
 #ifdef USE_CONV_ENCODER
 	conv_encoder_t * encoder;
+	conv_encoder_t * hdr_encoder;
 #else
 	turbo_encoder_t * encoder;
 #endif
@@ -238,6 +239,7 @@ bool state_append_low_priority_packet(state_t * state, uint8_t type, uint16_t le
 bool state_add_frame_to_send_queue(state_t * state, radio_frame_t * frame, bool high_priority);
 bool state_peek_next_frame_to_transmit(state_t * state);
 radio_frame_t * state_get_next_frame_to_transmit(state_t * state);
+void state_finish_receiving(state_t * state);
 void state_abort_transceiving(state_t * state);
 void state_run(state_t * state);
 bool state_generate_random_ip(state_t * state);
@@ -286,10 +288,11 @@ void tlv_destroy(tlv_t ** to_destroy);
 
 struct __attribute__((__packed__)) frame_header_DEFINITION {
 	uint8_t callsign[8]; ///<the src callsign of the frame
-	uint8_t opt1; ///<unused option byte
-	uint8_t mac_tail[3]; ///<the last three bytes of the sending radio's MAC
 	uint16_t len; ///<len of the payload that is used
-	uint32_t crc; ///<crc32 of the remaining payload	
+	uint16_t opt;
+	uint32_t crc; ///<crc32 of the remaining payload
+	uint8_t mac_tail[3]; ///<the last three bytes of the sending radio's MAC	
+	uint8_t hdr_crc; ///<crc byte of the header
 };
 
 void frame_header_print(frame_header_t * hdr);
@@ -329,12 +332,15 @@ packed_frame_t * frame_pack(frame_t ** frame);
 
 void frame_destroy(frame_t ** to_destroy);
 
+#define PAYLOADET_LEN 288
+#define PAYLOADETS 5
+
 ///<768 byte long decoded frame equal to UNCODED_LEN in turbo_wrapper.h
 struct __attribute__((__packed__)) packed_frame_DEFINITION {
 	frame_header_t hdr;
 	//uint8_t payload[750];
 #ifdef USE_CONV_ENCODER
-	uint8_t payload[270]; //336-(4*(336/(24+4))) - 18
+	uint8_t payload[PAYLOADET_LEN*PAYLOADETS]; //336-(4*(336/(24+4))) - 18
 	//uint8_t payload[198]; //240-(4*(240/(36+4))) - 18
 	//uint8_t payload[286]; //336-(4*(336/(38+4))) - 18
 #else
@@ -363,6 +369,7 @@ struct radio_frame_t_DEFINITION {
 	uint8_t * frame_ptr;
 	uint8_t * frame_position; ///<current position in the frame for transmit purposes
 	size_t frame_len;
+	int var_len;
 };
 
 radio_frame_t * radio_frame(size_t len);

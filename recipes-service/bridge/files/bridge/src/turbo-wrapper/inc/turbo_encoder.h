@@ -117,5 +117,11 @@ uint8_t * conv_encoder_decode(conv_encoder_t * encoder, uint8_t * input, uint32_
 void conv_encoder_destroy(conv_encoder_t ** to_destroy);
 
 
+conv_encoder_t * hdr_conv_encoder(void);
+uint8_t * hdr_conv_encoder_encode(conv_encoder_t * encoder, uint8_t * input, uint32_t input_len);
+uint8_t * hdr_conv_encoder_decode(conv_encoder_t * encoder, uint8_t * input, uint32_t input_len);
+void hdr_conv_encoder_destroy(conv_encoder_t ** to_destroy);
+
+
 
 

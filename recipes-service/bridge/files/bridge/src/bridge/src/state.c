@@ -1,5 +1,6 @@
 //#include "turbo_wrapper.h"
 #include "state.h"
+#include "header.h"
 #include "print_util.h"
 #include "json_util.h"
 #include "radio_events.h"
@@ -230,13 +231,14 @@ state_t * state(void){
 	//GSM_xCCH
 	//WiMax_FCH
 	to_return->encoder = conv_encoder(WiMax_FCH);
+	to_return->hdr_encoder = hdr_conv_encoder();
 #else
 	//to_return->encoder = turbo_encoder(3072, 48, 8); //block size bits, reed solomon block size in bytes, turbo iterations
 	to_return->encoder = turbo_encoder(1536, 80, 8); //block size bits, reed solomon block size in bytes, turbo iterations
 #endif
 	
 	to_return->transmitting = NULL;
-	to_return->receiving	= radio_frame(to_return->encoder->coded_bytes_len*to_return->encoder->conv_blocks);
+	to_return->receiving	= radio_frame(ENC_HEADER_LEN_BYTES+to_return->encoder->coded_bytes_len*to_return->encoder->conv_blocks*PAYLOADETS);
 	
 	global_state = to_return; //set the global state object, this is ok since this is a singleton class
 	
@@ -441,10 +443,11 @@ static bool state_create_loading_dock(state_t * state){
 }
 
 bool state_append_loading_dock(state_t * state, uint8_t type, uint16_t len, uint8_t * value){
-	//printf("DEBUG: state_append_loading_dock()\n");
+	printf("DEBUG: state_append_loading_dock(%u,%u)\n", type, len); 
+	//return true;
 	
 	if (state_loading_dock_empty(state)){
-		if (!state_create_loading_dock(state)) {return false;}
+		if (!state_create_loading_dock(state)) {return false;} 
 	}
 
 	if(!frame_append(state->loading_dock.frame, type, len, value)){ //the frame is full
@@ -501,6 +504,11 @@ radio_frame_t * state_get_next_frame_to_transmit(state_t * state){
 		zlistx_detach_cur(state->send_queue);
 	}
 	return to_return;
+}
+
+void state_finish_receiving(state_t * state){
+	radio_frame_reset(state->receiving);
+	radio_start_rx(state->current_channel, state->receiving->frame_len);
 }
 
 void state_abort_transceiving(state_t * state){
@@ -884,6 +892,7 @@ void state_destroy(state_t ** to_destroy){
 
 #ifdef USE_CONV_ENCODER
 	conv_encoder_destroy(&(*to_destroy)->encoder);
+	hdr_conv_encoder_destroy(&(*to_destroy)->hdr_encoder);
 #else
 	turbo_encoder_destroy(&(*to_destroy)->encoder);
 #endif	
@@ -980,22 +989,21 @@ frame_t * frame(char * callsign, uint8_t opt1, uint8_t * mac){
 	
 	memset(&to_return->hdr, 0, sizeof(to_return->hdr));
 	memcpy(to_return->hdr.callsign, callsign, sizeof(to_return->hdr.callsign));
-	to_return->hdr.opt1 = opt1;
+	to_return->hdr.opt = opt1;
 	memcpy(to_return->hdr.mac_tail, &mac[3], 3);
 	return to_return;
 }
 
 bool frame_append(frame_t * frame, uint8_t type, uint16_t len, uint8_t * value){
+	//printf("DEBUG: frame_append(0x%02x, %u)\n", type, len);
 	if ((frame_len(frame) + tlv_len(len)) > (int)sizeof(packed_frame_t)){ //cannot append value, frame would be too large
 		return false;
 	}
-	
 	tlv_t * to_append = tlv(type, len, value);
 	if (to_append == NULL) {
 		printf("ERROR: tlv() failed\n");
 		return false;
 	}
-	
 	if (zlistx_add_end(frame->payload, to_append) == NULL){
 		printf("ERROR: zlistx_add_end() failed\n");
 		return false;
@@ -1043,9 +1051,9 @@ packed_frame_t * frame_pack(frame_t ** frame){
 	printf("DEBUG: frame_pack %d/%u %4.1f%%\n", len, sizeof(to_return->payload), (flen/fsz)*100);
 #endif
 	
+	(*frame)->hdr.len = len; //set the length of the payload to the total length of the packed frame (including payload)
 	memcpy(&to_return->hdr, &(*frame)->hdr, sizeof(to_return->hdr)); //copy header directly
 	memset(to_return->payload, 0, sizeof(to_return->payload));
-	
 	tlv_t * p = zlistx_first((*frame)->payload);
 	uint8_t * ptr = to_return->payload;
 	while (p != NULL){
@@ -1054,6 +1062,7 @@ packed_frame_t * frame_pack(frame_t ** frame){
 		memcpy(ptr, p->value, p->len);
 		ptr += p->len;
 		p = zlistx_next((*frame)->payload);
+		
 	}
 	
 	frame_destroy(frame);
@@ -1074,40 +1083,68 @@ void frame_destroy(frame_t ** to_destroy){
 /////////////////////////// packed_frame_t definition start///////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-static void packed_frame_generate_crc(packed_frame_t * frame){
+static uint32_t __packed_frame_generate_crc(packed_frame_t * frame){
 	uint32_t crc = crc32(0, NULL, 0);
-	frame->hdr.crc = crc32(crc, frame->payload, sizeof(frame->payload));
+	crc = crc32(crc, frame->payload, frame->hdr.len - sizeof(frame_header_t));
+	return crc;
+}
+
+static void packed_frame_generate_crc(packed_frame_t * frame){
+	frame->hdr.crc = __packed_frame_generate_crc(frame);
 	return;
 }
 
 radio_frame_t * packed_frame_encode(packed_frame_t ** to_encode){
+	int i;
+	uint32_t encoded_len = global_state->encoder->coded_bytes_len*global_state->encoder->conv_blocks;
+	int payloadets = ((*to_encode)->hdr.len - sizeof(frame_header_t)) / PAYLOADET_LEN;
+	if ((((*to_encode)->hdr.len - sizeof(frame_header_t)) % PAYLOADET_LEN) != 0){
+		payloadets++;
+	}
+	if (payloadets > PAYLOADETS){ //check for maximum number of payloadets
+		printf("ERROR: packed frame passed in that contains for than %d payloadets %d\n", PAYLOADETS, payloadets);
+		return NULL;
+	}
+	(*to_encode)->hdr.len = sizeof(frame_header_t) + payloadets*PAYLOADET_LEN; //bump up the frame length to the length of the next full payloadet
+	int radio_frame_length = ENC_HEADER_LEN_BYTES + encoded_len*payloadets;
 	//printf("DEBUG: packed_frame_encode()\n");
-	radio_frame_t * to_return = radio_frame(global_state->encoder->coded_bytes_len*global_state->encoder->conv_blocks);
+	radio_frame_t * to_return = radio_frame(radio_frame_length);
 	if (to_return == NULL) {return NULL;}
 	
-	(*to_encode)->hdr.len = sizeof((*to_encode)->payload);
 	packed_frame_generate_crc(*to_encode);//calculate the CRC
+	(*to_encode)->hdr.len = radio_frame_length; //now set the length field in the header to the length of the encoded payload (including header)
 	
 	//frame_header_print(&(*to_encode)->hdr);
-
-#ifdef USE_CONV_ENCODER
-	uint8_t * encoded = conv_encoder_encode(global_state->encoder, (uint8_t*)(*to_encode), sizeof(packed_frame_t));
-#else
-	uint8_t * encoded = turbo_encoder_encode(global_state->encoder, (uint8_t*)(*to_encode), sizeof(packed_frame_t));
-#endif
+	uint8_t * ptr = to_return->frame_ptr;
+	uint32_t tmp;
+	uint8_t * encoded = encode_frame_header(global_state->hdr_encoder, &(*to_encode)->hdr, &tmp);
 	if (encoded == NULL){
 		radio_frame_destroy(&to_return);
 		return NULL;
 	}
+	memcpy(ptr, encoded, tmp);
+	ptr += tmp;
 
-	memcpy(to_return->frame_ptr, encoded, global_state->encoder->coded_bytes_len*global_state->encoder->conv_blocks);
-	
+#ifdef USE_CONV_ENCODER
+	for (i=0; i<payloadets; i++){
+		encoded = conv_encoder_encode(global_state->encoder, (uint8_t*)&(*to_encode)->payload[i*PAYLOADET_LEN], PAYLOADET_LEN);
+		if (encoded == NULL){
+			radio_frame_destroy(&to_return);
+			return NULL;
+		}
+		memcpy(ptr, encoded, encoded_len);
+		ptr += encoded_len;
+	}
+#else
+	uint8_t * encoded = turbo_encoder_encode(global_state->encoder, (uint8_t*)(*to_encode), sizeof(packed_frame_t));
+#endif
 	
 	packed_frame_destroy(to_encode);
 	return to_return;
 }
 
 frame_t * packed_frame_unpack(packed_frame_t ** to_unpack){
+	//printf("DEBUG: packed_frame_unpack()\n");
 	frame_t * to_return = frame_empty();
 	if (to_return == NULL) {return NULL;}
 	
@@ -1115,11 +1152,12 @@ frame_t * packed_frame_unpack(packed_frame_t ** to_unpack){
 	//placeholder for where header options would be inspected
 	
 	tl_t * tl= (tl_t*)((*to_unpack)->payload); //point to the first byte of the unpacked payload, should align with tl_t
-	uint8_t * payload_end = &(*to_unpack)->payload[sizeof((*to_unpack)->payload)-1];
+	uint32_t payload_len = (*to_unpack)->hdr.len - sizeof(frame_header_t);
+	uint8_t * payload_end = &(*to_unpack)->payload[payload_len-1];
 	uint32_t tlv_size;
 	int rc = 0; //the number of tlv subframes pulled from the payload
 	
-	//printArrHex((*to_unpack)->payload, sizeof((*to_unpack)->payload));
+	//printArrHex((*to_unpack)->payload, payload_len);
 	
 	while(rc >= 0){
 #ifdef PACKAGE_TYPE_DEBUG
@@ -1138,7 +1176,6 @@ frame_t * packed_frame_unpack(packed_frame_t ** to_unpack){
 		rc++; //one more subframe appended;
 		tl = (tl_t*)(((uint8_t*)tl) + tlv_size);
 	}
-	
 	packed_frame_destroy(to_unpack);
 	
 	if (rc < 0){
@@ -1149,8 +1186,7 @@ frame_t * packed_frame_unpack(packed_frame_t ** to_unpack){
 }
 
 bool packed_frame_verify_crc(packed_frame_t * frame){
-	uint32_t crc = crc32(0, NULL, 0);
-	crc = crc32(crc, frame->payload, sizeof(frame->payload));
+	uint32_t crc = __packed_frame_generate_crc(frame);
 	if (crc != frame->hdr.crc){
 		printf("WARNING: crc mismatch 0x%08x expected, 0x%08x received\n", frame->hdr.crc, crc);
 		return false;
@@ -1180,6 +1216,7 @@ radio_frame_t * radio_frame(size_t len){
 	to_return->frame_len = len;
 	to_return->frame_position = NULL;
 	memset(to_return->frame_ptr, 0, to_return->frame_len);
+	to_return->var_len = -1;
 	return to_return;	
 }
 
@@ -1239,30 +1276,56 @@ bool radio_frame_receive_start(radio_frame_t * frame){
 void radio_frame_reset(radio_frame_t * frame){
 	frame->frame_position = NULL;
 	memset(frame->frame_ptr,0,frame->frame_len);
+	frame->var_len = -1;
 }
 
 packed_frame_t * radio_frame_decode(radio_frame_t * to_decode){
+	printf("radio_frame_decode()\n");
 	//if (to_decode->frame_len != sizeof(coded_block_t)) {
 	//	printf("ERROR: radio_frame_decode() length check failed!\n");
 	//	return NULL;
 	//}
+	uint32_t encoded_len = global_state->encoder->coded_bytes_len*global_state->encoder->conv_blocks;
 	
 	packed_frame_t * to_return = (packed_frame_t*)malloc(sizeof(packed_frame_t));
 	if (to_return == NULL) {return NULL;}
-
-#ifdef USE_CONV_ENCODER
-	uint8_t * decoded = conv_encoder_decode(global_state->encoder, (uint8_t*)to_decode->frame_ptr, to_decode->frame_len);
-#else
-	uint8_t * decoded = turbo_encoder_decode(global_state->encoder, (uint8_t*)to_decode->frame_ptr, to_decode->frame_len);
-#endif
-	if (decoded == NULL){
+	
+	uint8_t * frame_position = to_decode->frame_ptr;
+	
+	frame_header_t * hdr = decode_frame_header(global_state->hdr_encoder, frame_position, ENC_HEADER_LEN_BYTES);
+	if (hdr == NULL){
+		printf("WARNING: failed to decode header in radio_frame_decode()\n");
 		free(to_return);
 		return NULL;
 	}
-	memcpy((uint8_t*)to_return, decoded, sizeof(packed_frame_t));
-	//frame_header_print(&to_return->hdr);
-	//printArrHex(to_return->payload, sizeof(to_return->payload));
+	memcpy(&to_return->hdr, hdr, sizeof(frame_header_t));
+	frame_position += ENC_HEADER_LEN_BYTES;
 
+	int i;
+	uint32_t payloadets_len = hdr->len - ENC_HEADER_LEN_BYTES;
+	int payloadets = payloadets_len / encoded_len;
+	if ((payloadets_len % encoded_len) != 0){
+		payloadets++;
+	}
+	if (payloadets > PAYLOADETS){ //check for maximum number of payloadets
+		printf("ERROR: radio frame passed in contains more than %d payloadets %d\n", PAYLOADETS, payloadets);
+		free(to_return);
+		return NULL;
+	}
+	
+	uint8_t * decoded;
+	for (i=0; i<payloadets; i++){
+		decoded =  conv_encoder_decode(global_state->encoder, frame_position, encoded_len);
+		if (decoded == NULL){
+			free(to_return);
+			return NULL;
+		}
+		memcpy(&to_return->payload[i*global_state->encoder->frame_bytes_len], decoded, global_state->encoder->frame_bytes_len);
+		frame_position += encoded_len;
+	}
+	
+	to_return->hdr.len = sizeof(frame_header_t) + payloadets*global_state->encoder->frame_bytes_len; //set header length to length of decoded payloadets plus the length of the decoded header
+	
 	if (!packed_frame_verify_crc(to_return)){
 		free(to_return);
 		return NULL;
