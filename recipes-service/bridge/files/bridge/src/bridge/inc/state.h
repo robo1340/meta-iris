@@ -332,17 +332,22 @@ packed_frame_t * frame_pack(frame_t ** frame);
 
 void frame_destroy(frame_t ** to_destroy);
 
-#define PAYLOADET_LEN 288
-#define PAYLOADETS 5
+//see definitions in turbo_encoder.c
+//UNCODED_BYTES=48, CONV_RS_DATA=44, CONV_RS_ECC=4
+#define PAYLOADET_LEN 44 //UNCODED_BYTES-(CONV_RS_ECC*(UNCODED_BYTES/(CONV_RS_DATA+CONV_RS_ECC)))
+#define PAYLOADETS 32
+
+
+//UNCODED_BYTES=336, CONV_RS_DATA=24, CONV_RS_ECC=4
+//#define PAYLOADET_LEN 288 //UNCODED_BYTES-(CONV_RS_ECC*(UNCODED_BYTES/(CONV_RS_DATA+CONV_RS_ECC)))
+//#define PAYLOADETS 5
 
 ///<768 byte long decoded frame equal to UNCODED_LEN in turbo_wrapper.h
 struct __attribute__((__packed__)) packed_frame_DEFINITION {
 	frame_header_t hdr;
 	//uint8_t payload[750];
 #ifdef USE_CONV_ENCODER
-	uint8_t payload[PAYLOADET_LEN*PAYLOADETS]; //336-(4*(336/(24+4))) - 18
-	//uint8_t payload[198]; //240-(4*(240/(36+4))) - 18
-	//uint8_t payload[286]; //336-(4*(336/(38+4))) - 18
+	uint8_t payload[PAYLOADET_LEN*PAYLOADETS];
 #else
 	//uint8_t payload[352-18]; //352-18
 	uint8_t payload[184-18]; //352-18

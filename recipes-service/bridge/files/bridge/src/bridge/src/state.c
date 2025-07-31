@@ -37,7 +37,7 @@
 #define DEBUG
 //#define OBJECT_DESTROY_DEBUG
 //#define PACKAGE_TYPE_DEBUG
-//#define TX_START_DEBUG
+#define TX_START_DEBUG
 
 state_t * global_state;
 
@@ -113,6 +113,8 @@ static int tun_init(state_t * state, char * ip){
 	system("python3 /bridge/scripts/create_tun.py -k");
 	snprintf(str, sizeof(str), "python3 /bridge/scripts/create_tun.py -ip %s -m %u", ip, (sizeof(packed_frame_t)-sizeof(frame_header_t)-4));
 	system(str);
+	system("sed -i -r '/^10\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}/d' /etc/hosts"); //delete any entries in localhost that remain from the last session
+	//printf("sed -i -r '/^10\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}/d' /etc/hosts\n");
 	
 	int to_return = tun_open("tun0");
 	ioctl(to_return, TUNSETNOCSUM, 1);
@@ -344,6 +346,7 @@ bool state_update_peers_new_beacon(state_t * state, beacon_t * b){
 	char cs[10]; //callsign null terminated
 	char csb[10]; //callsign null terminated
 	char ip[16];  //ip string buffer
+	char cmd[128];
 	peer_t * p;
 	
 	//check for an IP collision
@@ -365,9 +368,15 @@ bool state_update_peers_new_beacon(state_t * state, beacon_t * b){
 				snprintf(ip, sizeof(ip), "%u.%u.%u.%u", b->ip[0], b->ip[1], b->ip[2], b->ip[3]);
 				if (peer_ip_valid(p)){ //ip_str not set yet
 					zhashx_insert(state->peers_by_ip, ip, p);
+					snprintf(cmd, sizeof(cmd), "python3 /bridge/scripts/hostsed.py add %s %s", ip, cs);
+					//printf("%s\n",cmd);
+					system(cmd);
 				}
 				else if (strncmp(peer_ip_str(p), ip, sizeof(ip))!=0){ //IP changed, change hash table lookup
 					zhashx_rename(state->peers_by_ip, peer_ip_str(p), ip);
+					snprintf(cmd, sizeof(cmd), "python3 /bridge/scripts/hostsed.py add %s %s", ip, cs);
+					//printf("%s\n",cmd);
+					system(cmd);
 				}
 				peer_update_beacon(p, b);
 				return true; //peer was found so we can return
@@ -638,6 +647,8 @@ void state_run(state_t * state){
 
 
 static void state_remove_stale_peers(state_t * state){
+	char cmd[128];
+	
 	zlistx_t * stale = NULL;
 	peer_t * p = zlistx_first(state->peers);
 	while (p != NULL){
@@ -667,6 +678,9 @@ static void state_remove_stale_peers(state_t * state){
 		if (d != NULL){
 			zlistx_detach(state->link_peers, d);
 		}
+		snprintf(cmd, sizeof(cmd), "python3 /bridge/scripts/hostsed.py del %s", peer_callsign(p));
+		system(cmd);
+		printf("%s\n", cmd);
 		peer_destroy(&p);
 		//might need to remove the peer's old route eventually
 		p = zlistx_next(state->peers);
@@ -1280,7 +1294,7 @@ void radio_frame_reset(radio_frame_t * frame){
 }
 
 packed_frame_t * radio_frame_decode(radio_frame_t * to_decode){
-	printf("radio_frame_decode()\n");
+	//printf("radio_frame_decode()\n");
 	//if (to_decode->frame_len != sizeof(coded_block_t)) {
 	//	printf("ERROR: radio_frame_decode() length check failed!\n");
 	//	return NULL;

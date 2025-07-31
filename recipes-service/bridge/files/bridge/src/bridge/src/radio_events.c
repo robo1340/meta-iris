@@ -142,7 +142,7 @@ bool radio_receive_fifo_almost_full_callback(state_t * state, uint32_t rx_almost
 				state_abort_transceiving(state);
 				return false;
 			}
-			printf("hdr: %u\n", hdr->len);
+			//printf("hdr: %u\n", hdr->len);
 			state->receiving->var_len = hdr->len;
 		}
 		else if (state->receiving->var_len > 0){

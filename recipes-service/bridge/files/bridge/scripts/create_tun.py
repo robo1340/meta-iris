@@ -109,7 +109,7 @@ if __name__ == "__main__":
 		os.system('ip tuntap add mode tun')
 		time.sleep(0.1)
 		#bring up the interface
-		#os.system('ip link set multicast off dev %s' % (iface,))
+		os.system('ip link set multicast off dev %s' % (iface,))
 		os.system('ip addr add %s/24 dev %s' % (args['host_ip'], iface))
 		#os.system('ip addr add %s dev %s' % (args['host_ip'], iface))
 		#os.system('ip link set dev %s mtu %d' % (iface, args['mtu']))

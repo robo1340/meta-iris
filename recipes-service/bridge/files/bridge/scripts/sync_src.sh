@@ -4,9 +4,9 @@ cd /bridge
 tar  czf /tmp/src.tgz ./src
 cd -
 scp /tmp/src.tgz root@$dstip:/tmp/
-ssh root@$dstip 'systemctl stop bridge'
-ssh root@$dstip 'rm -rf /bridge/src'
-ssh root@$dstip 'tar -xzf /tmp/src.tgz -C /bridge'
-ssh root@$dstip 'sync'
-ssh root@$dstip 'systemctl start bridge'
+ssh -y root@$dstip 'systemctl stop bridge'
+ssh -y root@$dstip 'rm -rf /bridge/src'
+ssh -y root@$dstip 'tar -xzf /tmp/src.tgz -C /bridge'
+ssh -y root@$dstip 'sync'
+ssh -y root@$dstip 'systemctl start bridge'
 

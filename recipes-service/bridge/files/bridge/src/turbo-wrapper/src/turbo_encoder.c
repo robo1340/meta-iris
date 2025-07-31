@@ -502,11 +502,13 @@ const conv_encoder_attributes_t types[] = {
 //error_test(WiMax_FCH);
 ////error_test(LTE_PBCH);
 
-//make uncoded bytes length 336
-#define UNCODED_BYTES 336 //supports WiMax_FCH and GSM_xCCH
+//uncoded bytes length must be supported by the interleaver
+//#define UNCODED_BYTES 336 //supports WiMax_FCH and GSM_xCCH
 //#define UNCODED_BYTES 240 //supports WiMax_FCH
+#define UNCODED_BYTES 48 //supports WiMax_FCH
 
-#define CONV_RS_DATA	24 //reed solomon data symbols per block
+#define CONV_RS_DATA	44 //reed solomon data symbols per block
+//#define CONV_RS_DATA	24 //reed solomon data symbols per block
 //#define CONV_RS_DATA	38 //reed solomon data symbols per block
 //#define CONV_RS_DATA	36 //for when UNCODED_BYTES=240
 #define CONV_RS_ECC 4 //reed solomon error correction symbols per block

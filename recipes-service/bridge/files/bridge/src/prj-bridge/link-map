@@ -401,7 +401,7 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(.iplt)
  .iplt          0x000124e0        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.text           0x000124e0    0x11d1c
+.text           0x000124e0    0x11db8
  *(.text.unlikely .text.*_unlikely .text.unlikely.*)
  *(.text.exit .text.exit.*)
  *(.text.startup .text.startup.*)
@@ -415,401 +415,401 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  .text          0x000125a4      0x174 /bridge/src/prj-bridge/test.a(main.o)
                 0x000125a4                set_my_niceness
                 0x00012600                main
- .text          0x00012718      0x850 /bridge/src/prj-bridge/test.a(bridge.o)
+ .text          0x00012718      0x854 /bridge/src/prj-bridge/test.a(bridge.o)
                 0x000127c0                bridge_create
-                0x00012914                bridge_slip_run
-                0x00012c00                bridge_tun_run
-                0x00012dd4                bridge_run
-                0x00012ea0                bridge_interrupted
-                0x00012ef8                bridge_destroy
- .text          0x00012f68      0x7bc /bridge/src/prj-bridge/test.a(ipv4.o)
-                0x00012f68                ipv4_check_dst
-                0x00013304                ipv4_recompute_checksum
-                0x00013360                ipv4_set_ttl
-                0x00013398                ipv4_ttl_decrement
-                0x00013588                ipv4_print
-                0x00013644                ipv4_filter_misc
-                0x000136b8                check_udp_dst_port
- .text          0x00013724      0xa20 /bridge/src/prj-bridge/test.a(radio_events.o)
-                0x00013724                radio_preamble_detect_callback
-                0x000137d8                radio_sync_cb
-                0x000137fc                radio_receive_pending_callback
-                0x000138dc                radio_receive_fifo_almost_full_callback
-                0x00013aa4                radio_transmit_complete_callback
-                0x00013b04                radio_transmit_fifo_almost_full_callback
-                0x00013be4                radio_state_change_callback
-                0x00013c58                radio_event_callback
- .text          0x00014144     0x4670 /bridge/src/prj-bridge/test.a(state.o)
-                0x000143f0                state
-                0x00014978                state_process_receive_frame
-                0x00014c44                state_update_peers_new_header
-                0x00014dbc                state_update_peers_new_beacon
-                0x00015088                state_transmitting
-                0x000150c0                state_receiving
-                0x000150fc                state_transceiving
-                0x00015220                state_loading_dock_run
-                0x000153a0                state_append_loading_dock
-                0x0001553c                state_append_low_priority_packet
-                0x000155dc                state_add_frame_to_send_queue
-                0x00015648                state_peek_next_frame_to_transmit
-                0x00015688                state_get_next_frame_to_transmit
-                0x000156e4                state_finish_receiving
-                0x00015730                state_abort_transceiving
-                0x00015834                state_run
-                0x00015e04                state_generate_random_ip
-                0x00015f5c                state_read_ip
-                0x00016020                state_write_ip
-                0x00016068                state_ip_changed_callback
-                0x000160bc                state_read_mac
-                0x00016258                state_write_mac
-                0x000162a0                state_read_callsign
-                0x000163a0                state_write_callsign
-                0x00016e40                state_destroy
-                0x00016f8c                uint16_ptr
-                0x00016fcc                uint16_ptr_destroy
-                0x00017004                tlv
-                0x000170d0                tlv_len
-                0x000170fc                tlv_destroy
-                0x0001715c                frame_header_print
-                0x000171dc                frame_empty
-                0x0001725c                frame
-                0x000172f8                frame_append
-                0x000173cc                frame_append_tlv
-                0x00017454                frame_len
-                0x000174d0                frame_pack
-                0x0001768c                frame_destroy
-                0x00017764                packed_frame_encode
-                0x00017a04                packed_frame_unpack
-                0x00017ba8                packed_frame_verify_crc
-                0x00017c0c                packed_frame_destroy
-                0x00017c44                radio_frame
-                0x00017cf8                radio_frame_bytes_remaining
-                0x00017d5c                radio_frame_transmit_start
-                0x00017e5c                radio_frame_receive_start
-                0x00017ec0                radio_frame_reset
-                0x00017f10                radio_frame_decode
-                0x000181b8                radio_frame_destroy
-                0x00018218                create_peer_from_beacon
-                0x00018278                create_peer_from_header
-                0x000182d8                peer_update_beacon
-                0x000183b0                peer_update_header
-                0x00018438                peer_check_stale
-                0x00018498                peer_print
-                0x00018578                peer_callsign
-                0x000185c0                peer_ip_str
-                0x00018638                peer_mac_str
-                0x000186d0                peer_ip_valid
-                0x000186f8                peer_open_slip
-                0x0001877c                peer_destroy
- .text          0x000187b4      0x1fc /bridge/src/prj-bridge/test.a(timer.o)
-                0x000187b4                timer_init
-                0x0001881c                timer_run
-                0x00018904                timer_reset
-                0x00018938                timer_charge
- .text          0x000189b0      0x2a0 /bridge/src/prj-bridge/test.a(print_util.o)
-                0x000189b0                printArrHex
-                0x00018a4c                printArrHex_no_new_line
-                0x00018ae4                print_uint32_arr
-                0x00018b80                snprintArrHex
- .text          0x00018c50     0x3c40 /bridge/src/prj-bridge/test.a(turbo_encoder.o)
-                0x00018c50                generate_gf
-                0x00018e5c                gf_mul
-                0x00018ef0                gf_div
-                0x00018f8c                gf_sum
-                0x00018fbc                gf_polydiv_recursive
-                0x000191cc                gf_polydiv
-                0x00019224                gf_matr_det
-                0x000192e8                gf_matr_mul
-                0x00019490                gf_matr_mul_vector
-                0x000195f0                gf_matr_inv
-                0x00019758                generating_polynomial
-                0x00019854                shift_msg_to_vec
-                0x00019914                calculate_check_symbols
-                0x00019a18                calculate_syndrome
-                0x00019b58                extract_message
-                0x00019bbc                fail
-                0x00019bfc                pass
-                0x00019c3c                REQUIRE
-                0x00019c98                AR_EQ
-                0x00019d24                STR_EQ
-                0x00019da8                MX_EQ
-                0x00019eb0                encode_message
-                0x00019fe4                decode_message
-                0x0001aa38                turbo_encoder
-                0x0001af30                turbo_encoder_encode
-                0x0001b1bc                turbo_encoder_decode
-                0x0001b4ac                turbo_encoder_destroy
-                0x0001b53c                hdr_conv_encoder
-                0x0001b940                hdr_conv_encoder_encode
-                0x0001bb4c                hdr_conv_encoder_decode
-                0x0001bdb8                hdr_conv_encoder_destroy
-                0x0001be5c                conv_encoder
-                0x0001c2a4                conv_encoder_encode
-                0x0001c518                conv_encoder_decode
-                0x0001c7ec                conv_encoder_destroy
- .text          0x0001c890      0x2a0 /bridge/src/prj-bridge/test.a(turbo_wrapper.o)
-                0x0001c890                bytes2bits
-                0x0001c958                bytes2bits_ranged
-                0x0001ca34                bits2bytes
- .text          0x0001cb30      0x980 /bridge/src/prj-bridge/test.a(util.o)
-                0x0001cb30                vector_print
-                0x0001cba4                matrix_new
-                0x0001cc30                matrix_free
-                0x0001cca4                matrix_copy
-                0x0001cd74                fatal
-                0x0001cdb0                swap
-                0x0001cdfc                vector_new
-                0x0001ce28                vector_copy
-                0x0001cea8                vector_free
-                0x0001cecc                stack
-                0x0001cfb4                submatrix
-                0x0001d04c                pow2
-                0x0001d078                vector_sum
-                0x0001d154                vector_to_str
-                0x0001d1e4                str_to_vector
-                0x0001d264                sum
-                0x0001d2dc                substring
-                0x0001d3c0                strlength
-                0x0001d428                count
- .text          0x0001d4b0      0xb50 /bridge/src/prj-bridge/test.a(radio.o)
-                0x0001d558                radio_init
-                0x0001d5e8                radio_print_part_info
-                0x0001d680                radio_print_func_info
-                0x0001d71c                radio_get_state_string
-                0x0001d880                radio_print_state
-                0x0001d94c                radio_print_modem_status
-                0x0001da14                radio_get_modem_state
-                0x0001da38                radio_get_rssi
-                0x0001da5c                radio_start_rx
-                0x0001dbd0                radio_load_configs
-                0x0001dd6c                radio_parse_config
- .text          0x0001e000      0x1cc /bridge/src/prj-bridge/test.a(radio_hal.o)
-                0x0001e000                radio_hal_init
-                0x0001e070                radio_hal_deinit
-                0x0001e0a8                radio_hal_AssertShutdown
-                0x0001e0c0                radio_hal_DeassertShutdown
-                0x0001e0d8                radio_hal_NirqLevel
-                0x0001e0f8                radio_hal_SpiWriteData
-                0x0001e138                radio_hal_SpiReadData
-                0x0001e178                radio_hal_transfer
- .text          0x0001e1cc     0x2084 /bridge/src/prj-bridge/test.a(si446x_api_lib.o)
-                0x0001e1cc                si446x_reset
-                0x0001e1f4                si446x_power_up
-                0x0001e3c0                si446x_configuration_init_enhanced
-                0x0001e4c0                si446x_configuration_init
-                0x0001e604                si446x_apply_patch
-                0x0001e758                si446x_part_info
-                0x0001e884                si446x_start_tx
-                0x0001e93c                si446x_start_rx
-                0x0001ea10                si446x_get_int_status
-                0x0001eb5c                si446x_gpio_pin_cfg
-                0x0001ece8                si446x_set_property
-                0x0001edcc                si446x_change_state
-                0x0001ee1c                si446x_nop
-                0x0001ee4c                si446x_fifo_info
-                0x0001eed8                si446x_write_tx_fifo
-                0x0001ef10                si446x_read_rx_fifo
-                0x0001ef48                si446x_get_property
-                0x0001f15c                si446x_func_info
-                0x0001f1f8                si446x_frr_a_read
-                0x0001f290                si446x_frr_b_read
-                0x0001f328                si446x_frr_c_read
-                0x0001f3c0                si446x_frr_d_read
-                0x0001f458                si446x_get_adc_reading
-                0x0001f58c                si446x_get_packet_info
-                0x0001f690                si446x_get_ph_status
-                0x0001f71c                si446x_get_modem_status
-                0x0001f850                si446x_get_chip_status
-                0x0001f8f4                si446x_ircal
-                0x0001f99c                si446x_ircal_manual
-                0x0001fa44                si446x_request_device_state
-                0x0001fab0                si446x_tx_hop
-                0x0001fb98                si446x_rx_hop
-                0x0001fc60                si446x_start_tx_fast
-                0x0001fc90                si446x_start_rx_fast
-                0x0001fcc0                si446x_get_int_status_fast_clear
-                0x0001fcf0                si446x_get_int_status_fast_clear_read
-                0x0001fdec                si446x_gpio_pin_cfg_fast
-                0x0001fed0                si446x_get_ph_status_fast_clear
-                0x0001ff10                si446x_get_ph_status_fast_clear_read
-                0x0001ff7c                si446x_get_modem_status_fast_clear
-                0x0001ffbc                si446x_get_modem_status_fast_clear_read
-                0x000200d0                si446x_get_chip_status_fast_clear
-                0x00020110                si446x_get_chip_status_fast_clear_read
-                0x00020194                si446x_fifo_info_fast_reset
-                0x000201e4                si446x_fifo_info_fast_read
- .text          0x00020250      0x300 /bridge/src/prj-bridge/test.a(spidev.o)
-                0x00020250                spi_open
-                0x000203b4                spi_close
-                0x000203dc                spi_xfer
-                0x00020468                spi_read
-                0x000204dc                spi_write
- .text          0x00020550      0x69c /bridge/src/prj-bridge/test.a(slip.o)
-                0x00020550                slip_encode
-                0x000208cc                slip_decoder_feed
- .text          0x00020bec      0x968 /bridge/src/prj-bridge/test.a(gpio.o)
-                0x00020e30                gpio_init
-                0x000212d4                gpio_poll
-                0x000213c8                gpio_get
-                0x00021404                gpio_set_shutdown
-                0x00021468                gpio_deinit
- .text          0x00021554      0x280 /bridge/src/prj-bridge/test.a(serial.o)
-                0x00021554                serial_open
-                0x0002173c                serial_write
-                0x00021778                serial_read
-                0x000217b0                serial_close
- .text          0x000217d4       0x94 /bridge/src/prj-bridge/test.a(os_signal.o)
-                0x00021804                os_catch_signals
- .text          0x00021868       0x84 /bridge/src/prj-bridge/test.a(avg.o)
-                0x00021868                exp_moving_avg
- .text          0x000218ec      0x12c /bridge/src/prj-bridge/test.a(beacon.o)
-                0x000218ec                beacon_init
-                0x00021984                handle_beacon
-                0x000219c4                beacon_ttl_decrement
- .text          0x00021a18      0x25c /bridge/src/prj-bridge/test.a(csma.o)
-                0x00021a18                csma_init
-                0x00021aa8                csma_enabled
-                0x00021ad0                csma_reset
-                0x00021b58                csma_disable
-                0x00021b94                csma_run_countdown
-                0x00021bfc                csma_run_transmit
- .text          0x00021c74      0x2f0 /bridge/src/prj-bridge/test.a(header.o)
-                0x00021c74                decode_frame_header
-                0x00021d54                encode_frame_header
- .text          0x00021f64     0x13cc /bridge/src/prj-bridge/test.a(json_util.o)
-                0x000225a0                jsmn_parse
-                0x00022bc8                jsmn_init
-                0x00022c0c                read_json_str
-                0x00022db0                write_json_str
-                0x00022f14                jsmn_json_load_array
-                0x00022fdc                jsmn_json_lookup
-                0x00023158                json_load
-                0x00023230                json_lookup
- .text          0x00023330      0x63c /bridge/src/prj-bridge/test.a(conv_wrapper.o)
-                0x00023330                encoder
-                0x000235b0                encoder_bits_in_padded
-                0x000235d8                encoder_bits_out_padded
-                0x00023600                encoder_encode
-                0x00023788                encoder_decode
-                0x000238e4                encoder_destroy
- .text          0x0002396c      0x4d4 /bridge/src/prj-bridge/test.a(interleaver.o)
-                0x000239f0                turbo_interleave
-                0x00023b6c                turbo_deinterleave
-                0x00023d90                turbo_interleaver_init
-                0x00023de8                turbo_interleaver_deinit
- .text          0x00023e40      0x3bc /bridge/src/prj-bridge/test.a(radio_comm.o)
-                0x00023e40                radio_comm_GetResp
-                0x00023f18                radio_comm_SendCmd
-                0x00023f68                radio_comm_ReadData
-                0x0002404c                radio_comm_WriteData
-                0x000240f0                radio_comm_PollCTS
-                0x000241a0                radio_comm_SendCmdGetResp
- .text          0x000241fc        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
- .text          0x000241fc        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                0x00012918                bridge_slip_run
+                0x00012c04                bridge_tun_run
+                0x00012dd8                bridge_run
+                0x00012ea4                bridge_interrupted
+                0x00012efc                bridge_destroy
+ .text          0x00012f6c      0x7bc /bridge/src/prj-bridge/test.a(ipv4.o)
+                0x00012f6c                ipv4_check_dst
+                0x00013308                ipv4_recompute_checksum
+                0x00013364                ipv4_set_ttl
+                0x0001339c                ipv4_ttl_decrement
+                0x0001358c                ipv4_print
+                0x00013648                ipv4_filter_misc
+                0x000136bc                check_udp_dst_port
+ .text          0x00013728      0xa04 /bridge/src/prj-bridge/test.a(radio_events.o)
+                0x00013728                radio_preamble_detect_callback
+                0x000137dc                radio_sync_cb
+                0x00013800                radio_receive_pending_callback
+                0x000138e0                radio_receive_fifo_almost_full_callback
+                0x00013a8c                radio_transmit_complete_callback
+                0x00013aec                radio_transmit_fifo_almost_full_callback
+                0x00013bcc                radio_state_change_callback
+                0x00013c40                radio_event_callback
+ .text          0x0001412c     0x4724 /bridge/src/prj-bridge/test.a(state.o)
+                0x000143e4                state
+                0x00014964                state_process_receive_frame
+                0x00014c30                state_update_peers_new_header
+                0x00014da8                state_update_peers_new_beacon
+                0x000150d4                state_transmitting
+                0x0001510c                state_receiving
+                0x00015148                state_transceiving
+                0x0001526c                state_loading_dock_run
+                0x000153ec                state_append_loading_dock
+                0x00015588                state_append_low_priority_packet
+                0x00015628                state_add_frame_to_send_queue
+                0x00015694                state_peek_next_frame_to_transmit
+                0x000156d4                state_get_next_frame_to_transmit
+                0x00015730                state_finish_receiving
+                0x0001577c                state_abort_transceiving
+                0x00015880                state_run
+                0x00015e8c                state_generate_random_ip
+                0x00015fe4                state_read_ip
+                0x000160a8                state_write_ip
+                0x000160f0                state_ip_changed_callback
+                0x00016144                state_read_mac
+                0x000162e0                state_write_mac
+                0x00016328                state_read_callsign
+                0x00016428                state_write_callsign
+                0x00016ec8                state_destroy
+                0x00017014                uint16_ptr
+                0x00017054                uint16_ptr_destroy
+                0x0001708c                tlv
+                0x00017158                tlv_len
+                0x00017184                tlv_destroy
+                0x000171e4                frame_header_print
+                0x00017264                frame_empty
+                0x000172e4                frame
+                0x00017380                frame_append
+                0x00017454                frame_append_tlv
+                0x000174dc                frame_len
+                0x00017558                frame_pack
+                0x00017714                frame_destroy
+                0x000177ec                packed_frame_encode
+                0x00017a94                packed_frame_unpack
+                0x00017c38                packed_frame_verify_crc
+                0x00017c9c                packed_frame_destroy
+                0x00017cd4                radio_frame
+                0x00017d88                radio_frame_bytes_remaining
+                0x00017dec                radio_frame_transmit_start
+                0x00017f04                radio_frame_receive_start
+                0x00017f68                radio_frame_reset
+                0x00017fb8                radio_frame_decode
+                0x00018254                radio_frame_destroy
+                0x000182b4                create_peer_from_beacon
+                0x00018314                create_peer_from_header
+                0x00018374                peer_update_beacon
+                0x0001844c                peer_update_header
+                0x000184d4                peer_check_stale
+                0x00018534                peer_print
+                0x00018614                peer_callsign
+                0x0001865c                peer_ip_str
+                0x000186d4                peer_mac_str
+                0x0001876c                peer_ip_valid
+                0x00018794                peer_open_slip
+                0x00018818                peer_destroy
+ .text          0x00018850      0x1fc /bridge/src/prj-bridge/test.a(timer.o)
+                0x00018850                timer_init
+                0x000188b8                timer_run
+                0x000189a0                timer_reset
+                0x000189d4                timer_charge
+ .text          0x00018a4c      0x2a0 /bridge/src/prj-bridge/test.a(print_util.o)
+                0x00018a4c                printArrHex
+                0x00018ae8                printArrHex_no_new_line
+                0x00018b80                print_uint32_arr
+                0x00018c1c                snprintArrHex
+ .text          0x00018cec     0x3c40 /bridge/src/prj-bridge/test.a(turbo_encoder.o)
+                0x00018cec                generate_gf
+                0x00018ef8                gf_mul
+                0x00018f8c                gf_div
+                0x00019028                gf_sum
+                0x00019058                gf_polydiv_recursive
+                0x00019268                gf_polydiv
+                0x000192c0                gf_matr_det
+                0x00019384                gf_matr_mul
+                0x0001952c                gf_matr_mul_vector
+                0x0001968c                gf_matr_inv
+                0x000197f4                generating_polynomial
+                0x000198f0                shift_msg_to_vec
+                0x000199b0                calculate_check_symbols
+                0x00019ab4                calculate_syndrome
+                0x00019bf4                extract_message
+                0x00019c58                fail
+                0x00019c98                pass
+                0x00019cd8                REQUIRE
+                0x00019d34                AR_EQ
+                0x00019dc0                STR_EQ
+                0x00019e44                MX_EQ
+                0x00019f4c                encode_message
+                0x0001a080                decode_message
+                0x0001aad4                turbo_encoder
+                0x0001afcc                turbo_encoder_encode
+                0x0001b258                turbo_encoder_decode
+                0x0001b548                turbo_encoder_destroy
+                0x0001b5d8                hdr_conv_encoder
+                0x0001b9dc                hdr_conv_encoder_encode
+                0x0001bbe8                hdr_conv_encoder_decode
+                0x0001be54                hdr_conv_encoder_destroy
+                0x0001bef8                conv_encoder
+                0x0001c340                conv_encoder_encode
+                0x0001c5b4                conv_encoder_decode
+                0x0001c888                conv_encoder_destroy
+ .text          0x0001c92c      0x2a0 /bridge/src/prj-bridge/test.a(turbo_wrapper.o)
+                0x0001c92c                bytes2bits
+                0x0001c9f4                bytes2bits_ranged
+                0x0001cad0                bits2bytes
+ .text          0x0001cbcc      0x980 /bridge/src/prj-bridge/test.a(util.o)
+                0x0001cbcc                vector_print
+                0x0001cc40                matrix_new
+                0x0001cccc                matrix_free
+                0x0001cd40                matrix_copy
+                0x0001ce10                fatal
+                0x0001ce4c                swap
+                0x0001ce98                vector_new
+                0x0001cec4                vector_copy
+                0x0001cf44                vector_free
+                0x0001cf68                stack
+                0x0001d050                submatrix
+                0x0001d0e8                pow2
+                0x0001d114                vector_sum
+                0x0001d1f0                vector_to_str
+                0x0001d280                str_to_vector
+                0x0001d300                sum
+                0x0001d378                substring
+                0x0001d45c                strlength
+                0x0001d4c4                count
+ .text          0x0001d54c      0xb50 /bridge/src/prj-bridge/test.a(radio.o)
+                0x0001d5f4                radio_init
+                0x0001d684                radio_print_part_info
+                0x0001d71c                radio_print_func_info
+                0x0001d7b8                radio_get_state_string
+                0x0001d91c                radio_print_state
+                0x0001d9e8                radio_print_modem_status
+                0x0001dab0                radio_get_modem_state
+                0x0001dad4                radio_get_rssi
+                0x0001daf8                radio_start_rx
+                0x0001dc6c                radio_load_configs
+                0x0001de08                radio_parse_config
+ .text          0x0001e09c      0x1cc /bridge/src/prj-bridge/test.a(radio_hal.o)
+                0x0001e09c                radio_hal_init
+                0x0001e10c                radio_hal_deinit
+                0x0001e144                radio_hal_AssertShutdown
+                0x0001e15c                radio_hal_DeassertShutdown
+                0x0001e174                radio_hal_NirqLevel
+                0x0001e194                radio_hal_SpiWriteData
+                0x0001e1d4                radio_hal_SpiReadData
+                0x0001e214                radio_hal_transfer
+ .text          0x0001e268     0x2084 /bridge/src/prj-bridge/test.a(si446x_api_lib.o)
+                0x0001e268                si446x_reset
+                0x0001e290                si446x_power_up
+                0x0001e45c                si446x_configuration_init_enhanced
+                0x0001e55c                si446x_configuration_init
+                0x0001e6a0                si446x_apply_patch
+                0x0001e7f4                si446x_part_info
+                0x0001e920                si446x_start_tx
+                0x0001e9d8                si446x_start_rx
+                0x0001eaac                si446x_get_int_status
+                0x0001ebf8                si446x_gpio_pin_cfg
+                0x0001ed84                si446x_set_property
+                0x0001ee68                si446x_change_state
+                0x0001eeb8                si446x_nop
+                0x0001eee8                si446x_fifo_info
+                0x0001ef74                si446x_write_tx_fifo
+                0x0001efac                si446x_read_rx_fifo
+                0x0001efe4                si446x_get_property
+                0x0001f1f8                si446x_func_info
+                0x0001f294                si446x_frr_a_read
+                0x0001f32c                si446x_frr_b_read
+                0x0001f3c4                si446x_frr_c_read
+                0x0001f45c                si446x_frr_d_read
+                0x0001f4f4                si446x_get_adc_reading
+                0x0001f628                si446x_get_packet_info
+                0x0001f72c                si446x_get_ph_status
+                0x0001f7b8                si446x_get_modem_status
+                0x0001f8ec                si446x_get_chip_status
+                0x0001f990                si446x_ircal
+                0x0001fa38                si446x_ircal_manual
+                0x0001fae0                si446x_request_device_state
+                0x0001fb4c                si446x_tx_hop
+                0x0001fc34                si446x_rx_hop
+                0x0001fcfc                si446x_start_tx_fast
+                0x0001fd2c                si446x_start_rx_fast
+                0x0001fd5c                si446x_get_int_status_fast_clear
+                0x0001fd8c                si446x_get_int_status_fast_clear_read
+                0x0001fe88                si446x_gpio_pin_cfg_fast
+                0x0001ff6c                si446x_get_ph_status_fast_clear
+                0x0001ffac                si446x_get_ph_status_fast_clear_read
+                0x00020018                si446x_get_modem_status_fast_clear
+                0x00020058                si446x_get_modem_status_fast_clear_read
+                0x0002016c                si446x_get_chip_status_fast_clear
+                0x000201ac                si446x_get_chip_status_fast_clear_read
+                0x00020230                si446x_fifo_info_fast_reset
+                0x00020280                si446x_fifo_info_fast_read
+ .text          0x000202ec      0x300 /bridge/src/prj-bridge/test.a(spidev.o)
+                0x000202ec                spi_open
+                0x00020450                spi_close
+                0x00020478                spi_xfer
+                0x00020504                spi_read
+                0x00020578                spi_write
+ .text          0x000205ec      0x69c /bridge/src/prj-bridge/test.a(slip.o)
+                0x000205ec                slip_encode
+                0x00020968                slip_decoder_feed
+ .text          0x00020c88      0x968 /bridge/src/prj-bridge/test.a(gpio.o)
+                0x00020ecc                gpio_init
+                0x00021370                gpio_poll
+                0x00021464                gpio_get
+                0x000214a0                gpio_set_shutdown
+                0x00021504                gpio_deinit
+ .text          0x000215f0      0x280 /bridge/src/prj-bridge/test.a(serial.o)
+                0x000215f0                serial_open
+                0x000217d8                serial_write
+                0x00021814                serial_read
+                0x0002184c                serial_close
+ .text          0x00021870       0x94 /bridge/src/prj-bridge/test.a(os_signal.o)
+                0x000218a0                os_catch_signals
+ .text          0x00021904       0x84 /bridge/src/prj-bridge/test.a(avg.o)
+                0x00021904                exp_moving_avg
+ .text          0x00021988      0x12c /bridge/src/prj-bridge/test.a(beacon.o)
+                0x00021988                beacon_init
+                0x00021a20                handle_beacon
+                0x00021a60                beacon_ttl_decrement
+ .text          0x00021ab4      0x25c /bridge/src/prj-bridge/test.a(csma.o)
+                0x00021ab4                csma_init
+                0x00021b44                csma_enabled
+                0x00021b6c                csma_reset
+                0x00021bf4                csma_disable
+                0x00021c30                csma_run_countdown
+                0x00021c98                csma_run_transmit
+ .text          0x00021d10      0x2f0 /bridge/src/prj-bridge/test.a(header.o)
+                0x00021d10                decode_frame_header
+                0x00021df0                encode_frame_header
+ .text          0x00022000     0x13cc /bridge/src/prj-bridge/test.a(json_util.o)
+                0x0002263c                jsmn_parse
+                0x00022c64                jsmn_init
+                0x00022ca8                read_json_str
+                0x00022e4c                write_json_str
+                0x00022fb0                jsmn_json_load_array
+                0x00023078                jsmn_json_lookup
+                0x000231f4                json_load
+                0x000232cc                json_lookup
+ .text          0x000233cc      0x63c /bridge/src/prj-bridge/test.a(conv_wrapper.o)
+                0x000233cc                encoder
+                0x0002364c                encoder_bits_in_padded
+                0x00023674                encoder_bits_out_padded
+                0x0002369c                encoder_encode
+                0x00023824                encoder_decode
+                0x00023980                encoder_destroy
+ .text          0x00023a08      0x4d4 /bridge/src/prj-bridge/test.a(interleaver.o)
+                0x00023a8c                turbo_interleave
+                0x00023c08                turbo_deinterleave
+                0x00023e2c                turbo_interleaver_init
+                0x00023e84                turbo_interleaver_deinit
+ .text          0x00023edc      0x3bc /bridge/src/prj-bridge/test.a(radio_comm.o)
+                0x00023edc                radio_comm_GetResp
+                0x00023fb4                radio_comm_SendCmd
+                0x00024004                radio_comm_ReadData
+                0x000240e8                radio_comm_WriteData
+                0x0002418c                radio_comm_PollCTS
+                0x0002423c                radio_comm_SendCmdGetResp
+ .text          0x00024298        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .text          0x00024298        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(.gnu.warning)
  *(.glue_7t)
- .glue_7t       0x000241fc        0x0 linker stubs
+ .glue_7t       0x00024298        0x0 linker stubs
  *(.glue_7)
- .glue_7        0x000241fc        0x0 linker stubs
+ .glue_7        0x00024298        0x0 linker stubs
  *(.vfp11_veneer)
- .vfp11_veneer  0x000241fc        0x0 linker stubs
+ .vfp11_veneer  0x00024298        0x0 linker stubs
  *(.v4_bx)
- .v4_bx         0x000241fc        0x0 linker stubs
+ .v4_bx         0x00024298        0x0 linker stubs
 
-.fini           0x000241fc        0x8
+.fini           0x00024298        0x8
  *(SORT_NONE(.fini))
- .fini          0x000241fc        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
-                0x000241fc                _fini
- .fini          0x00024200        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .fini          0x00024298        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x00024298                _fini
+ .fini          0x0002429c        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
                 [!provide]                        PROVIDE (__etext = .)
                 [!provide]                        PROVIDE (_etext = .)
                 [!provide]                        PROVIDE (etext = .)
 
-.rodata         0x00024204     0x3868
+.rodata         0x000242a0     0x390c
  *(.rodata .rodata.* .gnu.linkonce.r.*)
- .rodata.cst4   0x00024204        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00024204                _IO_stdin_used
- .rodata        0x00024208       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
- .rodata        0x00024298       0x69 /bridge/src/prj-bridge/test.a(main.o)
- *fill*         0x00024301        0x3 
- .rodata        0x00024304      0x1f2 /bridge/src/prj-bridge/test.a(bridge.o)
- *fill*         0x000244f6        0x2 
- .rodata        0x000244f8       0x4e /bridge/src/prj-bridge/test.a(ipv4.o)
- *fill*         0x00024546        0x2 
- .rodata        0x00024548      0x1e2 /bridge/src/prj-bridge/test.a(radio_events.o)
- *fill*         0x0002472a        0x2 
- .rodata        0x0002472c      0xe2c /bridge/src/prj-bridge/test.a(state.o)
- .rodata        0x00025558       0x15 /bridge/src/prj-bridge/test.a(print_util.o)
- *fill*         0x0002556d        0x3 
- .rodata        0x00025570      0x72c /bridge/src/prj-bridge/test.a(turbo_encoder.o)
- .rodata        0x00025c9c       0x52 /bridge/src/prj-bridge/test.a(util.o)
- *fill*         0x00025cee        0x2 
- .rodata        0x00025cf0      0x27a /bridge/src/prj-bridge/test.a(radio.o)
- *fill*         0x00025f6a        0x2 
- .rodata        0x00025f6c        0xc /bridge/src/prj-bridge/test.a(radio_hal.o)
- .rodata        0x00025f78      0x223 /bridge/src/prj-bridge/test.a(si446x_api_lib.o)
- *fill*         0x0002619b        0x1 
- .rodata        0x0002619c       0xed /bridge/src/prj-bridge/test.a(slip.o)
- *fill*         0x00026289        0x3 
- .rodata        0x0002628c      0x22e /bridge/src/prj-bridge/test.a(gpio.o)
- *fill*         0x000264ba        0x2 
- .rodata        0x000264bc       0x3e /bridge/src/prj-bridge/test.a(serial.o)
- *fill*         0x000264fa        0x2 
- .rodata        0x000264fc       0x22 /bridge/src/prj-bridge/test.a(beacon.o)
- *fill*         0x0002651e        0x2 
- .rodata        0x00026520      0x13c /bridge/src/prj-bridge/test.a(header.o)
- .rodata        0x0002665c      0x19f /bridge/src/prj-bridge/test.a(json_util.o)
- *fill*         0x000267fb        0x1 
- .rodata        0x000267fc     0x1175 /bridge/src/prj-bridge/test.a(conv_wrapper.o)
-                0x000267fc                gsm_conv_xcch
-                0x00026824                gsm_conv_cs2
-                0x0002684c                gsm_conv_cs3
-                0x00026874                gsm_conv_rach
-                0x0002689c                gsm_conv_sch
-                0x000268c4                gsm_conv_tch_fr
-                0x000268ec                gsm_conv_tch_hr
-                0x00026914                gsm_conv_tch_afs_12_2
-                0x0002693c                gsm_conv_tch_afs_10_2
-                0x00026964                gsm_conv_tch_afs_7_95
-                0x0002698c                gsm_conv_tch_afs_7_4
-                0x000269b4                gsm_conv_tch_afs_6_7
-                0x000269dc                gsm_conv_tch_afs_5_9
-                0x00026a04                gsm_conv_tch_ahs_7_95
-                0x00026a2c                gsm_conv_tch_ahs_7_4
-                0x00026a54                gsm_conv_tch_ahs_6_7
-                0x00026a7c                gsm_conv_tch_ahs_5_9
-                0x00026aa4                gsm_conv_tch_ahs_5_15
-                0x00026acc                gsm_conv_tch_ahs_4_75
-                0x00026af4                wimax_conv_fch
-                0x00026b1c                lte_conv_pbch
-                0x00026b44                types
- *fill*         0x00027971        0x3 
- .rodata        0x00027974       0x1e /bridge/src/prj-bridge/test.a(interleaver.o)
- *fill*         0x00027992        0x2 
- .rodata        0x00027994       0x46 /bridge/src/prj-bridge/test.a(radio_comm.o)
- *fill*         0x000279da        0x2 
- .rodata        0x000279dc       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .rodata.cst4   0x000242a0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x000242a0                _IO_stdin_used
+ .rodata        0x000242a4       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .rodata        0x00024334       0x69 /bridge/src/prj-bridge/test.a(main.o)
+ *fill*         0x0002439d        0x3 
+ .rodata        0x000243a0      0x1f2 /bridge/src/prj-bridge/test.a(bridge.o)
+ *fill*         0x00024592        0x2 
+ .rodata        0x00024594       0x4e /bridge/src/prj-bridge/test.a(ipv4.o)
+ *fill*         0x000245e2        0x2 
+ .rodata        0x000245e4      0x1d6 /bridge/src/prj-bridge/test.a(radio_events.o)
+ *fill*         0x000247ba        0x2 
+ .rodata        0x000247bc      0xedc /bridge/src/prj-bridge/test.a(state.o)
+ .rodata        0x00025698       0x15 /bridge/src/prj-bridge/test.a(print_util.o)
+ *fill*         0x000256ad        0x3 
+ .rodata        0x000256b0      0x72c /bridge/src/prj-bridge/test.a(turbo_encoder.o)
+ .rodata        0x00025ddc       0x52 /bridge/src/prj-bridge/test.a(util.o)
+ *fill*         0x00025e2e        0x2 
+ .rodata        0x00025e30      0x27a /bridge/src/prj-bridge/test.a(radio.o)
+ *fill*         0x000260aa        0x2 
+ .rodata        0x000260ac        0xc /bridge/src/prj-bridge/test.a(radio_hal.o)
+ .rodata        0x000260b8      0x223 /bridge/src/prj-bridge/test.a(si446x_api_lib.o)
+ *fill*         0x000262db        0x1 
+ .rodata        0x000262dc       0xed /bridge/src/prj-bridge/test.a(slip.o)
+ *fill*         0x000263c9        0x3 
+ .rodata        0x000263cc      0x22e /bridge/src/prj-bridge/test.a(gpio.o)
+ *fill*         0x000265fa        0x2 
+ .rodata        0x000265fc       0x3e /bridge/src/prj-bridge/test.a(serial.o)
+ *fill*         0x0002663a        0x2 
+ .rodata        0x0002663c       0x22 /bridge/src/prj-bridge/test.a(beacon.o)
+ *fill*         0x0002665e        0x2 
+ .rodata        0x00026660      0x13c /bridge/src/prj-bridge/test.a(header.o)
+ .rodata        0x0002679c      0x19f /bridge/src/prj-bridge/test.a(json_util.o)
+ *fill*         0x0002693b        0x1 
+ .rodata        0x0002693c     0x1175 /bridge/src/prj-bridge/test.a(conv_wrapper.o)
+                0x0002693c                gsm_conv_xcch
+                0x00026964                gsm_conv_cs2
+                0x0002698c                gsm_conv_cs3
+                0x000269b4                gsm_conv_rach
+                0x000269dc                gsm_conv_sch
+                0x00026a04                gsm_conv_tch_fr
+                0x00026a2c                gsm_conv_tch_hr
+                0x00026a54                gsm_conv_tch_afs_12_2
+                0x00026a7c                gsm_conv_tch_afs_10_2
+                0x00026aa4                gsm_conv_tch_afs_7_95
+                0x00026acc                gsm_conv_tch_afs_7_4
+                0x00026af4                gsm_conv_tch_afs_6_7
+                0x00026b1c                gsm_conv_tch_afs_5_9
+                0x00026b44                gsm_conv_tch_ahs_7_95
+                0x00026b6c                gsm_conv_tch_ahs_7_4
+                0x00026b94                gsm_conv_tch_ahs_6_7
+                0x00026bbc                gsm_conv_tch_ahs_5_9
+                0x00026be4                gsm_conv_tch_ahs_5_15
+                0x00026c0c                gsm_conv_tch_ahs_4_75
+                0x00026c34                wimax_conv_fch
+                0x00026c5c                lte_conv_pbch
+                0x00026c84                types
+ *fill*         0x00027ab1        0x3 
+ .rodata        0x00027ab4       0x1e /bridge/src/prj-bridge/test.a(interleaver.o)
+ *fill*         0x00027ad2        0x2 
+ .rodata        0x00027ad4       0x46 /bridge/src/prj-bridge/test.a(radio_comm.o)
+ *fill*         0x00027b1a        0x2 
+ .rodata        0x00027b1c       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
 
 .rodata1
  *(.rodata1)
 
-.ARM.extab      0x00027a6c        0x0
+.ARM.extab      0x00027bac        0x0
  *(.ARM.extab* .gnu.linkonce.armextab.*)
- .ARM.extab     0x00027a6c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .ARM.extab     0x00027bac        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.ARM.exidx      0x00027a6c        0x8
+.ARM.exidx      0x00027bac        0x8
                 [!provide]                        PROVIDE (__exidx_start = .)
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
- .ARM.exidx     0x00027a6c        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .ARM.exidx     0x00027bac        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
                 [!provide]                        PROVIDE (__exidx_end = .)
 
 .eh_frame_hdr
  *(.eh_frame_hdr)
  *(.eh_frame_entry .eh_frame_entry.*)
 
-.eh_frame       0x00027a74        0x4
+.eh_frame       0x00027bb4        0x4
  *(.eh_frame)
- .eh_frame      0x00027a74        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .eh_frame      0x00027bb4        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
  *(.eh_frame.*)
 
 .sframe
@@ -1240,7 +1240,7 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000    0x10819
+.debug_info     0x00000000    0x1083c
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x51e /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
  .debug_info    0x0000051e       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
@@ -1248,29 +1248,29 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  .debug_info    0x000011f7      0xeb0 /bridge/src/prj-bridge/test.a(bridge.o)
  .debug_info    0x000020a7      0xd8d /bridge/src/prj-bridge/test.a(ipv4.o)
  .debug_info    0x00002e34     0x121d /bridge/src/prj-bridge/test.a(radio_events.o)
- .debug_info    0x00004051     0x2f0f /bridge/src/prj-bridge/test.a(state.o)
- .debug_info    0x00006f60      0x20f /bridge/src/prj-bridge/test.a(timer.o)
- .debug_info    0x0000716f      0x22a /bridge/src/prj-bridge/test.a(print_util.o)
- .debug_info    0x00007399     0x1d52 /bridge/src/prj-bridge/test.a(turbo_encoder.o)
- .debug_info    0x000090eb      0x23b /bridge/src/prj-bridge/test.a(turbo_wrapper.o)
- .debug_info    0x00009326      0x99a /bridge/src/prj-bridge/test.a(util.o)
- .debug_info    0x00009cc0     0x11bf /bridge/src/prj-bridge/test.a(radio.o)
- .debug_info    0x0000ae7f      0x315 /bridge/src/prj-bridge/test.a(radio_hal.o)
- .debug_info    0x0000b194     0x1125 /bridge/src/prj-bridge/test.a(si446x_api_lib.o)
- .debug_info    0x0000c2b9      0x3e4 /bridge/src/prj-bridge/test.a(spidev.o)
- .debug_info    0x0000c69d      0x3e7 /bridge/src/prj-bridge/test.a(slip.o)
- .debug_info    0x0000ca84      0x730 /bridge/src/prj-bridge/test.a(gpio.o)
- .debug_info    0x0000d1b4      0x39a /bridge/src/prj-bridge/test.a(serial.o)
- .debug_info    0x0000d54e      0x4d0 /bridge/src/prj-bridge/test.a(os_signal.o)
- .debug_info    0x0000da1e       0xff /bridge/src/prj-bridge/test.a(avg.o)
- .debug_info    0x0000db1d      0x9bd /bridge/src/prj-bridge/test.a(beacon.o)
- .debug_info    0x0000e4da      0x265 /bridge/src/prj-bridge/test.a(csma.o)
- .debug_info    0x0000e73f      0x5aa /bridge/src/prj-bridge/test.a(header.o)
- .debug_info    0x0000ece9      0xc37 /bridge/src/prj-bridge/test.a(json_util.o)
- .debug_info    0x0000f920      0x8b3 /bridge/src/prj-bridge/test.a(conv_wrapper.o)
- .debug_info    0x000101d3      0x31f /bridge/src/prj-bridge/test.a(interleaver.o)
- .debug_info    0x000104f2      0x304 /bridge/src/prj-bridge/test.a(radio_comm.o)
- .debug_info    0x000107f6       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .debug_info    0x00004051     0x2f32 /bridge/src/prj-bridge/test.a(state.o)
+ .debug_info    0x00006f83      0x20f /bridge/src/prj-bridge/test.a(timer.o)
+ .debug_info    0x00007192      0x22a /bridge/src/prj-bridge/test.a(print_util.o)
+ .debug_info    0x000073bc     0x1d52 /bridge/src/prj-bridge/test.a(turbo_encoder.o)
+ .debug_info    0x0000910e      0x23b /bridge/src/prj-bridge/test.a(turbo_wrapper.o)
+ .debug_info    0x00009349      0x99a /bridge/src/prj-bridge/test.a(util.o)
+ .debug_info    0x00009ce3     0x11bf /bridge/src/prj-bridge/test.a(radio.o)
+ .debug_info    0x0000aea2      0x315 /bridge/src/prj-bridge/test.a(radio_hal.o)
+ .debug_info    0x0000b1b7     0x1125 /bridge/src/prj-bridge/test.a(si446x_api_lib.o)
+ .debug_info    0x0000c2dc      0x3e4 /bridge/src/prj-bridge/test.a(spidev.o)
+ .debug_info    0x0000c6c0      0x3e7 /bridge/src/prj-bridge/test.a(slip.o)
+ .debug_info    0x0000caa7      0x730 /bridge/src/prj-bridge/test.a(gpio.o)
+ .debug_info    0x0000d1d7      0x39a /bridge/src/prj-bridge/test.a(serial.o)
+ .debug_info    0x0000d571      0x4d0 /bridge/src/prj-bridge/test.a(os_signal.o)
+ .debug_info    0x0000da41       0xff /bridge/src/prj-bridge/test.a(avg.o)
+ .debug_info    0x0000db40      0x9bd /bridge/src/prj-bridge/test.a(beacon.o)
+ .debug_info    0x0000e4fd      0x265 /bridge/src/prj-bridge/test.a(csma.o)
+ .debug_info    0x0000e762      0x5aa /bridge/src/prj-bridge/test.a(header.o)
+ .debug_info    0x0000ed0c      0xc37 /bridge/src/prj-bridge/test.a(json_util.o)
+ .debug_info    0x0000f943      0x8b3 /bridge/src/prj-bridge/test.a(conv_wrapper.o)
+ .debug_info    0x000101f6      0x31f /bridge/src/prj-bridge/test.a(interleaver.o)
+ .debug_info    0x00010515      0x304 /bridge/src/prj-bridge/test.a(radio_comm.o)
+ .debug_info    0x00010819       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
 .debug_abbrev   0x00000000     0x3361
  *(.debug_abbrev)
@@ -1304,37 +1304,37 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  .debug_abbrev  0x000031d9      0x176 /bridge/src/prj-bridge/test.a(radio_comm.o)
  .debug_abbrev  0x0000334f       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
-.debug_line     0x00000000     0x79a3
+.debug_line     0x00000000     0x79a9
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x1f1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
  .debug_line    0x000001f1       0x70 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
  .debug_line    0x00000261      0x262 /bridge/src/prj-bridge/test.a(main.o)
  .debug_line    0x000004c3      0x48c /bridge/src/prj-bridge/test.a(bridge.o)
  .debug_line    0x0000094f      0x3c3 /bridge/src/prj-bridge/test.a(ipv4.o)
- .debug_line    0x00000d12      0x53d /bridge/src/prj-bridge/test.a(radio_events.o)
- .debug_line    0x0000124f     0x17be /bridge/src/prj-bridge/test.a(state.o)
- .debug_line    0x00002a0d      0x119 /bridge/src/prj-bridge/test.a(timer.o)
- .debug_line    0x00002b26      0x1c3 /bridge/src/prj-bridge/test.a(print_util.o)
- .debug_line    0x00002ce9     0x176b /bridge/src/prj-bridge/test.a(turbo_encoder.o)
- .debug_line    0x00004454      0x21b /bridge/src/prj-bridge/test.a(turbo_wrapper.o)
- .debug_line    0x0000466f      0x46f /bridge/src/prj-bridge/test.a(util.o)
- .debug_line    0x00004ade      0x4fa /bridge/src/prj-bridge/test.a(radio.o)
- .debug_line    0x00004fd8      0x148 /bridge/src/prj-bridge/test.a(radio_hal.o)
- .debug_line    0x00005120      0x8c8 /bridge/src/prj-bridge/test.a(si446x_api_lib.o)
- .debug_line    0x000059e8      0x1e5 /bridge/src/prj-bridge/test.a(spidev.o)
- .debug_line    0x00005bcd      0x297 /bridge/src/prj-bridge/test.a(slip.o)
- .debug_line    0x00005e64      0x291 /bridge/src/prj-bridge/test.a(gpio.o)
- .debug_line    0x000060f5      0x201 /bridge/src/prj-bridge/test.a(serial.o)
- .debug_line    0x000062f6      0x103 /bridge/src/prj-bridge/test.a(os_signal.o)
- .debug_line    0x000063f9       0x7d /bridge/src/prj-bridge/test.a(avg.o)
- .debug_line    0x00006476      0x1c8 /bridge/src/prj-bridge/test.a(beacon.o)
- .debug_line    0x0000663e      0x12a /bridge/src/prj-bridge/test.a(csma.o)
- .debug_line    0x00006768      0x1e2 /bridge/src/prj-bridge/test.a(header.o)
- .debug_line    0x0000694a      0x86f /bridge/src/prj-bridge/test.a(json_util.o)
- .debug_line    0x000071b9      0x333 /bridge/src/prj-bridge/test.a(conv_wrapper.o)
- .debug_line    0x000074ec      0x2a6 /bridge/src/prj-bridge/test.a(interleaver.o)
- .debug_line    0x00007792      0x1b9 /bridge/src/prj-bridge/test.a(radio_comm.o)
- .debug_line    0x0000794b       0x58 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .debug_line    0x00000d12      0x537 /bridge/src/prj-bridge/test.a(radio_events.o)
+ .debug_line    0x00001249     0x17ca /bridge/src/prj-bridge/test.a(state.o)
+ .debug_line    0x00002a13      0x119 /bridge/src/prj-bridge/test.a(timer.o)
+ .debug_line    0x00002b2c      0x1c3 /bridge/src/prj-bridge/test.a(print_util.o)
+ .debug_line    0x00002cef     0x176b /bridge/src/prj-bridge/test.a(turbo_encoder.o)
+ .debug_line    0x0000445a      0x21b /bridge/src/prj-bridge/test.a(turbo_wrapper.o)
+ .debug_line    0x00004675      0x46f /bridge/src/prj-bridge/test.a(util.o)
+ .debug_line    0x00004ae4      0x4fa /bridge/src/prj-bridge/test.a(radio.o)
+ .debug_line    0x00004fde      0x148 /bridge/src/prj-bridge/test.a(radio_hal.o)
+ .debug_line    0x00005126      0x8c8 /bridge/src/prj-bridge/test.a(si446x_api_lib.o)
+ .debug_line    0x000059ee      0x1e5 /bridge/src/prj-bridge/test.a(spidev.o)
+ .debug_line    0x00005bd3      0x297 /bridge/src/prj-bridge/test.a(slip.o)
+ .debug_line    0x00005e6a      0x291 /bridge/src/prj-bridge/test.a(gpio.o)
+ .debug_line    0x000060fb      0x201 /bridge/src/prj-bridge/test.a(serial.o)
+ .debug_line    0x000062fc      0x103 /bridge/src/prj-bridge/test.a(os_signal.o)
+ .debug_line    0x000063ff       0x7d /bridge/src/prj-bridge/test.a(avg.o)
+ .debug_line    0x0000647c      0x1c8 /bridge/src/prj-bridge/test.a(beacon.o)
+ .debug_line    0x00006644      0x12a /bridge/src/prj-bridge/test.a(csma.o)
+ .debug_line    0x0000676e      0x1e2 /bridge/src/prj-bridge/test.a(header.o)
+ .debug_line    0x00006950      0x86f /bridge/src/prj-bridge/test.a(json_util.o)
+ .debug_line    0x000071bf      0x333 /bridge/src/prj-bridge/test.a(conv_wrapper.o)
+ .debug_line    0x000074f2      0x2a6 /bridge/src/prj-bridge/test.a(interleaver.o)
+ .debug_line    0x00007798      0x1b9 /bridge/src/prj-bridge/test.a(radio_comm.o)
+ .debug_line    0x00007951       0x58 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
 .debug_frame    0x00000000     0x2838
  *(.debug_frame)
