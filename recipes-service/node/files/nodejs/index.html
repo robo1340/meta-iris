@@ -15,9 +15,9 @@
 	</head>
 	<body>
 		<div class="tab">
-			<button class="tablinks" onclick="open_tab('chat_button')" id="chat_button">Chat</button>
-			<button class="tablinks" onclick="open_tab('map_button')" id="map_button">Map</button>
-			<button class="tablinks" onclick="open_tab('settings_button')" id="settings_button">Settings</button>
+			<button class="tablinks" onclick="View.open_tab('chat_button')" id="chat_button">Chat</button>
+			<button class="tablinks" onclick="View.open_tab('map_button')" id="map_button">Map</button>
+			<button class="tablinks" onclick="View.open_tab('settings_button')" id="settings_button">Settings</button>
 		</div>
 		<!-- Starting Page Content -->
 		<div id="splash" class="tabcontent">
@@ -46,47 +46,75 @@
 		<!-- Settings Content -->
 		<div id="settings" class="tabcontent">
 			<h3>User Info</h3>
-				<label id="username_label">Username: </label><br>
-				<button  class="general_button" id="set_username" >Set Username</button> <br>
-			<h3>Load by Default</h3>
+				<label id="callsign_label">Callsign: </label><br>
+				<label id="addr_label">My Address: </label><br>
+				<button  class="general_button" id="set_callsign" >Set Callsign</button> <br><br>
+			<input type="radio" id="msg_req_ack" name="msg_req_ack" value="msg_req_ack">
+			<label for="msg_req_ack"> Message Request Ack</label><br>
+			<h3>Message Destination Address</h3>
+			<button  class="general_button" id="refresh_address_list">Refresh Address List</button> <br>
+			<select name="destination_address" id="destination_address"></select><br>
+			<h3>Load on Start</h3>
 				<input type="radio" id="load_chat" name="load_on_start" value="load_chat">
 				<label for="load_chat">Chat</label><br>
 				<input type="radio" id="load_map" name="load_on_start" value="load_map">
 				<label for="load_map">Map</label><br>
 			<h3>List Users/Stations</h3>
-				<button class="general_button" onclick="list_map_elements('list_users')" id="list_users">List Users</button>
-				<button class="general_button" onclick="list_map_elements('list_stations')" id="list_stations">List Stations</button>
+				<button class="general_button" onclick="View.list_map_elements('list_users')" id="list_users">List Users</button>
+				<button class="general_button" onclick="View.list_map_elements('list_stations')" id="list_stations">List Stations</button>
 			<h3>Clear Data</h3>
 				<button  class="general_button" id="clear_messages" >Clear Messages</button> <br>
 				<button  class="general_button" id="clear_users" >Clear Users</button> <br>
 				<button  class="general_button" id="clear_waypoints" >Clear Waypoints</button> 
 			<!--<h3>Download Site Certificate</h3>	
 			<a href="/certificate/cert.pem" download="cert.pem">cert.pem</a>-->
-			<h2>IRIS Node</h2>
 			<h3>Radio Config</h3>
 				<label id="current_radio_config">Current: UNKNOWN</label><br>
-				<select name="radio_configs" id="radio_configs">
-					<!--<option value="volvo">Volvo</option>-->
+				<select name="radio_configs" id="radio_configs"></select><br>
+			<h3>Packet Length</h3>
+				<input type="text" id="payload" placeholder="Enter text here">
+			<h3>Reed Solomon Block Length</h3>
+				<input type="text" id="block" placeholder="Enter text here">
+			<h3>Disable Reed Solomon Encoding</h3>
+				<select name="disable_reed_solomon_encoding" id="disable_reed_solomon">
+					<option value="true">true</option>
+					<option value="false">false</option>
 				</select><br>
-				<button  class="general_button" id="set_radio_config" >Load Selected</button> <br>
+				
 			<h3>Radio Config General</h3>
-				<label id="current_radio_general_config">Current: UNKNOWN</label><br>
-				<select name="radio_general_configs" id="radio_general_configs">
-					<!--<option value="volvo">Volvo</option>-->
-				</select><br>
-				<button  class="general_button" id="set_radio_general_config" >Load Selected</button> <br>
+				<select name="radio_general_configs" id="radio_general_configs"></select><br>
 			<h3>Radio Config Packet</h3>
-				<label id="current_radio_packet_config">Current: UNKNOWN</label><br>
-				<select name="radio_packet_configs" id="radio_packet_configs">
-					<!--<option value="volvo">Volvo</option>-->
-				</select><br>
-				<button  class="general_button" id="set_radio_packet_config" >Load Selected</button> <br>
+				<select name="radio_packet_configs" id="radio_packet_configs"></select><br>
 			<h3>Radio Config Premble</h3>
-				<label id="current_radio_preamble_config">Current: UNKNOWN</label><br>
-				<select name="radio_preamble_configs" id="radio_preamble_configs">
-					<!--<option value="volvo">Volvo</option>-->
+				<select name="radio_preamble_configs" id="radio_preamble_configs"></select><br>
+			<br><button  class="general_button" id="set_radio_config" >Change Radio Config</button> <br>
+			<h3>Network (Hub) settings</h3>
+			<h3>Retransmit Wait Multiplier</h3>
+				<select name="retransmit_wait_multiplier_s" id="retransmit_wait_multiplier_s">
+					<option value="0.05">0.05</option>
+					<option value="0.1">0.1</option>
+					<option value="0.2">0.2</option>
+					<option value="0.3">0.3</option>
+					<option value="0.4">0.4</option>
+					<option value="0.5">0.5</option>
+					<option value="0.6">0.6</option>
+					<option value="0.7">0.7</option>
+					<option value="0.8">0.8</option>
+					<option value="0.9">0.9</option>
+					<option value="1.0">1.0</option>
+					<option value="1.2">1.2</option>
+					<option value="1.4">1.4</option>
+					<option value="1.6">1.6</option>
+					<option value="1.8">1.8</option>
+					<option value="2.0">2.0</option>
 				</select><br>
-				<button  class="general_button" id="set_radio_preamble_config" >Load Selected</button> <br>
+			<h3>Peer Timeout (S)</h3>
+				<input type="text" id="peer_timeout_s" placeholder="Enter text here">
+			<h3>Peer Info Transmit Rate (S)</h3>
+				<input type="text" id="peer_info_tx_s" placeholder="Enter text here">
+			<h3>Number of Hops</h3>
+				<input type="text" id="default_hops" placeholder="Enter text here"><br>
+			<br><button  class="general_button" id="set_hub_config" >Change Network Settings</button> <br>
 			<h3>Misc.</h3>
 				<button  class="general_button" id="do_nothing" >Do Nothing</button> <br>
 		</div>

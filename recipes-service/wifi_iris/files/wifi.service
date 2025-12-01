@@ -7,7 +7,7 @@ WantedBy=multi-user.target
 
 [Service]
 Type=simple
-WorkingDirectory=/bridge/scripts
+WorkingDirectory=/home/wifi/
 ExecStart=python3 wifi_ap_service.py
 #ExecStartPre=/bin/sleep 11
 Restart=always

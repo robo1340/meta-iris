@@ -1,947 +1,1190 @@
 
 const COOKIE_EXP=30;
 const LOAD_WAIT_MS=2000;
-var user_list_loaded = false;
-
-function add_saved_message(username, msg){
-	addMessage(username, msg);
-	add_unsaved_message(username, msg);
-}
-
-var msg_last_grey = false; //Used to alternate color of messages;
-
-function add_unsaved_message(username, msg){
-    var li = $("<li></li>",{
-			"class": "message",
-			"style": "background-color:" + (msg_last_grey ? "white" : "#eee") + ";list-style-type:none;",
-			"text": username + ": " + msg
-		});
-    $("#list").append(li);
-    msg_last_grey = !msg_last_grey;
-    //$('input[name=messageText]').val("");
-    
-    //scroll to bottom of div with scroll bar
-    //setting position:fixed for this div is important
-    //in adding a scroll bar to it
-	$("#list").scrollTop($("#list")[0].scrollHeight);
-
-
-	//$("#list").scrollTop($("#list").height());
-	//$("#chatBox").scrollTop($("#chatBox").height());
-	//$("div").scrollTop($("div").height());		
-}
-
-function send_msg() {
-	try {
-		console.log("send_msg()");
-		var msg = $('input[name=messageText]').val()
-		//console.log(msg)
-		
-		messenger.postMessage(["newMessage",{'username': my_username, 'message': msg}]);
-		add_saved_message(my_username, msg);
-		$("input[name=messageText]").val(''); //clear the text input
-	}
-	catch (error) {console.log(error);}
-	return false; //very important to not get redirected
-}
-
-function clear_messages_ui() {
-	try {
-		clear_messages(); //delete all messages from the db
-		$("#list").empty();
-	}
-	catch (error) {console.log(error);}
-	return false;
-}
-function clear_users_ui() {
-	try {
-		clear_users(); //delete all user entries from the db
-		$("#userList").empty();
-		for (const [k, m] of Object.entries(markers)) {
-			if (k == my_username){continue;}
-			m.remove();
-		}
-	} catch(error){
-		console.log(error);
-	}
-	return false;
-}
-function clear_waypoints_ui() {
-	try {
-		clear_waypoints(); //delete all messages from the db
-		for (const [k, w] of Object.entries(waypoints)) {
-			w.remove();
-		}
-	} catch(error){
-		console.log(error);
-	}
-	return false;
-}
-
-var selected_radio_config = null;
-function set_radio_config(config_type='modem') {
-	console.log("set_radio_config("+config_type+")");
-	var selected = '';
-	if (config_type=='modem'){
-		selected = selected_radio_config;
-	} else {
-		selected = selected_radio_config_other[config_type];
-	}
-	
-	if ((selected === null)||(selected === undefined)){return;} //do nothing
-	messenger.postMessage(["select_radio_config",{'config_type':config_type,'selected':selected}]);
-	lbl = document.getElementById('current_radio_config');
-	lbl.innerHTML = "Current: LOADING";
-	lbl = document.getElementById('current_radio_general_config');
-	lbl.innerHTML = "Current: LOADING";
-	lbl = document.getElementById('current_radio_packet_config');
-	lbl.innerHTML = "Current: LOADING";
-	lbl = document.getElementById('current_radio_preamble_config');
-	lbl.innerHTML = "Current: LOADING";
-	
-	setTimeout(function(){
-		get_current_radio_config();	
-		get_current_radio_config_other();
-	}, 2500);
-}
-
-function set_radio_modem_config() {set_radio_config(config_type='modem');};
-function set_radio_general_config() {set_radio_config(config_type='general');};
-function set_radio_packet_config() 	{set_radio_config(config_type='packet');};
-function set_radio_preamble_config(){set_radio_config(config_type='preamble');};
-
-function setup_button_callbacks(){
-
-	document.getElementById("send_button").onclick = get_message_to_send;
-	//$("#messageInput").submit(send_msg);
-	
-	document.getElementById("clear_messages").onclick = clear_messages_ui;
-	document.getElementById("clear_users").onclick = clear_users_ui;
-	document.getElementById("clear_waypoints").onclick = clear_waypoints_ui;
-	document.getElementById("set_radio_config").onclick = set_radio_modem_config;
-	document.getElementById("set_radio_general_config").onclick = set_radio_general_config;
-	document.getElementById("set_radio_packet_config").onclick = set_radio_packet_config;
-	document.getElementById("set_radio_preamble_config").onclick = set_radio_preamble_config;
-	document.getElementById("set_username").onclick = set_username;
-	document.getElementById("do_nothing").onclick = function() {return false;};
-	document.getElementById("radio_configs").onclick = load_radio_configs;
-	document.getElementById("radio_general_configs").onclick = load_radio_general_configs;
-	document.getElementById("radio_packet_configs").onclick = load_radio_packet_configs;
-	document.getElementById("radio_preamble_configs").onclick = load_radio_preamble_configs;
-	
-	
-	/*
-	$(document).keypress(function(event) {
-		var keycode = event.keyCode || event.which;
-		if(keycode == '13') {
-			//console.log('You pressed a "enter" key in somewhere');
-			send_msg();
-		}
-	});
-	*/
-}
-
-function other_user_message_cb(data, timestamp){
-	console.log("other_user_message_cb");
-	if (data.username == my_username){return;}
-	add_saved_message(data.username, data.message);
-	if (notifications == true){
-		const notification = new Notification(data.username + ": " + data.message);
-	}
-	set_tab_pending("chat");
-}
-
+var state;
+var map;
+var waypoint_view;
+var user_input;
+var load;
 var markers = {}; //a dictionary of location markers for other users
 
-function fix_coords(coords,d=5){
-	return coords[0].toFixed(d) + ', ' + coords[1].toFixed(d);
-}
+const hub_control_messages = ["GET_MY_CALLSIGN","GET_MY_ADDR","GET_PEERS","GET_LINK_PEERS"]
+const packet_types = ["ack","peer_info","location","message","waypoint","ping_request","ping_response","beacon"];
 
-function generate_user_tooltip_contents(username, last_location_beacon_time=null, coords=null){
-	if (username == my_username){
-		return '(Me) ' + username  + '\n' + fix_coords(coords);
-	} else {
-		return username + ' ' + iso_to_time(last_location_beacon_time) + '\n' + fix_coords(coords);
+class Util {
+
+	static safe_execute(func, ...args){
+		try {
+			return func(args);
+		} catch { 
+			return null;
+		}
 	}
-	return to_return;
-}
-
-//calculate the distance between two markers
-function get_distance(from, to){
-	if ((from === undefined) || (to === undefined)) {return -1;}
-	to_return = from.getLatLng().distanceTo(to.getLatLng());
-	if (to_return > 10000){return -1;} //return invalid if greater than 100km
-	//console.log('get_distance()->' + to_return);
-	return to_return.toFixed(0);
-}
-
-function randfloat(min, max){
-	return (Math.random() * (max-min) + min);
-}
-
-function other_user_location_cb(data, timestamp){
-	if (data == null){return;}
-	if (data.username == my_username){return;}
-	if (user_list_loaded == false){console.log('user list not loaded yet'); return;}
-	/////////////////////////////////////
-	//add some error to the coordinates//
-	/////////////////////////////////////
-	//new_lat = data.coords[0]+randfloat(-0.01,0.01);
-	//new_lon = data.coords[1]+randfloat(-0.01,0.01);
-	//data.coords = [new_lat, new_lon];
 	
-	//console.log("other_user_location_cb");
-	//console.log(data);
-	updateUser(data.username, data.coords, timestamp, type=data.type, function(user){
-		if (first_map_update == false){
-			first_map_update = true;
-			set_map_location(data.coords);
+	static path_basename(path){
+		return path.split('\\').pop().split('/').pop();
+	}
+	
+	static get_iso_timestamp(date) {
+		var date = new Date();
+		return date.toLocaleString('sv').replace(' ', 'T');
+	}
+	
+	static get_cookie(name, default_return=undefined, parser=null){
+		try {
+			var val = Cookies.get(name);
+			//console.log(name, val);
+			if (val === undefined){
+				Cookies.set(name,default_return, {expires:COOKIE_EXP});
+				return default_return;
+			} else if (parser !== null){
+				return parser(val);
+			} else {
+				return val;
+			}
+		} catch { 
+			return default_return;
 		}
-		if (user.username in markers){
-			markers[data.username].setLatLng(data.coords);
-			markers[data.username]._tooltip._content = generate_user_tooltip_contents(data.username, data.last_location_beacon_time, data.coords);
-
-			update_span_time(user.username, iso_to_time(user.last_location_beacon_time));
-			update_span_distance(user.username, get_distance(markers[data.username], markers[my_username]) + 'm');
-			
-			//console.log($("#userList")[0]);
+	}
+	
+	static randint(max) {
+	  return Math.floor(Math.random() * max);
+	}
+	
+	static randfloat(min, max){
+		return (Math.random() * (max-min) + min);
+	}
+	
+	static hex(i,pad=2){
+		return i.toString(16).padStart(pad,'0').toUpperCase();
+	}
+	
+	static user_string(user){
+		return user.callsign + "(" + Util.hex(user.addr,4) + ")"
+	}
+	
+	static float_equals(f1, f2, delta=0.01){
+		//console.log("float_equals("+f1+","+f2+")");
+		//console.log(Math.abs(f1-f2));
+		//console.log(delta + " " + (Math.abs(f1-f2) < delta));
+		return (Math.abs(f1-f2) < delta);
+	}
+	
+	//calculate the distance between two markers
+	static get_distance(from, to){
+		//console.log('get_distance');
+		if ((from === undefined) || (to === undefined)) {return -1;}
+		//console.log(from);
+		//console.log(to);
+		if ((from.lat !== undefined) && (from.lng !== undefined)){
+			from = from;
+		} else if (from.getLatLng !== undefined){
+			from = from.getLatLng();
 		} else {
-			//const cnt = Object.keys(markers).length+1;
-			load_user(user);
+			console.log('ERROR: get_distance',from);
+			return -1;
 		}
-	});
+		if ((to.lat !== undefined) && (to.lng !== undefined)){
+			to = to;
+		} else if (to.getLatLng !== undefined){
+			to = to.getLatLng();
+		} else{
+			console.log('ERROR: get_distance',to);
+			return -1;
+		}
+		//console.log(from);
+		//console.log(to);
+
+		var to_return = from.distanceTo(to);
+		if (to_return > 10000){return -1;} //return invalid if greater than 100km
+		//console.log('get_distance()->' + to_return);
+		return to_return.toFixed(0);
+	}
+	
+	static iso_to_time(iso_str){
+		try {
+			return iso_str.split('T')[1].split('.')[0];
+		} catch {return "";}
+	}
+
+	static iso_to_date(iso_str) {
+		try {
+			return iso_str.split('T')[0];
+		} catch {return "";}
+	}
+	
+	static fix_coords(lat,lon,d=5){
+		return `${lat.toFixed(d)}, ${lon.toFixed(d)}`;
+	}
+	
 }
 
-function set_tab_pending(tabname){
-	try {
-		if (document.getElementById(tabname).style.display == "none"){
-			if (document.getElementById(tabname+"_button").className.includes("pending") != true){
-				document.getElementById(tabname+"_button").className += " pending";
+class LoadStatus {
+	constructor(interval_ms, complete_cb){
+		let keys = ['users_db', 'msg_db', 'waypoint_db', 'my_callsign', 'my_addr'];
+		this.load_status = {};
+		this.complete_cb = complete_cb;
+		for (const k in keys){
+			this.load_status[keys[k]] = false;
+		}
+		this.load_complete = false;
+		this.interval_ms = interval_ms;
+		//console.log('LoadStatus',this.load_status);
+		this.check = this.check.bind(this); //very important to ensure "this" is always this object
+		this.load_status_interval = setInterval(this.check,this.interval_ms);
+		return this;
+	}
+	
+	set(key){
+		this.load_status[key] = true;
+	}
+	
+	complete(){
+		return this.load_complete;
+	}
+	
+	check(){
+		var complete = true;
+		for (const i in this.load_status){
+			if (this.load_status[i] != true){complete=false;}
+		}
+		if (complete === true){
+			this.load_complete = true;
+			console.log('load complete!',this.load_status);
+			clearInterval(this.load_status_interval);
+			this.complete_cb();
+		} else {
+			//console.log('load not complete', this.load_status);
+		}
+	}
+}
+
+class State {
+	constructor() {
+		this.my_addr 		= Util.get_cookie('my_addr', undefined, parseInt);
+		this.my_callsign 	= Util.get_cookie('my_callsign', undefined);
+		this.my_lat 		= Util.get_cookie('my_lat', '37.5479', parseFloat);
+		this.my_lon 		= Util.get_cookie('my_lon', '-97.2702', parseFloat);
+		this.dst_addr		= 0;
+		this.load_on_start 	= Util.get_cookie('load_on_start', "load_chat");
+		this.list_users 	= Util.get_cookie('list_users', 'true')=='true';
+		this.list_stations 	= Util.get_cookie('list_stations', 'true')=='true';
+		this.ping_requests 	= {}; //dictionary of ping requests keys are user id's and values are the time of the last request
+		this.msg_req_ack 	= Util.get_cookie('msg_req_ack','true')=='true';
+		this.messages_with_ack_pending = {};
+	}
+	
+	user_string(){
+		return Util.user_string({'callsign':this.my_callsign,'addr':this.my_addr});
+	}
+	
+	get_distance(from){
+		return Util.get_distance(from, L.latLng(this.my_lat, this.my_lon));		
+	}
+}
+
+class MessageView {
+
+	static last_grey = false; //Used to alternate color of messages;
+
+	static add_saved(addr, msg, unique_id=undefined, finished_cb=null){
+		//console.log('add_saved',addr,msg);
+		Message.add(addr, msg, finished_cb);
+		MessageView.add(addr, msg, unique_id);
+	}
+
+	static add(addr, msg, unique_id=undefined){
+		//console.log('add',addr,msg);
+		User.get(addr, function(user){
+			//console.log('add',user);
+			var li = $("<li></li>",{
+				"class": "message",
+				"style": "background-color:" + (MessageView.last_grey ? "white" : "#eee") + ";list-style-type:none;",
+				"text": Util.user_string(user) + ": " + msg,
+				"unique_id" : unique_id
+			}); 
+			$("#list").append(li);
+			MessageView.last_grey = !MessageView.last_grey;
+			//$('input[name=messageText]').val("");
+			
+			//scroll to bottom of div with scroll bar
+			//setting position:fixed for this div is important
+			//in adding a scroll bar to it
+			$("#list").scrollTop($("#list")[0].scrollHeight);
+
+
+			//$("#list").scrollTop($("#list").height());
+			//$("#chatBox").scrollTop($("#chatBox").height());
+			//$("div").scrollTop($("div").height());			
+		});
+	}
+
+	static clear() {
+		try {
+			Message.clear(); //delete all messages from the db
+			$("#list").empty();
+		}
+		catch (error) {console.log(error);}
+		return false;
+	}
+
+}
+
+class UserView {
+	static index = 1;
+	static last_grey = false;
+
+	static colors = {
+		0 : "Crimson",
+		1 : "DarkCyan",
+		2 : "Chocolate",
+		3 : "Chartreuse",
+		4 : "Magenta",
+		5 : "DarkOrange",
+		6 : "ForestGreen",
+		7 : "Gold",
+		8 : "Aqua"
+	}
+
+	static color_by_id(id){
+		return UserView.colors[(id)%Object.keys(UserView.colors).length];
+	}
+
+	static HTML_TRIANGLE_1 = `
+				<svg
+				  width="12"
+				  height="24"
+				  viewBox="0 0 100 100"
+				  version="1.1"
+				  preserveAspectRatio="none"
+				  xmlns="http://www.w3.org/2000/svg"
+				>
+					<path d="M0 0 L50 100 L100 0 Z" fill="#7A8BE7"></path>
+				</svg>`;
+
+	static HTML_SQUARE_1 = `
+				<svg
+				  width="26"
+				  height="26"
+				  viewBox="0 0 100 100"
+				  version="1.1"
+				  preserveAspectRatio="none"
+				  xmlns="http://www.w3.org/2000/svg"
+				>
+					<rect x="25" y="25" width="50" height="50" fill="blue" />
+				</svg>`;
+
+	static HTML_CIRCLE_1 = `
+				<svg
+				  width="18"
+				  height="18"
+				  viewBox="0 0 100 100"
+				  version="1.1"
+				  preserveAspectRatio="none"
+				  xmlns="http://www.w3.org/2000/svg"
+				>
+					<circle r="45" cx="50" cy="50" fill="red" /></circle>
+				</svg>`;
+				
+	static HTML_CIRCLE_2 = `
+				<svg
+				  width="14"
+				  height="14"
+				  viewBox="0 0 100 100"
+				  version="1.1"
+				  preserveAspectRatio="none"
+				  xmlns="http://www.w3.org/2000/svg"
+				>
+					<circle r="45" cx="50" cy="50" fill="#7A8BE7" /></circle>
+				</svg>`;
+				
+	static ICON_BY_USER_TYPE = {
+		'station' : {'html' : UserView.HTML_TRIANGLE_1, 'size': [12, 24],'anchor' : [6,24]},
+		'self' : {'html' : UserView.HTML_CIRCLE_1, 'size': [18, 18],'anchor' : [9, 9]},
+		null : {'html' : UserView.HTML_CIRCLE_2, 'size': [14, 14],'anchor' : [7, 7]},
+		undefined : {'html' : UserView.HTML_CIRCLE_2, 'size': [14, 14],'anchor' : [7, 7]},
+		//undefined : {'html' : UserView.HTML_TRIANGLE_1, 'size': [24, 36],'anchor' : [12, 36]},
+	};
+
+	static user_icon_factory(id, type=null){
+		//console.log(type);
+		var class_name = "user_icon " + UserView.color_by_id(id);
+		var to_return = L.divIcon({
+			html: UserView.ICON_BY_USER_TYPE[type].html,
+			className: class_name,
+			iconSize: UserView.ICON_BY_USER_TYPE[type].size,
+			iconAnchor: UserView.ICON_BY_USER_TYPE[type].anchor
+		});	
+		return to_return;
+	}
+
+	static circle_icon_factory(){
+		const class_name = "circle_icon";
+		var to_return = L.divIcon({
+			html: `
+				<svg
+				  width="18"
+				  height="18"
+				  viewBox="0 0 100 100"
+				  version="1.1"
+				  preserveAspectRatio="none"
+				  xmlns="http://www.w3.org/2000/svg"
+				>
+					<circle r="45" cx="50" cy="50" fill="red" /></circle>
+				</svg>`,
+			className: class_name,
+			iconSize: [18, 18],
+			iconAnchor: [9, 9]
+		});	
+		return to_return;
+	}
+
+	static load_user(user){
+		if (user.addr == 0){return;}
+		//console.log('UserView.load_user',user);
+		//const index = Object.keys(markers).length+1;
+		var user_icon = UserView.user_icon_factory(UserView.index, user.type);
+		if ((user.lat !== null) && (user.lon !== null) && (user.lat !== undefined) && (user.lon !== undefined) && (user.callsign != state.my_callsign)) {
+			markers[user.addr] = L.marker([user.lat, user.lon], {icon: user_icon}).addTo(map);
+			markers[user.addr].bindTooltip( UserView.tooltip_contents(user.callsign, user.last_location_beacon_time, user.lat, user.lon),
+				{permanent: false, direction: 'right', className: 'leaflet-tooltip'}
+			);
+		}
+		else if ((user.lat !== null) && (user.lon !== null) && (user.callsign == state.my_callsign)) {
+			if (Map.first_update != true){
+				Map.first_update = true;
+				Map.set_location(user.lat, user.lon);
 			}
 		}
-	} catch(error) {console.log(error);}
-}
+		
+		UserView.add_user_to_list(user, UserView.index, true);	
+		UserView.index += 1;
+	}
+	
+	static add_user_to_list(user, index, stale=false){ 
+		//console.log('UserView.add_user_to_list',user,index,stale);
+		if (user.callsign === null){return;}
+		
+		//check for duplicates
+		let e = $('#'+user.addr+'.user-entry');
+		if (e.length > 0){
+			console.log('duplicate user entry');
+			return;
+		}
+		
+		let me = user.callsign == state.my_callsign;
+		var color = (me == false) ? UserView.color_by_id(index) : "ME";
+		var time  =  ((stale == true)&&(me==false)) ?  "INACTIVE " : Util.iso_to_time(user.last_location_beacon_time);
+		
+		var li = $("<tr></tr>",{
+				"class": "user-entry",
+				"id" : user.addr,
+				"style": "background-color:" + (UserView.last_grey ? "white" : "#eee") + ";list-style-type:none;",
+			});
+		var span_id = $("<td></td>",{
+				"class": "user-entry-index " + color,
+				"id" : user.addr,
+				"text" : index + '.'
+			});
+		
+		let display_name = (me==false) ? Util.user_string(user) : state.user_string() + '(Me)';
+		
+		var span_name = $("<td></td>",{
+				"class": "user-entry-name",
+				"id" : user.addr,
+				"text" : display_name
+			});
+		var span_time = $("<td></td>",{
+				"class": "user-entry-time",
+				"id" : user.addr,
+				"text" : time
+			});
+		var span_distance = $("<td></td>",{
+				"class": "user-entry-distance",
+				"id" : user.addr,
+				"text" : state.get_distance(markers[user.addr])+'m'
+			}); 
+			
+		let waypoint_text = "WAYPOINT " + state.get_distance(waypoints[user.addr])+'m';
+		var span_waypoint = $("<td></td>",{
+				"class": "user-entry-waypoint",
+				"id" : user.addr,
+				"text" : waypoint_text
+			});
+		var span_ping = $("<td></td>",{
+				"class": "user-entry-ping",
+				"id" : user.addr,
+				"text" : 'PING'
+			});
+		
+		li.append(span_id);
+		li.append(span_name);
+		li.append(span_distance);
+		li.append(span_time);
+		li.append(span_waypoint);
+		if (me == false){
+			li.append(span_ping);
+		}
+		$("#userList").append(li);
+		UserView.last_grey = !UserView.last_grey;
 
-///////////////////////// Loading Users and Messages on load///////////////////////////////////////
+		$("#"+user.addr+" .user-entry-name").click(function(e) {Map.go_to_user(e.currentTarget.id);});
+		$("#"+user.addr+" .user-entry-time").click(function(e) {Map.go_to_user(e.currentTarget.id);});
+		$("#"+user.addr+" .user-entry-waypoint").click(function(e) {Map.go_to_waypoint(e.currentTarget.id);});
 
-function go_to_user(username) {
-	const marker = markers[username]
-	if (marker === undefined) {return;}
-	if ((marker._latlng.lat == 0) && (marker._latlng.lng == 0)) {return;}
-	var popup = L.popup({className: "leaflet-tooltip"}).setLatLng(marker._latlng).setContent('<p>'+username+'</p>').openOn(map);
-	setTimeout(function(){popup.close()}, 1500);
-}
+		$("#"+user.addr+" .user-entry-ping").click(function(e) {
+			if(e.currentTarget.id == state.my_addr){return;}
+			let ping_id = Util.randint(256);
+			let now = Date.now();
+			if (state.ping_requests[e.currentTarget.id] !== undefined){
+				if ((now - state.ping_requests[e.currentTarget.id]) < 5000){
+					console.log('ping request suppressed, wait');
+					return;
+				}
+			}
+			state.ping_requests[e.currentTarget.id] = now;
+			let req = {'src':state.my_addr, 'dst': parseInt(e.currentTarget.id), 'ping_id':ping_id};
+			console.log('ping request', req);
+			messenger.postMessage(["ping_request",req]);
+			UserView.update_span_ping(e.currentTarget.id, 'REQ 0x' + Util.hex(ping_id,2));
+		});
+		
+		//scroll to bottom of div with scroll bar
+		//setting position:fixed for this div is important
+		//in adding a scroll bar to it
+		$("#userPane").scrollTop($("#userPane")[0].scrollHeight);
+	}
 
-function go_to_waypoint(username) {
-	const w = waypoints[username]
-	if (w === undefined) {return;}
-	if ((w._latlng.lat == 0) && (w._latlng.lng == 0)) {return;}
-	var popup = L.popup({className: "leaflet-tooltip"}).setLatLng(w._latlng).setContent('<p>'+w._tooltip._content+'</p>').openOn(map);
-	setTimeout(function(){popup.close()}, 1500);
-}
+	static clear_users_ui() {
+		try {
+			User.clear(); //delete all user entries from the db
+			$("#userList").empty();
+			for (const [k, m] of Object.entries(markers)) {
+				if (k == state.my_callsign){continue;}
+				m.remove();
+			}
+		} catch(error){
+			console.log(error);
+		}
+		return false;
+	}
+	
+	static tooltip_contents(callsign, last_location_beacon_time, lat, lon){
+		if (callsign == state.my_callsign){
+			return `(Me) ${callsign}<br>${Util.fix_coords(lat,lon)}`;
+		} else {
+			return `${callsign} ${Util.iso_to_time(last_location_beacon_time)}<br>${Util.fix_coords(lat,lon)}`;
+		}
+		return to_return;
+	}
+	
+	static update_span_ping(addr, new_text){
+		let e = $('#'+addr+'.user-entry-ping');
+		e.html(new_text);
+		if (new_text.includes('REQ')){e.css("color","red");}
+		else if (new_text.includes('RSP')){
+			e.css("color","green");
+			e.css("font-weight","bold");
+			setTimeout(function(){
+				e.css("font-weight","normal");
+			}, 2000);
+		}
+	}
 
-function randint(max) {
-  return Math.floor(Math.random() * max);
-}
-
-function update_span_ping(user, new_text){
-	let e = $('#'+user+'.user-entry-ping');
-	e.html(new_text);
-	if (new_text.includes('REQ')){e.css("color","red");}
-	else if (new_text.includes('RSP')){
-		e.css("color","green");
+	static update_span_time(addr, new_text){
+		let e = $('#'+addr+'.user-entry-time');
+		e.html(new_text);	
 		e.css("font-weight","bold");
 		setTimeout(function(){
 			e.css("font-weight","normal");
 		}, 2000);
 	}
-}
 
-function update_span_time(user, new_text){
-	let e = $('#'+user+'.user-entry-time');
-	e.html(new_text);	
-	e.css("font-weight","bold");
-	setTimeout(function(){
-		e.css("font-weight","normal");
-	}, 2000);
-}
+	static update_span_distance(addr, new_text){
+		let e = $('#'+addr+'.user-entry-distance');
+		e.html(new_text);	
+	}
 
-function update_span_distance(user, new_text){
-	let e = $('#'+user+'.user-entry-distance');
-	e.html(new_text);	
-}
-
-function update_span_name(user, new_text){
-	let e = $('#'+user+'.user-entry-name');
-	e.html(new_text);
-}
-
-function update_span_waypoint(user, new_text){
-	let e = $('#'+user+'.user-entry-waypoint');
-	e.html(new_text);
-}
-
-var user_last_grey = false;
-
-var ping_requests = {}; //dictionary of ping requests keys are user id's and values are the time of the last request
-
-function add_user_to_list(user, index, stale=false){
-	//console.log('add_user_to_list('+user.username+')');
-
-	if ((user.type == 'station') && (properties.list_stations == false)) {return;}
-	if ((user.type != 'station') && (properties.list_users == false)) {return;}
-	
-	//check for duplicates
-	let e = $('#'+user.username+'.user-entry');
-	if (e.length > 0){
-		console.log('duplicate user entry');
-		return;
+	static update_span_name(user){
+		let e = $(`#${user.addr}.user-entry-name`);
+		if (e === undefined){return;}
+		let new_text = (user.addr!=state.my_addr) ? Util.user_string(user) : state.user_string() + '(Me)';
+		e.html(new_text);
 	}
 	
-	let me = user.username == my_username;
-	var color = (me == false) ? user_color_by_id(index) : "ME";
-	//console.log(index + ' ' + color);
-	var time  =  ((stale == true)&&(me==false)) ?  "INACTIVE " : iso_to_time(user.last_location_beacon_time);
-	
-    var li = $("<tr></tr>",{
-			"class": "user-entry",
-			"id" : user.username,
-			"style": "background-color:" + (user_last_grey ? "white" : "#eee") + ";list-style-type:none;",
-		});
-	var span_id = $("<td></td>",{
-			"class": "user-entry-index " + color,
-			"id" : user.username,
-			"text" : index + '.'
-		});
-	
-	let display_name = user.username;
-	if ((user.type == 'station') && (user.username == properties.station_callsign)){
-		display_name = user.username + '(My Sta.)';
-	}
-	else if (user.type == 'station') {
-		display_name = user.username + '(Station)';
-	}
-	else if (user.username == my_username){
-		display_name = user.username + '(Me)';
-	}
-	
-	var span_name = $("<td></td>",{
-			"class": "user-entry-name",
-			"id" : user.username,
-			"text" : display_name
-		});
-	var span_time = $("<td></td>",{
-			"class": "user-entry-time",
-			"id" : user.username,
-			"text" : time
-		});
-	var span_distance = $("<td></td>",{
-			"class": "user-entry-distance",
-			"id" : user.username,
-			"text" : get_distance(markers[user.username], markers[my_username])+'m'
-		}); 
+
+}
+
+class Map {
+	static first_update = false;
+
+	static set_location(lat, lon){
+		console.log('Map.set_location',lat,lon);
+		//console.log(lat_lon_arr)
+		var lat_lon_arr = [lat, lon];
+		map.setView(lat_lon_arr, 14);
+		map.flyTo(lat_lon_arr, 14);	
 		
-	let waypoint_text = "WAYPOINT " + get_distance(waypoints[user.username], markers[my_username])+'m';
-	if (user.type == 'station'){
-		waypoint_text = 'NA';
+		var my_location_marker = L.marker(lat_lon_arr, {icon: UserView.circle_icon_factory()}).addTo(map);
+		my_location_marker.bindTooltip(UserView.tooltip_contents(state.my_callsign,null,lat,lon), {permanent: false});
+		markers[state.my_addr] = my_location_marker;
 	}
-	var span_waypoint = $("<td></td>",{
-			"class": "user-entry-waypoint",
-			"id" : user.username,
-			"text" : waypoint_text
+	
+	static DD_to_DMS(deg) {
+		var d = parseInt(deg);
+		var md = Math.abs(deg - d) * 60;
+		var m = parseInt(md);
+		var sd = (md - m) * 60;
+		return `${d}D ${m}M ${sd.toFixed(2)}S`; // Format as desired 
+	}
+	
+	static create_popup(contents, lat, lon, close_ms=1500){
+		console.log('Map.create_popup',lat,lon);
+		if ((lat==0) || (lon==0)){return;}
+		var popup = L.popup({className: "leaflet-tooltip"}).setLatLng([lat,lon]).setContent(contents).openOn(map);
+		setTimeout(function(){popup.close()}, close_ms);
+		
+	}
+	
+	static go_to_user(addr) {
+		console.log('Map.go_to_user',addr);
+		User.get(addr, function(user) {
+			let contents = '<p>'+`${user.callsign}(${Util.hex(user.addr)})`+'<br />'+`(${Map.DD_to_DMS(user.lat)}, ${Map.DD_to_DMS(user.lon)})`+'</p>';
+			Map.create_popup(contents, user.lat, user.lon);
 		});
-	var span_ping = $("<td></td>",{
-			"class": "user-entry-ping",
-			"id" : user.username,
-			"text" : 'PING'
+	}
+
+	static go_to_waypoint(addr) {
+		console.log('Map.go_to_waypoint', addr);
+		Waypoint.get(addr, function(w){
+			User.get(addr, function(user){
+				let contents = '<p>'+`${user.callsign}(${Util.hex(user.addr)})`+'<br />'+w.msg+'<br />'+`(${Map.DD_to_DMS(w.lat)}, ${Map.DD_to_DMS(w.lon)})`+'</p>';
+				Map.create_popup(contents, w.lat, w.lon);
+			});
 		});
-	
-	li.append(span_id);
-	li.append(span_name);
-	li.append(span_distance);
-	li.append(span_time);
-	li.append(span_waypoint);
-	li.append(span_ping);
-    $("#userList").append(li);
-    user_last_grey = !user_last_grey;
-
-	$("#"+user.username+" .user-entry-name").click(function(e) {
-		go_to_user(e.currentTarget.id);
-	});
-	
-	$("#"+user.username+" .user-entry-time").click(function(e) {
-		go_to_user(e.currentTarget.id);
-	});
-	
-	//$("#"+user.username+"_0 td").click(function(e){go_to_user(e.currentTarget.id.split("_")[0])});
-	//$("#"+user.username+"_1").click(function(e){go_to_user(e.currentTarget.id)});
-	//$("#"+user.username+"_2").click(function(e){go_to_user(e.currentTarget.id)});
-	
-	$("#"+user.username+" .user-entry-waypoint").click(function(e) {
-		go_to_waypoint(e.currentTarget.id);
-	});
-
-	$("#"+user.username+" .user-entry-ping").click(function(e) {
-		let ping_id = randint(256);
-		let now = Date.now();
-		if (ping_requests[e.currentTarget.id] !== undefined){
-			if ((now - ping_requests[e.currentTarget.id]) < 5000){
-				console.log('ping request suppressed, wait');
-				return;
-			}
-		}
-		ping_requests[e.currentTarget.id] = now;
-		messenger.postMessage(["ping_request",{'src':my_username, 'dst': e.currentTarget.id, 'ping_id':ping_id}]);
-		update_span_ping(e.currentTarget.id, 'REQ ' + ping_id);
-	});
-	
-    //scroll to bottom of div with scroll bar
-    //setting position:fixed for this div is important
-    //in adding a scroll bar to it
-    $("#userPane").scrollTop($("#userPane")[0].scrollHeight);		
-}
-
-
-
-var user_colors = {
-	0 : "Crimson",
-	1 : "DarkCyan",
-	2 : "Chocolate",
-	3 : "Chartreuse",
-	4 : "Magenta",
-	5 : "DarkOrange",
-	6 : "ForestGreen",
-	7 : "Gold",
-	8 : "Aqua"
-}
-var num_user_colors = Object.keys(user_colors).length;
-
-function user_color_by_id(id){
-	return user_colors[(id)%num_user_colors];
-}
-
-const HTML_TRIANGLE_1 = `
-			<svg
-			  width="12"
-			  height="24"
-			  viewBox="0 0 100 100"
-			  version="1.1"
-			  preserveAspectRatio="none"
-			  xmlns="http://www.w3.org/2000/svg"
-			>
-				<path d="M0 0 L50 100 L100 0 Z" fill="#7A8BE7"></path>
-			</svg>`;
-
-const HTML_SQUARE_1 = `
-			<svg
-			  width="26"
-			  height="26"
-			  viewBox="0 0 100 100"
-			  version="1.1"
-			  preserveAspectRatio="none"
-			  xmlns="http://www.w3.org/2000/svg"
-			>
-				<rect x="25" y="25" width="50" height="50" fill="blue" />
-			</svg>`;
-
-const HTML_CIRCLE_1 = `
-			<svg
-			  width="18"
-			  height="18"
-			  viewBox="0 0 100 100"
-			  version="1.1"
-			  preserveAspectRatio="none"
-			  xmlns="http://www.w3.org/2000/svg"
-			>
-				<circle r="45" cx="50" cy="50" fill="red" /></circle>
-			</svg>`;
-			
-const HTML_CIRCLE_2 = `
-			<svg
-			  width="14"
-			  height="14"
-			  viewBox="0 0 100 100"
-			  version="1.1"
-			  preserveAspectRatio="none"
-			  xmlns="http://www.w3.org/2000/svg"
-			>
-				<circle r="45" cx="50" cy="50" fill="#7A8BE7" /></circle>
-			</svg>`;
-			
-const ICON_BY_USER_TYPE = {
-	'station' : {'html' : HTML_TRIANGLE_1, 'size': [12, 24],'anchor' : [6,24]},
-	'self' : {'html' : HTML_CIRCLE_1, 'size': [18, 18],'anchor' : [9, 9]},
-	null : {'html' : HTML_CIRCLE_2, 'size': [14, 14],'anchor' : [7, 7]},
-	undefined : {'html' : HTML_CIRCLE_2, 'size': [14, 14],'anchor' : [7, 7]},
-	//undefined : {'html' : HTML_TRIANGLE_1, 'size': [24, 36],'anchor' : [12, 36]},
-};
-
-function user_icon_factory(id, type=null){
-	//console.log(type);
-	var class_name = "user_icon " + user_color_by_id(id);
-	var to_return = L.divIcon({
-		html: ICON_BY_USER_TYPE[type].html,
-		className: class_name,
-		iconSize: ICON_BY_USER_TYPE[type].size,
-		iconAnchor: ICON_BY_USER_TYPE[type].anchor
-	});	
-	return to_return;
-}
-
-function circle_icon_factory(){
-	const class_name = "circle_icon";
-	var to_return = L.divIcon({
-		html: `
-			<svg
-			  width="18"
-			  height="18"
-			  viewBox="0 0 100 100"
-			  version="1.1"
-			  preserveAspectRatio="none"
-			  xmlns="http://www.w3.org/2000/svg"
-			>
-				<circle r="45" cx="50" cy="50" fill="red" /></circle>
-			</svg>`,
-		className: class_name,
-		iconSize: [18, 18],
-		iconAnchor: [9, 9]
-	});	
-	return to_return;
-}
-
-function load_user(user){	
-	const index = Object.keys(markers).length+1;
-	var user_icon = user_icon_factory(index, user.type);
-	if ((user.lat !== undefined) && (user.lon !== undefined) && (user.username != my_username)) {
-		var coords = [user.lat, user.lon]
-		markers[user.username] = L.marker(coords, {icon: user_icon}).addTo(map);
-		markers[user.username].bindTooltip( generate_user_tooltip_contents(user.username, user.last_location_beacon_time, coords),
-			{permanent: false, direction: 'right', className: 'leaflet-tooltip'}
-		);
 	}
-	add_user_to_list(user, index, stale=true);	
-	
 }
 
-function users_loaded_cb(users){
-	//console.log(users)
-	setTimeout(function(){
-		let cnt = 0; //variable used to set the user color and placement in list
-		
-		for (i in users){ //add me
-			if (users[i].username == my_username){ 
-				load_user(users[i]);
-			}
-		}
-		for (i in users){ //addmy station 
-			if ((users[i].type == 'station') && (users[i].username == properties.station_callsign)){
-				load_user(users[i]);
-			}	
-		}
-		
-		for (i in users) {
-			if (users[i].username == my_username){ continue;}			
-			else if ((users[i].type == 'station') && (users[i].username == properties.station_callsign)){continue;}
-			else {
-				load_user(users[i]);
-			}
-		}
-		user_list_loaded = true;
-		
-	}, LOAD_WAIT_MS);
-	
-}
+class View {
 
-var default_username = true;
-
-function load_complete_cb(messages) {
-	for (i in messages) {
-		add_unsaved_message(messages[i].username, messages[i].msg);
+	//temporarily highlight a UI element by changing its background color
+	static highlight(id, color, timeout_ms){
+		let ele = document.getElementById(id);
+		let prev_color = ele.style.backgroundColor;
+		ele.style.backgroundColor = color;
+		setTimeout(function(){
+			ele.style.backgroundColor = prev_color;
+		}, timeout_ms);
 	}
 	
-	setTimeout(function(){
-		add_unsaved_message('Iris', 'Connected to Station: "' + properties.station_callsign + '"');
-		if (default_username == true){
-			add_unsaved_message('Iris', "Welcome! Your temporary username is " + my_username + " To change it navigate to \"Settings\"");
+	static highlight_element(ele, color, timeout_ms){
+		let prev_color = ele.style.backgroundColor;
+		ele.style.backgroundColor = color;
+		setTimeout(function(){
+			ele.style.backgroundColor = prev_color;
+		}, timeout_ms);		
+	}
+
+	static set_tab_buttons(disabled=false){
+		document.getElementById("chat_button").disabled = disabled;
+		document.getElementById("map_button").disabled = disabled;
+		document.getElementById("settings_button").disabled = disabled;	
+	}
+
+	static list_map_elements(target){
+		let load = true;
+		//console.log('list_map_elements('+target+')');
+		b = document.getElementById(target);
+		if (b.className.includes('untoggled_button')) {
+			b.className = b.className.replace(" untoggled_button", "");
+			load = true;
 		} else {
-			add_unsaved_message('Iris', "Welcome Back \"" + my_username + "\"");
-			const notification = new Notification("Welcome Back: " + my_username);
-		}	
-	}, LOAD_WAIT_MS);
-	
-}
-
-function msg_db_cb() {
-	load_messages(load_complete_cb);
-}
-
-function user_db_cb() {
-	load_users(users_loaded_cb);
-}
-
-///////////////////////////////MAP///////////////////////////////////////////////
-
-let map;
-var first_map_update = false;
-
-function set_map_location(lat_lon_arr){
-	//console.log(lat_lon_arr)
-	map.setView(lat_lon_arr, 14);
-	map.flyTo(lat_lon_arr, 14);	
-	
-	var my_location_marker = L.marker(lat_lon_arr, {icon: circle_icon_factory()}).addTo(map);
-	my_location_marker.bindTooltip(generate_user_tooltip_contents(my_username,null,lat_lon_arr), {permanent: false});
-	markers[my_username] = my_location_marker;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
-function open_tab(target) {
-	var i, tabcontent, tablinks;
-
-	// Get all elements with class="tabcontent" and hide them
-	tabcontent = document.getElementsByClassName("tabcontent");
-	for (i=0; i < tabcontent.length; i++) {
-		tabcontent[i].style.display = "none";
+			b.className += " untoggled_button";
+			load = false;
+		}
+		Cookies.set(target,load.toString(), {expires:COOKIE_EXP});
 	}
+	
+	static set_tab_pending(tabname){
+		try {
+			if (document.getElementById(tabname).style.display == "none"){
+				if (document.getElementById(tabname+"_button").className.includes("pending") != true){
+					document.getElementById(tabname+"_button").className += " pending";
+				}
+			}
+		} catch(error) {console.log(error);}
+	}
+	
+	static open_tab(target) {
+		var i, tabcontent, tablinks;
 
-	// Get all elements with class="tablinks" and remove the class "active"
-	tablinks = document.getElementsByClassName("tablinks");
-	for (i=0; i < tablinks.length; i++) {
-		if (tablinks[i].id == target){
-			tablinks[i].className += " active";
-			tablinks[i].className = tablinks[i].className.replace(" pending", "");
-		} else {
-			tablinks[i].className = tablinks[i].className.replace(" active", "");
+		// Get all elements with class="tabcontent" and hide them
+		tabcontent = document.getElementsByClassName("tabcontent");
+		for (i=0; i<tabcontent.length; i++) {
+			tabcontent[i].style.display = "none";
+		}
+
+		// Get all elements with class="tablinks" and remove the class "active"
+		tablinks = document.getElementsByClassName("tablinks");
+		for (i=0; i<tablinks.length; i++) {
+			if (tablinks[i].id == target){
+				tablinks[i].className += " active";
+				tablinks[i].className = tablinks[i].className.replace(" pending", "");
+			} else {
+				tablinks[i].className = tablinks[i].className.replace(" active", "");
+			}
+		}
+		target = target.split('_')[0]
+		document.getElementById(target).style.display = "block";
+		if (target == "map"){
+			map.invalidateSize()
+		}
+	}	
+}
+
+class UserInput {
+	
+	constructor(){
+		$("input[name=load_on_start]").click(function(){
+			//console.log($(this).val());
+			Cookies.set('load_on_start',$(this).val(), {expires:COOKIE_EXP})
+		});	
+		
+		document.getElementById("send_button").onclick = UserInput.send_msg;
+		document.getElementById("clear_messages").onclick = MessageView.clear;
+		document.getElementById("clear_users").onclick = UserView.clear_users_ui;
+		document.getElementById("clear_waypoints").onclick = WaypointView.clear;
+		document.getElementById("set_radio_config").onclick = this.set_radio_config;
+		document.getElementById("set_hub_config").onclick = this.set_hub_config;
+		document.getElementById("set_callsign").onclick = UserInput.set_callsign;
+		document.getElementById("msg_req_ack").onclick = this.msg_req_ack;
+		document.getElementById("do_nothing").onclick = function() {return false;};
+		document.getElementById("refresh_address_list").onclick = this.refresh_address_list;
+		document.getElementById("destination_address").addEventListener('change', this.destination_address);
+	}
+	
+	destination_address(){ //change the destination address
+		console.log('UserInput.destination_address');
+		let addr = parseInt(this.value);
+		if (Number.isNaN(addr)==false){
+			state.dst_addr = addr;
 		}
 	}
-	target = target.split('_')[0]
-	document.getElementById(target).style.display = "block";
-	if (target == "map"){
-		map.invalidateSize()
+	
+	refresh_address_list(){
+		let s = document.getElementById("destination_address");
+		s.innerHTML = ""; //clear the Options
+		s.add(new Option('Broadcast (0000)', 0));
+		User.load_users(function(users){
+			for (const i in users){
+				if ((users[i].addr==0) || (users[i].addr == state.my_addr)){continue;}
+				s.add(new Option(`${users[i].callsign} (${Util.hex(users[i].addr,4)})`, users[i].addr));
+			}
+		});		
 	}
-}
-
-function list_map_elements(target){
-	var load = true;
-	//console.log('list_map_elements('+target+')');
-	b = document.getElementById(target);
-	if (b.className.includes('untoggled_button')) {
-		b.className = b.className.replace(" untoggled_button", "");
-		load = true;
-	} else {
-		b.className += " untoggled_button";
-		load = false;
+	
+	msg_req_ack(){
+		state.msg_req_ack = !state.msg_req_ack;
+		//console.log('UserView.msg_req_ack()', state.msg_req_ack);
+		let b = document.getElementById("msg_req_ack");
+		b.checked = state.msg_req_ack;
+		Cookies.set('msg_req_ack',state.msg_req_ack, {expires:COOKIE_EXP});
 	}
-	Cookies.set(target,load.toString(), {expires:COOKIE_EXP});
-}
-
-$("input[name=load_on_start]").click(function(){
-	//console.log($(this).val());
-	Cookies.set('load_on_start',$(this).val(), {expires:COOKIE_EXP})
-});
-
-$("input[name=list_users]").click(function(){
-	console.log($(this).val());
-	consoel.log($(this));
-	Cookies.set('list_users',$(this).val(), {expires:COOKIE_EXP})
-});
-
-$("input[name=list_stations]").click(function(){
-	console.log($(this).val());
-	Cookies.set('list_stations',$(this).val(), {expires:COOKIE_EXP})
-});
-
-function get_message_to_send() {
-	try {
-		let msg = prompt("Message:","");
-		if ((msg !== null)&&(msg != "")){
-			console.log("get_message_to_send()");
-			messenger.postMessage(["newMessage",{'username': my_username, 'message': msg}]);
-			add_saved_message(my_username, msg);			
-		}
-	}
-	catch (error) {console.log(error);}
-	return false; //very important to not get redirected
-}
-
-adjectives = {
-	0 : "shady",
-	1 : "quirky",
-	2 : "smiley",
-	3 : "tipsy",
-	4 : "filthy",
-	5 : "sleepy",
-	6 : "rapey"
-}
-
-animals = {
-	0 : "monkey",
-	1 : "otter",
-	2 : "hippo",
-	3 : "elephant",
-	4 : "horse",
-	5 : "dog",
-	6 : "otter"
-}
-
-function rand_int(min, max) {
-	const minCeiled = Math.ceil(min);
-	const maxFloored = Math.floor(max);
-	return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
-}
-
-function generate_username(){
-	return adjectives[rand_int(0,7)] + "_" + animals[rand_int(0,7)]
-}
-
-function set_username(){
-	try {
-		let new_username = prompt("Enter Username","");
-		if ((new_username !== null)&&(new_username != "")){
-			var old = my_username;
-			my_username = new_username;
-			Cookies.set('username',my_username, {expires:COOKIE_EXP});
+	
+	set_radio_config(){
+		console.log('UserInput.set_radio_config()');
+		var new_rc = {'radio':{},'snap_args':{}};
+		
+		new_rc.radio.modem 		= document.getElementById('radio_configs').value;
+		new_rc.radio.general 	= document.getElementById('radio_general_configs').value;
+		new_rc.radio.packet 	= document.getElementById('radio_packet_configs').value;
+		new_rc.radio.preamble 	= document.getElementById('radio_preamble_configs').value;
+		
+		try {
+			let x = parseInt(document.getElementById('payload').value);
+			if (Number.isNaN(x) == false){
+				new_rc.snap_args.payload = x;
+			} else {
+				View.highlight('payload','salmon',2500);
+				throw new Error("payload value is not an integer");
+			}
+			x = parseInt(document.getElementById('block').value);
+			if (Number.isNaN(x) == false){
+				new_rc.snap_args.block = x;
+			} else {
+				View.highlight('block','salmon',2500);
+				throw new Error("block value is not an integer");
+			}
+			new_rc.snap_args.disable_reed_solomon = document.getElementById('disable_reed_solomon').value;
 			
-			if (old != my_username) {
-				Object.defineProperty(markers, my_username, Object.getOwnPropertyDescriptor(markers, old));
-				delete markers[old];
-				markers[my_username]._tooltip._content = generate_user_tooltip_contents(my_username);
+			console.log('set_radio_config',new_rc);
+			messenger.postMessage(["SET_RADIO_CONFIG",new_rc]);
+			document.getElementById('set_radio_config').old_textContent = document.getElementById('set_radio_config').textContent;
+			document.getElementById('set_radio_config').textContent = 'Change Pending';
+			state.radio_config_set = true;
+			setTimeout(function(){
+				if (state.radio_config_set == true) { //request timed out
+					console.log('SET_RADIO_CONFIG request timed out');
+					state.radio_config_set = false;
+					View.highlight("set_radio_config","salmon",2500);
+					document.getElementById('set_radio_config').textContent = document.getElementById('set_radio_config').old_textContent;
+				}
+			}, 10000);
+			
+		}
+		catch(error) {
+			console.log(error);
+			View.highlight('set_radio_config','salmon',2500);
+		}
+	}
+	
+	set_hub_config(){
+		console.log('UserInput.set_hub_config()');
+		var nc = {};
+		
+		nc.retransmit_wait_multiplier_s 	= parseFloat(document.getElementById('retransmit_wait_multiplier_s').value);
+		nc.peer_timeout_s 	= document.getElementById('peer_timeout_s').value;
+		nc.peer_info_tx_s 	= document.getElementById('peer_info_tx_s').value;
+		nc.default_hops = document.getElementById('default_hops').value;
+		
+		try {
+			nc.peer_timeout_s = parseInt(nc.peer_timeout_s);
+			if (Number.isNaN(nc.peer_timeout_s) == true){
+				View.highlight('peer_timeout_s','salmon',2500);
+				throw new Error("peer_timeout_s value is not an integer");
+			}
+			
+			nc.peer_info_tx_s = parseInt(nc.peer_info_tx_s);
+			if (Number.isNaN(nc.peer_info_tx_s) == true){
+				View.highlight('peer_info_tx_s','salmon',2500);
+				throw new Error("peer_info_tx_s value is not an integer");
+			}
+			
+			nc.default_hops = parseInt(nc.default_hops);
+			if (Number.isNaN(nc.default_hops) == true){
+				View.highlight('default_hops','salmon',2500);
+				throw new Error("default_hops value is not an integer");
+			}
+			
+			console.log('set_hub_config',nc);
+			messenger.postMessage(["SET_HUB_CONFIG",nc]);
+			document.getElementById('set_hub_config').old_textContent = document.getElementById('set_hub_config').textContent;
+			document.getElementById('set_hub_config').textContent = 'Change Pending';
+			state.hub_config_set = true;
+			setTimeout(function(){
+				if (state.hub_config_set == true) { //request timed out
+					console.log('SET_HUB_CONFIG request timed out');
+					state.hub_config_set = false;
+					View.highlight("set_hub_config","salmon",2500);
+					document.getElementById('set_hub_config').textContent = document.getElementById('set_hub_config').old_textContent;
+				}
+			}, 10000);
+			
+		}
+		catch(error) {
+			console.log(error);
+			View.highlight('set_hub_config','salmon',2500);
+		}
+	}
+
+	static send_msg() {
+		try {
+			let msg = prompt("Message:","");
+			if ((msg !== null)&&(msg != "")){
+				//console.log("UserInput.send_msg()");
+				let unique_id = (state.msg_req_ack==true) ? Util.randint(65535) : null;
+				messenger.postMessage(["message",{'src': state.my_addr, 'dst':state.dst_addr, 'msg': msg, 'want_ack':state.msg_req_ack, 'unique_id':unique_id}]);
+				MessageView.add_saved(state.my_addr, msg, unique_id, function(e){
+					state.messages_with_ack_pending[unique_id] = {'msg_db_key':e.target.result,'unique_id':unique_id, 'time':Util.get_iso_timestamp()};
+					//console.log('msg',state.messages_with_ack_pending[unique_id]);
+				});			
+			}
+		}
+		catch (error) {console.log(error);}
+		return false; //very important to not get redirected
+	}
+
+	static set_callsign(){
+		try {
+			let new_callsign = prompt("Enter New Callsign","");
+			if ((new_callsign !== null)&&(new_callsign != "")){
+				var old = state.my_callsign;
+				state.my_callsign = new_callsign;
+				messenger.postMessage(["SET_MY_CALLSIGN",{'callsign':state.my_callsign}]);
 				
-				getUser(old, function(old_user) {
-					updateUser(my_username, coords=[old_user.lat,old_user.lon], timestamp=null);
-					delete_user(old, function() {
-						update_span_name(old, my_username)
-						//console.log(e);
-						messenger.postMessage(["username",my_username]);
-						messenger.postMessage(["newMessage",{'username': "Iris", 'message': old + " changed username to " + my_username}]);
+				if (old != state.my_callsign) {
+					//Object.defineProperty(markers, state.my_callsign, Object.getOwnPropertyDescriptor(markers, old));
+					//delete markers[state.my_addr];
+					User.update(state.my_addr, state.my_callsign, null, null, null, null, function(user){
+						//User.load(user);
+						UserView.update_span_name(user);
+						markers[user.addr]._tooltip._content = UserView.tooltip_contents(user.callsign,null,user.lat,user.lon);
 					});
-				});
-				
-				
+					
+				}
 			}
+			document.getElementById("callsign_label").innerHTML = "Callsign: " + state.my_callsign;
 		}
-		document.getElementById("username_label").innerHTML = "Username: " + my_username;
+		catch (error) {console.log(error);}
+		return false;
 	}
-	catch (error) {console.log(error);}
-	return false;
-}
-
-var radio_configs = null;
-var radio_configs_other = {};
-selected_radio_config_other = {};
-
-function load_radio_configs(){
-	console.log("load_radio_configs");
-	if (radio_configs === null){
-		messenger.postMessage(["get_radio_configs",{'type':'modem'}]);
-	} else {
-		var rs = document.getElementById("radio_configs");
-		selected_radio_config = rs.options[rs.selectedIndex].value;
-		//console.log(selected);
-	}
-}
-
-function load_radio_other_configs(config_type){
-	console.log("load_radio_other_configs("+config_type+")");
-	if (!(config_type in radio_configs_other)) {
-		messenger.postMessage(["get_radio_configs",{'type':config_type}]);
-	} else {
-		var rs = document.getElementById("radio_"+config_type+"_configs");
-		selected_radio_config_other[config_type] = rs.options[rs.selectedIndex].value;
-	}
-}
-
-function load_radio_general_configs(){load_radio_other_configs("general");}
-function load_radio_packet_configs(){load_radio_other_configs("packet");}
-function load_radio_preamble_configs(){load_radio_other_configs("preamble");}
-
-function get_current_radio_config(){
-	console.log("get_current_radio_config")
-	messenger.postMessage(["get_current_radio_config",{'type':'modem'}]);
-}
-
-function get_current_radio_config_other(){
-	console.log("get_current_radio_config_other")
-	messenger.postMessage(["get_current_radio_config_other",{'type':'general'}]);
-}
-
-function radio_config_path_extract(path){
-	const freq_re 	 = new RegExp("(\\d+)M", "gm");
-	const bitrate_re = new RegExp("(\\d+)kbps", "gm");
-	var freq = freq_re.exec(path);
-	var bitrate = bitrate_re.exec(path);
-	if ((freq === null) || (bitrate === null)){
-		console.log("throwing out " + path);
-		return null;
-	}
-	return {"freq":freq[1],"bitrate":bitrate[1],"path":path};
-}
-
-function radio_configs_other_received(config_type, config_paths){
-	console.log('radio_configs_other_received('+config_type+')');
-	radio_configs_other[config_type] = config_paths
-	if (radio_configs_other[config_type].length == 0){
-		radio_configs_other[config_type] = null;
-		return;
-	}
-	//console.log(radio_configs_other[config_type]);
-	for (i in radio_configs_other[config_type]){ //generate HTML objects now
-		rs = document.getElementById('radio_'+config_type+'_configs');
-		rs.add(new Option(radio_configs_other[config_type][i]));
-	}
-}
-
-function radio_configs_received(value){
-	config_paths = value['config_paths']
-	config_type = value['config_type']
-	console.log(config_paths);
-	
-	if (config_type == 'modem'){
-		radio_configs = [];
-		for (i in config_paths){
-			var c = radio_config_path_extract(config_paths[i]);
-			if (c === null) {continue;}
-			radio_configs.push(c);
-		}
-		if (radio_configs.length == 0){
-			radio_configs = null;
-			return;
-		}
-		console.log(radio_configs);
-		
-		for (i in radio_configs){ //generate HTML objects now
-			rs = document.getElementById('radio_configs');
-			rs.add(new Option(radio_configs[i]["freq"] + "M " + radio_configs[i]["bitrate"] + "kbps", radio_configs[i]["path"]));
-		}
-	} else {
-		radio_configs_other_received(config_type, config_paths)
-	}
-}
-
-function current_radio_config_received(current_config){
-	console.log("current_radio_config_received");
-	console.log(current_config);
-	var c = radio_config_path_extract(current_config);
-	lbl = document.getElementById('current_radio_config');
-	if (c === null){
-		lbl.innerHTML = "Current: None Loaded!";
-	} else {
-		lbl.innerHTML = "Current: " + c["freq"] + "M " + c["bitrate"] + "kbps";
-	}
-}
-
-function current_radio_config_other_received(current_config){
-	console.log("current_radio_config_other_received");
-	txt = document.getElementById('current_radio_general_config')
-	txt.innerHTML = current_config[0];
-	txt = document.getElementById('current_radio_packet_config')
-	txt.innerHTML = current_config[1];
-	txt = document.getElementById('current_radio_preamble_config')
-	txt.innerHTML = current_config[2];
-}
-
-function ping_request_cb(msg){
-	if ((msg['dst'] === undefined) || (msg['src'] === undefined)){return;}
-	if (msg['dst'] != my_username) {return;}
-	console.log('Ping Request Received from ' + msg['src'] + ' id:' + msg['ping_id'])
-	messenger.postMessage(["ping_response",{'src':my_username, 'dst': msg['src'], 'ping_id': msg['ping_id']}]);
-}
-
-function ping_response_cb(msg){
-	if ((msg['dst'] === undefined) || (msg['src'] === undefined)){return;}
-	if (msg['dst'] != my_username) {return;}
-	if (ping_requests[msg.src] === undefined){
-		console.log('unknown ping response received ' + msg);
-		return;
-	} else {
-		let diff = Date.now() - ping_requests[msg.src];
-		update_span_ping(msg['src'], 'RSP ' + diff + 'ms');
-		ping_requests[msg.src] = undefined;
-	}
-}
-
-var properties = {};
-
-function properties_cb(msg){
-	if (msg.name === undefined) {return;}
-	if (msg.name == 'station_callsign'){
-		console.log('Station Callsign: ' + msg.value);
-		properties['station_callsign'] = msg.value;
-	}
-}
-
-function retrieve_username(){
-	my_username = Cookies.get('username');
-	if (my_username === undefined){
-		my_username = generate_username();
-		Cookies.set('username',my_username, {expires:COOKIE_EXP})
-	} else {
-		default_username = false;
-	}
-	document.getElementById("username_label").innerHTML = "Username: " + my_username;
-	return my_username;
-}
-
-function retrieve_location_beacon_ms(){
-	var location_beacon_ms = localStorage.getItem("location_beacon_ms");
-	if (!location_beacon_ms){
-		location_beacon_ms = 10000; //set to default
-		localStorage.setItem("location_beacon_ms",location_beacon_ms); 
-	}
-	return location_beacon_ms;
-}
-
-function set_tab_buttons(disabled=false){
-	document.getElementById("chat_button").disabled = disabled;
-	document.getElementById("map_button").disabled = disabled;
-	document.getElementById("settings_button").disabled = disabled;	
 }
 
 $(document).ready(function() {
 	var ip = location.host;
 	document.getElementById("instructions").innerHTML = "If you are in a captive portal browser the application will not work, please navigate to https://" + ip + " in chrome or firefox"
 	
-	set_tab_buttons(disabled=true);
-	open_tab("splash");
+	View.set_tab_buttons(true);
+	View.open_tab("splash");
 });
 
-handlers = {
-	"newMessage" : other_user_message_cb,
-	"location"   : other_user_location_cb,
-	"waypoint"   : other_user_waypoint_cb,
-	"get_radio_configs" : radio_configs_received,
-	"get_current_radio_config" : current_radio_config_received,
-	"get_current_radio_config_other" : current_radio_config_other_received,
-	"ping_request" : ping_request_cb,
-	"ping_response" : ping_response_cb,
-	"properties" : properties_cb
-};
-
-var messenger = new Worker("message_worker.js");
-messenger.onmessage = (e) => {
-	const handler = handlers[e.data[0]];
-	if (handler === undefined){
-		console.log("unknown header received from worker: " + e.data[0]);
-		return;
+class RadioUtil {
+	static config_path_extract(path){
+		const freq_re 	 = new RegExp("(\\d+)M", "gm");
+		const bitrate_re = new RegExp("(\\d+)kbps", "gm");
+		var freq = freq_re.exec(path);
+		var bitrate = bitrate_re.exec(path);
+		if ((freq === null) || (bitrate === null)){
+			console.log("throwing out " + path);
+			return null;
+		}
+		return {"freq":freq[1],"bitrate":bitrate[1],"path":path};
 	}
-	handler(e.data[1],e.data[2]);
-};
-
-function get_cookie(name, default_return){
-	var val = Cookies.get(name);
-	if (val === undefined){
-		Cookies.set(name,default_return, {expires:COOKIE_EXP});
-		return default_return;
-	} 
-	return val;
+	
 }
 
-function user_accepted() {
-	messenger.postMessage(["start",{'username':retrieve_username(),'location_beacon_ms':retrieve_location_beacon_ms()}]);
+//handlers for when message is received from the backend client process
+class Handlers {
+	constructor(initial_handlers) { //setup initial handlers, when data bases are opened call this.init()
+		this.handlers = initial_handlers;
+		this.init_complete = false;
+		//console.log("Constructor of:", this.constructor.name);
+	}
+
+	static callsign(pay, timestamp){
+		//console.log('Handlers.callsign',pay); 
+		state.my_callsign = pay.callsign;
+		state.my_addr = pay.addr;
+		Cookies.set('my_callsign',state.my_callsign, {expires:COOKIE_EXP});
+		Cookies.set('my_addr',state.my_addr, {expires:COOKIE_EXP});
+		load.set('my_callsign');
+		document.getElementById("callsign_label").innerHTML = `My Callsign: ${state.my_callsign}`;
+		load.set('my_addr');
+		document.getElementById("addr_label").innerHTML = `My Address: 0x${Util.hex(state.my_addr,4)}`
+		User.update(state.my_addr, state.my_callsign);
+	}
 	
-	set_tab_buttons(disabled=false);
+	static message(data, timestamp){
+		//console.log("Handlers.message", data);
+		if (data.src == state.my_addr){return;}
+		MessageView.add_saved(data.src, data.msg);
+		if (notifications == true){
+			User.get(msg.src, function(user){
+				const notification = new Notification(`${user.addr}: ${data.msg}`);
+			});
+		}
+		View.set_tab_pending("chat");
+	}
+	
+	static location(data, timestamp){
+		//console.log("Handlers.location", data);
+		if (data === null){return;}
+		if (data.src === undefined){return;}
+		if ((data.lat === undefined) || (data.lon===undefined)){return;}
+		if (load.complete() != true) {console.log('load not complete yet'); return;}
+		
+		
+		/////////////////////////////////////
+		//add some error to the coordinates//
+		/////////////////////////////////////
+		data.lat = data.lat+Util.randfloat(-0.01,0.01);
+		data.lon = data.lon+Util.randfloat(-0.01,0.01);
+		
+		if (data.src == state.my_addr){
+			state.my_lat = data.lat;
+			state.my_lon = data.lon;
+			Cookies.set('my_lat',state.my_lat, {expires:COOKIE_EXP});
+			Cookies.set('my_lon',state.my_lon, {expires:COOKIE_EXP});
+			
+			User.update(data.src, null, data.lat, data.lon, null, null, function(user){
+				if (Map.first_update != true){
+					Map.first_update = true;
+					Map.set_location(user.lat, user.lon);
+				}
+			});			
+		} else {
+			User.update(data.src, null, data.lat, data.lon, null, null, function(user){
+				if (user.addr in markers){
+					markers[user.addr].setLatLng([user.lat, user.lon]);
+					markers[user.addr]._tooltip._content = UserView.tooltip_contents(user.callsign, user.last_location_beacon_time, user.lat, user.lon);
+
+					UserView.update_span_time(user.addr, Util.iso_to_time(user.last_location_beacon_time));
+					UserView.update_span_distance(user.addr, state.get_distance(markers[user.addr]) + 'm');
+				} else {
+					UserView.load_user(user);
+				}
+			});			
+		}
+	}
+	
+	static get_peers(data, timestamp){
+		//console.log("Handlers.get_peers", data);
+		for (const key in data) {
+			var p = data[key]
+			User.update(p.addr, p.callsign);
+		}
+	}
+	
+	static get_link_peers(data){
+		//console.log("Handlers.get_link_peers", data);
+		for (const key in data){
+			var p = data[key];
+			User.update(p.addr);
+		}
+	}
+	
+	static ping_request_cb(msg){
+		console.log('ping_request_cb',msg);
+		if ((msg['dst'] === undefined) || (msg['src'] === undefined)){return;}
+		if (msg['dst'] != state.my_callsign) {return;}
+		console.log('Ping Request Received from ' + msg['src'] + ' id:' + msg['ping_id'])
+		messenger.postMessage(["ping_response",{'src':state.my_callsign, 'dst': msg['src'], 'ping_id': msg['ping_id']}]);
+	}
+
+	static ping_response_cb(msg){
+		console.log('ping_response_cb',msg);
+		if ((msg['dst'] === undefined) || (msg['src'] === undefined)){return;}
+		if (msg['dst'] != state.my_addr) {return;}
+		if (state.ping_requests[msg.src] === undefined){
+			console.log('unknown ping response received ' + msg);
+			return;
+		} else {
+			let diff = Date.now() - state.ping_requests[msg.src];
+			UserView.update_span_ping(msg['src'], 'RSP ' + diff + 'ms');
+			state.ping_requests[msg.src] = undefined;
+		}
+	}
+	
+	static available_configs_cb(a){
+		var radio_configs = [];
+		for (const i in a.modem){
+			var c = RadioUtil.config_path_extract(a.modem[i]);
+			if (c === null){continue;}
+			radio_configs.push(c);
+		}
+		if (radio_configs.length == 0){
+			radio_configs = null;
+		}
+		else {
+			//console.log(radio_configs);
+			for (const i in radio_configs){
+				let rs = document.getElementById('radio_configs');
+				rs.add(new Option(`${radio_configs[i]["freq"]}M ${radio_configs[i]["bitrate"]}kbps`, radio_configs[i]["path"]));
+			} 
+		}
+		
+		for (const i in a.general){
+			let rs = document.getElementById('radio_general_configs');
+			rs.add(new Option(Util.path_basename(a.general[i]), a.general[i]));
+		}
+		
+		for (const i in a.packet){
+			let rs = document.getElementById('radio_packet_configs');
+			rs.add(new Option(Util.path_basename(a.packet[i]), a.packet[i]));			
+		}
+		
+		for (const i in a.preamble){
+			let rs = document.getElementById('radio_preamble_configs');
+			rs.add(new Option(Util.path_basename(a.preamble[i]), a.preamble[i]));			
+		}		
+	}
+	
+	static get_radio_config_cb(msg){
+		function select_element(id, value) {    
+			let element = document.getElementById(id);
+			element.value = value;
+		}
+		
+		//console.log('Handlers.get_radio_config_cb', msg);
+		Handlers.available_configs_cb(msg.available);
+
+		//current modem config
+		let c = RadioUtil.config_path_extract(msg.selected.modem);
+		let lbl = document.getElementById('current_radio_config');
+		if (c !== null){
+			lbl.innerHTML = `Current: ${c["freq"]}M ${c["bitrate"]}kbps`;
+			select_element('radio_configs', c['path']);
+		}
+		//current other configs
+		select_element('radio_general_configs',msg.selected.general);
+		select_element('radio_packet_configs', msg.selected.packet);
+		select_element('radio_preamble_configs',msg.selected.preamble);
+		
+		//snap arguments
+		for (const arg in msg.snap_args){
+			select_element(arg, msg.snap_args[arg]);
+		}
+		
+		if (state.radio_config_set == true){
+			state.radio_config_set = false;
+			View.highlight("set_radio_config","lime",2500);
+			document.getElementById('set_radio_config').textContent = document.getElementById('set_radio_config').old_textContent;
+			user_input.set_hub_config();
+		}
+		
+	}
+	
+	static peer_info_cb(msg){
+		//console.log('Handlers.peer_info_cb', msg);
+		User.get(msg.addr, function(user){
+			if (user.callsign != msg.callsign){
+				MessageView.add_saved(0, `User ${user.callsign}(${Util.hex(user.addr)}) changed callsign to ${msg.callsign}`);
+				View.set_tab_pending("chat");
+				User.update(user.addr, msg.callsign, null, null, null, null, function(user_u){
+					UserView.update_span_name(user_u);
+					markers[user_u.addr]._tooltip._content = UserView.tooltip_contents(user_u.callsign, user_u.last_location_beacon_time, user_u.lat, user_u.lon);
+					Waypoint.get(user_u.addr, function(w){
+						waypoints[w.addr]._tooltip._content = WaypointView.tooltip_text(w,user_u);
+					});
+				});
+			}
+		});
+		
+	}
+	
+	static get_hub_config_cb(msg){
+		console.log('Handlers.get_hub_config_cb',msg);
+		
+		for (const key in msg){
+			let ele = document.getElementById(key);
+			if ((ele !== undefined)&&(ele !== null)){
+				ele.value = msg[key].toString();
+			}
+			
+		}
+		if (state.hub_config_set == true){
+			state.hub_config_set = false;
+			View.highlight("set_hub_config","lime",2500);
+			document.getElementById('set_hub_config').textContent = document.getElementById('set_hub_config').old_textContent;
+		}	
+		
+	}
+	
+	static set_hub_config_cb(msg){
+		console.log('Handlers.set_hub_config_cb',msg);
+		
+	}
+	
+	static ack_cb(pay){
+		//console.log('Handler.ack_cb',pay);
+		var my_ack_req = state.messages_with_ack_pending[pay.ack_id];
+		if (my_ack_req !== undefined){
+			console.log('ack received for', my_ack_req);
+			let ADDENDUM = ' ACKED';
+			Message.get(my_ack_req.msg_db_key, function(m){
+				m.msg = m.msg + ADDENDUM;
+				Message.update(my_ack_req.msg_db_key, m.msg, function(m_new){
+					let unique_id = pay.ack_id.toString();
+					let items = document.querySelectorAll('#list li');
+					for (let i = items.length - 1; i >= 0; i--) {
+						//for (const prop in items[i]){console.log(prop, items[i][prop]);}
+						if ((items[i].attributes.unique_id !== undefined) && (items[i].attributes.unique_id !== null) && (items[i].attributes.unique_id.value == unique_id)){
+							items[i].textContent = items[i].textContent + ADDENDUM;
+							View.highlight_element(items[i], 'aqua', 10000);
+							break;
+						}
+					}
+				});
+			});
+		}
+		
+	}
+	
+	init(){
+		for (const topic of hub_control_messages) {
+			if (this.handlers[topic] === undefined){
+				this.handlers[topic] = function(pay, timestamp){console.log(topic,pay);}
+			}
+		}
+		
+		for (const topic of packet_types){
+			if (this.handlers[topic] === undefined){
+				this.handlers[topic] = function(pay, timestamp){console.log(topic,pay);}
+			}
+		}
+		
+		this.handlers['peer_info'] = Handlers.peer_info_cb;
+		this.handlers['message'] = Handlers.message;
+		this.handlers['location'] = Handlers.location;
+		this.handlers['waypoint'] = waypoint_view.received_cb;
+		this.handlers['ack'] = Handlers.ack_cb;
+		this.handlers['GET_PEERS'] = Handlers.get_peers;
+		this.handlers['GET_LINK_PEERS'] = Handlers.get_link_peers;
+		this.handlers['ping_request'] = Handlers.ping_request_cb;
+		this.handlers['ping_response'] = Handlers.ping_response_cb;
+		this.handlers['GET_RADIO_CONFIG'] = Handlers.get_radio_config_cb;
+		this.handlers['SET_RADIO_CONFIG'] = Handlers.get_radio_config_cb;
+		this.handlers['GET_HUB_CONFIG'] = Handlers.get_hub_config_cb;
+		this.handlers['SET_HUB_CONFIG'] = Handlers.get_hub_config_cb;
+		this.handlers['SET_MY_CALLSIGN'] = function(msg){console.log('SET_MY_CALLSIGN success',msg);}
+		this.init_complete = true;
+	}
+	
+	handle(topic, data, timestamp){
+		//console.log('Handlers.handle from backend',topic,data,timestamp);
+		const h = this.handlers[topic];
+		if (h === undefined){
+			if (this.init_complete == true){
+				console.log("unknown header received from worker",topic,data);
+			}
+			return;			
+		} else {
+			h(data, timestamp);
+		}
+	}
+	
+}
+
+
+var handler = new Handlers({
+	"GET_MY_CALLSIGN" : Handlers.callsign
+});
+
+
+var messenger = new Worker("message_worker.js");
+messenger.onmessage = function(e) {
+	handler.handle(e.data[0],e.data[1],e.data[2]);
+};
+
+//triggered whenever the databases have completed loading
+load = new LoadStatus(250,function(){
+	setTimeout(function(){
+		MessageView.add(0, "Welcome Back \"" + state.my_callsign + "\"");
+		const notification = new Notification("Welcome Back: " + state.my_callsign);
+	}, LOAD_WAIT_MS);
+	handler.init();
+	messenger.postMessage(["GET_RADIO_CONFIG",'']);
+	messenger.postMessage(["GET_HUB_CONFIG",'']);
+	if ((Map.first_update != true) && (state.my_lat !== undefined) && (state.my_lon !== undefined)){
+		Map.first_update = true;
+		Map.set_location(state.my_lat, state.my_lon);
+	}
+});
+
+function user_accepted() {
+	messenger.postMessage(["init",{}]);
+	messenger.postMessage(["start",{}]);
+	
+	state = new State();
+	console.log('main()',state);
+	
+	messenger.postMessage(["GET_MY_CALLSIGN",'']);
+	
+	View.set_tab_buttons(false);
 	map = L.map('themap');
+	
+
+	
 
 	var vectorTileStyling = {
 		water: {
@@ -1110,61 +1353,37 @@ function user_accepted() {
 	
 	//map.on('click', function(e) {});
 	
-	setup_waypoints(map);
-	setup_button_callbacks();
-	get_current_radio_config();
-	get_current_radio_config_other();
-	messenger.postMessage(["properties",{'name':'station_callsign'}]);
+	waypoint_view = new WaypointView(map);
+	user_input = new UserInput();
 	
 	///end of map setup///////////////////////////
 	
-	
 	//init the radio button settings
-	var load_on_start = Cookies.get('load_on_start');
-	if (load_on_start === undefined){
-		load_on_start = "load_chat";	
-		Cookies.set('load_on_start',load_on_start, {expires:COOKIE_EXP})
-	}
-	document.getElementById(load_on_start).checked = true;
-	if (load_on_start == "load_chat"){
+	document.getElementById(state.load_on_start).checked = true;
+	if (state.load_on_start == "load_chat"){
 		$('#chat_button').click();
 		$('#messageText').focus();		
 	}
 	else {
 		$('#map_button').click();
 	}
+
+	document.getElementById("msg_req_ack").checked = state.msg_req_ack;
 	
-	properties.list_users 		= get_cookie('list_users', 'true')=='true';
-	properties.list_stations 	= get_cookie('list_stations', 'true')=='true';
-	if (properties.list_users == false){
+	if (state.list_users == false){
 		b = document.getElementById('list_users');
 		b.className += " untoggled_button";
 	}
-	if (properties.list_stations == false){
+	if (state.list_stations == false){
 		b = document.getElementById('list_stations');
 		b.className += " untoggled_button";
 	}
 	
 	setup_notifications();
 	
-	setup_db(msg_db_cb, user_db_cb);
+	setup_db(Message.msg_db_cb, User.user_db_cb);
+	waypoint_db_init();
 	setup_location_watch();
 	
-//////////////////////
-    //console.log(Date.now())
-    //socket = io.connect({query: "username=anonymous"});
-    //socket.emit('time', {'timestamp': Date.now()});
-
-	/*
-	var startTime = new Date().getTime();
-	map.on('movestart', function(evt) {
-		startTime = new Date().getTime();
-	});
-
-	map.on('moveend', function(evt) {
-		endTime = new Date().getTime();
-		console.log('elapsed: ' + (endTime - startTime));
-	});
-	*/
-	return false;
+	return false; //why does this return false?
 }

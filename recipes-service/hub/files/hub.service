@@ -1,0 +1,18 @@
+[Unit]
+Description=starts the hub service
+After=network.target var-volatile.mount wifi_reset.service snap.service
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+WorkingDirectory=/hub/src/
+ExecStart=python3 main.py
+#ExecStartPre=/bin/sleep 11
+Restart=always
+RestartSec=2
+StandardOutput=append:/var/log/hub.log
+StandardError=append:/var/log/hub.log
+SyslogIdentifier=%n
+

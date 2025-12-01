@@ -1,305 +1,347 @@
 
-let msg_db = undefined;
-let user_db = undefined;
-let settings_db = undefined;
-
-let my_username = undefined;
+let msg_db;
+let user_db;
+let settings_db;
 
 var socket;
 
 var location_watch_id = null;
 var notifications = false;
 
-function do_nothing(data) {
-	//console.log('donothing');
-	return;
-}
-
-/*
-function get_iso_timestamp(){
-	var date = new Date();
-	return date.toISOString()
-}
-*/
-
-//function get_iso_timestamp(){
-//	var date = new Date();
-//	return date.toISOString()
-//}
-
-
-function get_iso_timestamp(date) {
-	var date = new Date();
-    return date.toLocaleString('sv').replace(' ', 'T');
-}
+function do_nothing(data) {return;}
 
 ////////////////////////////////////////////////////////////////
 ////////////////////Database Operations/////////////////////////
 ////////////////////////////////////////////////////////////////
 
-function addUser(username, lat=null, lon=null, type=null){
-	if (user_db === undefined){
-		return
-	}
-
-	var last_activity_time = get_iso_timestamp(); //"2011-12-19T15:28:46.493Z"
-	var last_location_beacon_time = null;
-	if ((lat !== null) && (lon !== null)){
-		last_location_beacon_time = last_activity_time
-	}
+class User {
 	
-	const transaction = user_db.transaction(["notes_os"], "readwrite");
-	const objectStore = transaction.objectStore("notes_os");
-	const addRequest = objectStore.add({
-		username:username, 
-		lat:lat, lon:lon, 
-		last_location_beacon_time:last_location_beacon_time, 
-		last_activity_time:last_activity_time,
-		type:type
-	});		
-}
-
-function get_user_object_store(){
-	return user_db.transaction(["notes_os"], "readwrite").objectStore("notes_os");
-}
-
-
-function getUser(username, cb) {
-	if (user_db === undefined) {cb(null);}
-	const read_request = get_user_object_store().get(username);
-	read_request.onsuccess = function() {
-		if (read_request.result === undefined){cb(null);}
-		return cb(read_request.result);
-    };	
-}
-
-function updateUser(username, coords=null, timestamp=null, type=null, complete_cb=do_nothing){
-	if (user_db === undefined){
-		return;
+	static load(){
+		return user_db.transaction(["notes_os"], "readwrite").objectStore("notes_os");
 	}
-	if (timestamp == null){
-		timestamp = get_iso_timestamp();
-	}
-	
-	const read_request = get_user_object_store().get(username);
-	read_request.onsuccess = function() {
-		if (read_request.result === undefined){
-			if (coords !== null){
-				addUser(username, coords[0], coords[1], type);
-			} else {
-				addUser(username, null, null, type);
-			}
-		} else {
-			//console.log(read_request.result)
-			var last_activity_time = timestamp; //"2011-12-19T15:28:46.493Z"
-			var last_location_beacon_time = null;
-			var new_lat = read_request.result.lat;
-			var new_lon = read_request.result.lon;
-			if (coords !== null){
-				last_location_beacon_time = last_activity_time;
-				new_lat = coords[0];
-				new_lon = coords[1];
-			}
-			
-			const transaction = user_db.transaction(["notes_os"], "readwrite");
-			const objectStore = transaction.objectStore("notes_os");
-			const updated_user = {
-				username:username, 
-				lat:new_lat, lon:new_lon, 
-				last_location_beacon_time:last_location_beacon_time, 
-				last_activity_time:last_activity_time,
-				type:type
-			};
-			const addRequest = objectStore.put(updated_user);
-			complete_cb(updated_user);
+
+	static add(addr, callsign=null, lat=null, lon=null, type=null){
+		if (user_db === undefined){return}
+
+		var last_activity_time = Util.get_iso_timestamp(); //"2011-12-19T15:28:46.493Z"
+		var last_location_beacon_time = null;
+		if ((lat !== null) && (lon !== null)){
+			last_location_beacon_time = last_activity_time
 		}
-    };
-	
-}
-
-function addMessage(username, msg) {
-	console.log("addMessage");
-	if (msg_db === undefined){
-		console.log("addMessage() failed msg_db is undefined");
-		return
-	}
-	//console.log(msg);
-	const transaction = msg_db.transaction(["notes_os"], "readwrite");
-	const objectStore = transaction.objectStore("notes_os");
-	const addRequest = objectStore.add({username:username, msg:msg, time:get_iso_timestamp()});	
-}
-
-/*
-function setup_settings_db(cb=do_nothing){
-	const settings_open_req  = window.indexedDB.open("settings_db", 1);
-	
-	settings_open_req.addEventListener("error", () =>
-		console.error("msg_open_req failed to open"),
-	);
-	
-	settings_open_req.addEventListener("success", () => {
-		settings_db = msg_open_req.result;
-		cb();
-	});
-	
-	settings_open_req.addEventListener("upgradeneeded", (e) => {
-		settings_db = e.target.result;
-
-		// Create an objectStore in our database to store notes and an auto-incrementing key
-		// An objectStore is similar to a 'table' in a relational database
-		const objectStore = settings_db.createObjectStore("notes_os", {
-			keyPath: "id",
-			autoIncrement: true,
-		});
-
-		// Define what data items the objectStore will contain
-		objectStore.createIndex("username", "username", {unique: false });
-		objectStore.createIndex("msg", "msg", 			{unique: false });
-		objectStore.createIndex("time", "time", 		{unique: false });
-
-		console.log("Database setup complete");
-		cb();
-	});	
-}
-*/
-
-function setup_db(msg_db_cb=do_nothing,user_db_cb=do_nothing) {
-	const msg_open_req  = window.indexedDB.open("msg_db", 1);
-	const user_open_req = window.indexedDB.open("user_db", 1);
-	
-	msg_open_req.addEventListener("error", () =>
-		console.error("msg_open_req failed to open"),
-	);
-	
-	user_open_req.addEventListener("error", () =>
-		console.error("user_open_req failed to open"),
-	);
-	
-	msg_open_req.addEventListener("success", () => {
-		msg_db = msg_open_req.result;
-		msg_db_cb();
-	});
-
-	user_open_req.addEventListener("success", () => {
-		user_db = user_open_req.result;
-		user_db_cb();
-	});
-	
-	msg_open_req.addEventListener("upgradeneeded", (e) => {
-		console.log("Upgrade msg_db");
-		msg_db = e.target.result;
-
-		// Create an objectStore in our database to store notes and an auto-incrementing key
-		// An objectStore is similar to a 'table' in a relational database
-		const objectStore = msg_db.createObjectStore("notes_os", {
-			keyPath: "id",
-			autoIncrement: true,
-		});
-
-		// Define what data items the objectStore will contain
-		objectStore.createIndex("username", "username", {unique: false });
-		objectStore.createIndex("msg", "msg", 			{unique: false });
-		objectStore.createIndex("time", "time", 		{unique: false });
-
-		console.log("Database setup complete");
-	});
-	
-	user_open_req.addEventListener("upgradeneeded", (e) => {
-		console.log("upgrade user_db");
-		user_db = e.target.result;
-
-		// Create an objectStore in our database to store notes and an auto-incrementing key
-		// An objectStore is similar to a 'table' in a relational database
-		const objectStore = user_db.createObjectStore("notes_os", {
-			keyPath: "username",
-			//keyPath: "id",
-			autoIncrement: true,
-		});
-
-		// Define what data items the objectStore will contain
-		objectStore.createIndex("username", "username", {unique: false });
-		objectStore.createIndex("lat", "lat", 			{unique: false });
-		objectStore.createIndex("lon", "lon", 			{unique: false });
-		objectStore.createIndex("last_location_beacon_time", "last_location_beacon_time", 	{unique: false });
-		objectStore.createIndex("last_activity_time", "last_activity_time", 				{unique: false });
-		objectStore.createIndex("type", "type", 				{unique: false });
-		console.log("Database setup complete");
-	});
-}
-
-function load_messages(finished_cb=do_nothing) {
-	if (msg_db !== undefined){
-		const transaction = msg_db.transaction(["notes_os"], "readwrite");
+		
+		const transaction = user_db.transaction(["notes_os"], "readwrite");
 		const objectStore = transaction.objectStore("notes_os");
-		var messages = objectStore.getAll();
-		messages.onsuccess = function() {
-			finished_cb(messages.result);
+		const addRequest = objectStore.add({
+			addr:addr, 
+			callsign:callsign,
+			lat:lat, lon:lon, 
+			last_location_beacon_time:last_location_beacon_time, 
+			last_activity_time:last_activity_time,
+			type:type
+		});		
+	}
+
+	static get(addr, cb) {
+		if (user_db === undefined) {cb(null);}
+		if (typeof addr === "string" || addr instanceof String) {
+			addr = parseInt(addr,10);
+		}
+		const read_request = User.load().get(addr);
+		read_request.onsuccess = function() {
+			if (read_request.result === undefined) {return false;}//{cb(null);}
+			return cb(read_request.result);
+		};	
+	}
+
+	static update(addr, callsign=null, lat=null, lon=null, timestamp=null, type=null, complete_cb=do_nothing){ 
+		if (user_db === undefined){return;}
+		if (timestamp == null){timestamp = Util.get_iso_timestamp();}
+		
+		const read_request = User.load().get(addr);
+		read_request.onsuccess = function() {
+			if (read_request.result === undefined){
+				if ((lat !== null) && (lon !== null)){
+					User.add(addr, callsign, lat, lon, type);
+				} else {
+					User.add(addr, callsign, null, null, type);
+				}
+			} else { //update user
+				//console.log(read_request.result)
+				var last_activity_time = timestamp; //"2011-12-19T15:28:46.493Z"
+				var last_location_beacon_time = null;
+				var new_lat = read_request.result.lat;
+				var new_lon = read_request.result.lon;
+				var new_callsign = read_request.result.callsign;
+				if ((lat !== null) && (lon !== null)){
+					last_location_beacon_time = last_activity_time;
+					new_lat = lat;
+					new_lon = lon;
+				}
+				if (callsign != null){
+					new_callsign = callsign;
+				}
+				
+				const transaction = user_db.transaction(["notes_os"], "readwrite");
+				const objectStore = transaction.objectStore("notes_os");
+				const updated_user = {
+					addr:addr, 
+					callsign:new_callsign,
+					lat:new_lat, lon:new_lon, 
+					last_location_beacon_time:last_location_beacon_time, 
+					last_activity_time:last_activity_time,
+					type:type
+				};
+				const addRequest = objectStore.put(updated_user);
+				complete_cb(updated_user);
+			}
+		};	
+	}
+	
+	static load_users(finished_cb=do_nothing) {
+		if (user_db === undefined){return;}
+		const objectStore = user_db.transaction(["notes_os"], "readwrite").objectStore("notes_os");
+		var users = objectStore.getAll();
+		users.onsuccess = function() {
+			finished_cb(users.result);
 		};
 	}
+
+	static clear(finished_cb=do_nothing) {
+		if (user_db === undefined){return;}	
+		const objectStore = user_db.transaction(["notes_os"], "readwrite").objectStore("notes_os");
+		objectStore.clear();
+		finished_cb();
+	}
+
+	static remove(addr, finished_cb=do_nothing) {
+		if (user_db === undefined){return;}	
+		User.load().delete(addr); 
+		finished_cb();
+	}
+	
+	static user_db_cb() {
+		function users_loaded_cb(users){
+			//console.log(users)
+			setTimeout(function(){
+				let cnt = 0; //variable used to set the user color and placement in list
+				
+				for (const i in users){ //add me
+					if (users[i].addr == state.my_addr){ 
+						UserView.load_user(users[i]);
+					}
+				}				
+				for (const i in users) {
+					if (users[i].addr == state.my_addr){ continue;}			
+					else {
+						UserView.load_user(users[i]);
+					}
+				}
+				load.set('user_list_loaded');
+				
+			}, LOAD_WAIT_MS);
+			load.set('users_db');
+		}
+		User.update(0,'Iris');
+		User.load_users(users_loaded_cb);
+	}
+
 }
 
-function clear_messages(finished_cb=do_nothing) {
-	if (msg_db === undefined){return;}
-	const objectStore = msg_db.transaction(["notes_os"], "readwrite").objectStore("notes_os");
-	objectStore.clear();
-	finished_cb();
+class Message {
+	
+	static add(addr, msg, finished_cb=null) {
+		//console.log("Message.add");
+		if (msg_db === undefined){
+			console.log("Message.add() failed msg_db is undefined");
+			return
+		}
+		//console.log(msg);
+		const transaction = msg_db.transaction(["notes_os"], "readwrite");
+		const objectStore = transaction.objectStore("notes_os");
+		const req = objectStore.add({addr:addr, msg:msg, time:Util.get_iso_timestamp()});	
+		if (finished_cb !== null){
+			req.onsuccess = finished_cb;
+		}
+	}
+	
+	static load(finished_cb=do_nothing) {
+		if (msg_db !== undefined){
+			const transaction = msg_db.transaction(["notes_os"], "readwrite");
+			const objectStore = transaction.objectStore("notes_os");
+			var messages = objectStore.getAll();
+			messages.onsuccess = function() {
+				finished_cb(messages.result);
+			};
+		}
+	}
+	
+	static get(id, cb) {
+		if (msg_db === undefined) {cb(null);}
+		const read_request = msg_db.transaction(["notes_os"], "readwrite").objectStore("notes_os").get(id);
+		read_request.onsuccess = function() {
+			if (read_request.result === undefined) {return false;}
+			return cb(read_request.result);
+		};	
+	}
+	
+	static update(id, msg, complete_cb=do_nothing){ 
+		//console.log('Message.update',id,msg);
+		if (msg_db === undefined){return;}
+		const req = msg_db.transaction(["notes_os"], "readwrite").objectStore("notes_os").get(id);
+		req.onsuccess = function() {
+			if (req.result === undefined){
+				return;
+			} else { //update message	
+				const transaction = msg_db.transaction(["notes_os"], "readwrite");
+				const objectStore = transaction.objectStore("notes_os");
+				const updated_msg = {
+					id:req.result.id,
+					addr:req.result.addr, 
+					msg : msg,
+					time:req.result.time
+				};
+				const addRequest = objectStore.put(updated_msg);
+				complete_cb(updated_msg);
+			}
+		};	
+	}
+
+	static clear(finished_cb=do_nothing) {
+		if (msg_db === undefined){return;}
+		const objectStore = msg_db.transaction(["notes_os"], "readwrite").objectStore("notes_os");
+		objectStore.clear();
+		finished_cb();
+	}
+	
+	static msg_db_cb() {
+		function load_complete_cb(messages) {
+			//console.log(messages);
+			for (const i in messages) {
+				MessageView.add(messages[i].addr, messages[i].msg);
+			}
+			load.set('msg_db');
+		}
+		Message.load(load_complete_cb);
+	}
+
+	
 }
 
-function load_users(finished_cb=do_nothing) {
-	if (user_db === undefined){return;}
-	const objectStore = user_db.transaction(["notes_os"], "readwrite").objectStore("notes_os");
-	var users = objectStore.getAll();
-	users.onsuccess = function() {
-		finished_cb(users.result);
-	};
+function setup_db(msg_db_cb=do_nothing,user_db_cb=do_nothing) {
+	function setup_msg_db(cb){
+		const msg_open_req  = window.indexedDB.open("msg_db", 1);
+		msg_open_req.addEventListener("error", () =>
+			console.error("msg_open_req failed to open"),
+		);
+		msg_open_req.addEventListener("success", () => {
+			msg_db = msg_open_req.result;
+			cb();
+		});	
+
+		msg_open_req.addEventListener("upgradeneeded", (e) => {
+			console.log("Upgrade msg_db");
+			msg_db = e.target.result;
+
+			// Create an objectStore in our database to store notes and an auto-incrementing key
+			// An objectStore is similar to a 'table' in a relational database
+			const objectStore = msg_db.createObjectStore("notes_os", {
+				keyPath: "id",
+				autoIncrement: true,
+			});
+
+			// Define what data items the objectStore will contain
+			objectStore.createIndex("addr", "addr", {unique: false });
+			objectStore.createIndex("msg", "msg", 			{unique: false });
+			objectStore.createIndex("time", "time", 		{unique: false });
+
+			console.log("Database setup complete");
+		});		
+	}
+	
+	function setup_user_db(cb){
+		const user_open_req = window.indexedDB.open("user_db", 1);
+		user_open_req.addEventListener("error", () =>
+			console.error("user_open_req failed to open"),
+		);
+		user_open_req.addEventListener("success", () => {
+			user_db = user_open_req.result;
+			cb();
+		});
+		
+		user_open_req.addEventListener("upgradeneeded", (e) => {
+			console.log("upgrade user_db");
+			user_db = e.target.result;
+
+			// Create an objectStore in our database to store notes and an auto-incrementing key
+			// An objectStore is similar to a 'table' in a relational database
+			const objectStore = user_db.createObjectStore("notes_os", {
+				keyPath: "addr",
+				//keyPath: "id",
+				autoIncrement: true,
+			});
+
+			// Define what data items the objectStore will contain
+			objectStore.createIndex("addr", "addr", {unique: false });
+			objectStore.createIndex("callsign", "callsign", {unique: false });
+			objectStore.createIndex("link_peer", "link_peer", {unique: false });
+			objectStore.createIndex("lat", "lat", 			{unique: false });
+			objectStore.createIndex("lon", "lon", 			{unique: false });
+			objectStore.createIndex("last_location_beacon_time", "last_location_beacon_time", 	{unique: false });
+			objectStore.createIndex("last_activity_time", "last_activity_time", 				{unique: false });
+			objectStore.createIndex("type", "type", 				{unique: false });
+			console.log("Database setup complete");
+		});		
+	}
+	
+	setup_user_db(function(){
+		user_db_cb();
+		setup_msg_db(msg_db_cb);
+	});
+	
 }
 
-function clear_users(finished_cb=do_nothing) {
-	if (user_db === undefined){return;}	
-	const objectStore = user_db.transaction(["notes_os"], "readwrite").objectStore("notes_os");
-	objectStore.clear();
-	finished_cb();
-}
 
-function delete_user(username, finished_cb=do_nothing) {
-	if (user_db === undefined){return;}	
-	get_user_object_store().delete(username); 
-	finished_cb();
-}
+
 
 ////////////////////////////////////////////////////////////////
 ///////////////////////LOCATION RELATED/////////////////////////
 ////////////////////////////////////////////////////////////////
 
-var my_location = null
-const MAX_LOCATION_TX = 5000;
-var last_location_tx = -1;
+function position_received_cb(position){
+	console.log('position_received_cb', position);
+	if ((position.coords.latitude == 0) && (position.coords.longitude == 0)){return;}
+	if (state === undefined){return;}
+	
 
-const position_received_cb = (position) => {
-	var coords = [position.coords.latitude,position.coords.longitude];
-	if ((coords[0] == 0) && (coords[1] == 0)){return;}
-
-	my_location = {'username':my_username, 'coords':coords};
-	messenger.postMessage(["my_location",my_location]);
-	//console.log(my_location);
-	updateUser(my_username, my_location.coords, null, 'self', function(user) {
-		if (first_map_update == false){
-			first_map_update = true;
-			set_map_location(coords);
-			load_user(user);
-			
+	var location_period_s = Util.get_cookie('location_period_s', 15, parseInt);
+	state.my_lat = position.coords.latitude;
+	state.my_lon = position.coords.longitude;
+	messenger.postMessage(["my_location",{'src':state.my_addr,'dst':0,'lat':state.my_lat,'lon':state.my_lon,'period':location_period_s}]);
+	
+	if (load.complete() != true){return;} //don't do database things until the database is loaded
+	
+	//static update(addr, callsign=null, lat=null, lon=null, timestamp=null, type=null, complete_cb=do_nothing){ 
+	User.update(state.my_addr, null, state.my_lat, state.my_lon, null, null, function(user) {
+		if (Map.first_update == false){
+			Map.first_update = true;
+			Map.set_location(user.lat,user.lon);
+			//UserView.load_user(user);	
 		} else {
-			markers[my_username].setLatLng(coords);
+			let m = markers[state.my_addr]
+			if (m !== undefined){
+				m.setLatLng([state.my_lat, state.my_lon]);
+			}
 		}
 	});
+	
 }
 
 const DEFAULT_COORDS = [37.54557, -97.26893];
 
-const position_error_cb = (error) => {
-	if (first_map_update == false){
-		set_map_location(DEFAULT_COORDS);
-		first_map_update = true;
+function position_error_cb(error){
+	if (Map.first_update == false){
+		Map.set_location(DEFAULT_COORDS[0],DEFAULT_COORDS[1]);
+		Map.first_update = true;
 		var popup = L.popup(DEFAULT_COORDS, options={"class" : "map_context_popup"})
 		.setContent("Location of Local Device Not Found, the map was set to a default location")
 		.openOn(map);  
@@ -308,15 +350,7 @@ const position_error_cb = (error) => {
 }
 
 function setup_location_watch(rx_cb=position_received_cb, error_cb=position_error_cb) {
-	location_watch_id = navigator.geolocation.watchPosition(
-		rx_cb, 
-		error_cb, 
-		{
-			enableHighAccuracy:true,
-			maximumAge:30000,
-			timeout: 15000
-		}
-	);
+	location_watch_id = navigator.geolocation.watchPosition(rx_cb, error_cb, {enableHighAccuracy:true, maximumAge:30000, timeout: 15000});
 	//navigator.geolocation.clearWatch(watchID);
 }
 
@@ -335,22 +369,4 @@ function setup_notifications(){
 	} else {
 		console.log("Notifications denied")
 	}
-}
-
-var location_beacon_ms = null;
-
-////////////////////////////////////////////////////////////////
-////////////////////////////UTILITY ////////////////////////////
-////////////////////////////////////////////////////////////////
-
-function iso_to_time(iso_str){
-	try {
-		return iso_str.split('T')[1].split('.')[0];
-	} catch {return "";}
-}
-
-function iso_to_date(iso_str) {
-	try {
-		return iso_str.split('T')[0];
-	} catch {return "";}
 }

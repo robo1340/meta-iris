@@ -1,0 +1,19 @@
+[Unit]
+Description=snap
+After=network.target ares-var-run.mount var-volatile.mount
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+EnvironmentFile=/snap/conf/config.ini
+ExecStart=/snap/src/prj-snap/test --payload=${payload} --block=${block} --disable-reed-solomon=${disable_reed_solomon}
+WorkingDirectory=/snap/src/prj-snap
+#ExecStartPre=/bin/sleep 11
+Restart=always
+RestartSec=1
+StandardOutput=append:/var/log/snap.log
+StandardError=append:/var/log/snap.log
+SyslogIdentifier=%n
+

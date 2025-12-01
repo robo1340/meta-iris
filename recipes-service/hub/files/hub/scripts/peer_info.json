@@ -1,0 +1,8 @@
+{
+	"type" : "peer_info",
+	"dst" : 0, 
+	"want_ack" : true,
+	"hops_start" : 2,
+	"addr" : "0x42B9",
+	"callsign" : "angry_dog"
+}

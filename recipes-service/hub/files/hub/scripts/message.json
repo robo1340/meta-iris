@@ -1,0 +1,7 @@
+{
+	"type" : "message",
+	"dst" : "0x106D", 
+	"want_ack" : true,
+	"hops_start" : 2,
+	"message" : "hello world first message" 
+}

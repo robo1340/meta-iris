@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2ba5c6e4c336f3d9e4d191d4a74fb91c"
 #RM_WORK_EXCLUDE += "${PN}"
 
 # Create dependency to library packages
-RDEPENDS:${PN} += " bridge "
+RDEPENDS:${PN} += " "
 PACKAGES="${PN}"
 
 #src uri's for the source code and .service conf file

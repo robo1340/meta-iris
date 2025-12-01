@@ -3,19 +3,128 @@ var https = require("https");
 var io = require('socket.io')();
 var os = require('os');
 var fs = require("fs");
+var express = require('express');
 var child_process = require("child_process");
 var zmq = require("zeromq");
 var sub = zmq.socket("sub");
-sub.connect("ipc:///tmp/chat.ipc");
+const ZMQ_ID = 'hub';
+sub.connect("ipc:///tmp/received_msg.ipc");
 sub.subscribe("");
+var push = zmq.socket("push");
+push.connect("ipc:///tmp/transmit_msg.ipc");
+var hub = zmq.socket("dealer");
+hub.setsockopt(zmq.ZMQ_IDENTITY, Buffer.from(ZMQ_ID));
+hub.setsockopt(zmq.ZMQ_RCVTIMEO, 5000);
+hub.connect('ipc:///tmp/hub_requests.ipc');
+
 var timeSet = false;
+
+var text_decoder = new TextDecoder('ascii');
 
 const spawn = child_process.spawn;
 
-var currentUsers = [];
-var resourceToFunction = {};
-var ifaces = os.networkInterfaces();
+/*
+function getMethods(obj) {
+  var result = [];
+  for (var id in obj) {
+    try {
+      if (typeof(obj[id]) == "function") {
+        result.push(id + ": " + obj[id].toString());
+      }
+    } catch (err) {
+      result.push(id + ": inaccessible");
+    }
+  }
+  return result;
+}
+console.log(getMethods(hub));
+*/
 
+let my_addr = null;
+let my_callsign = null;
+let peers = {};
+let link_peers = {};
+const COMMANDS = ["GET_HUB_CONFIG", "SET_HUB_CONFIG","GET_RADIO_CONFIG","SET_RADIO_CONFIG","SET_MY_CALLSIGN","GET_MY_CALLSIGN","GET_MY_ADDR","GET_PEERS","GET_LINK_PEERS"]
+const TLV_TYPES = ["ack","peer_info","location","message","waypoint","ping_request","ping_response","beacon"];
+
+function req_hub(cmd, pay='') {
+	console.log('req_hub',cmd,pay);
+	hub.send(['',cmd,pay]);
+	//rsp = hub.read();
+	//if (rsp === null){
+	//	console.log('WARNING: req_hub failed to receive a response for', cmd);
+	//	return ['',{}]
+	//}
+	//console.log(rsp);
+	//var rsp_cmd = text_decoder.decode(rsp[0]);
+	//var rsp_pay = JSON.parse(text_decoder.decode(rsp[1]));
+	//if (callback !== null){
+	//	callback(rsp_cmd, rsp_pay);
+	//} else {
+	//	return [rsp_cmd, rsp_pay];
+	//}
+}
+
+
+
+//handlers for messages received from the hub process
+class Handlers {
+	constructor(initial_handlers){
+		this.handlers = initial_handlers;
+	}
+	
+	static handle_my_callsign(cmd, pay){
+		my_callsign = pay.callsign;
+		my_addr = pay.addr;
+	}
+	
+	static handle_get_peers(cmd, pay){
+		peers = pay;
+	}
+	
+	static handle_get_link_peers(cmd,pay){
+		link_peers = pay;
+	}
+	
+	static handle_nack(cmd, pay){
+		console.log("WARNING: NACK received\n", pay);
+	}
+	
+	handle(cmd, pay){
+		//console.log(cmd,pay);
+		let h = this.handlers[cmd];
+		if (h !== undefined){
+			h(cmd, pay);
+		}
+		io.emit(cmd, pay); //always pass on the message to the client
+	}
+	
+}
+
+handler = new Handlers({
+	"GET_MY_CALLSIGN" 	: Handlers.handle_my_callsign,
+	"GET_PEERS" 		: Handlers.handle_my_callsign,
+	"GET_LINK_PEERS" 	: Handlers.handle_my_callsign,
+	"NACK" 				: Handlers.handle_my_callsign
+});
+
+//packet received from the hub process locally, passively forward to the client
+hub.on("message", function(empty, type_bytes, msg_bytes) {
+	//console.log(empty, type_bytes, msg_bytes);
+	var cmd = text_decoder.decode(type_bytes);
+	var msg = '';
+	if (cmd == "NACK"){
+		msg = text_decoder.decode(msg_bytes);
+	} else {
+		msg = JSON.parse(text_decoder.decode(msg_bytes));
+	}
+	handler.handle(cmd, msg);
+});
+
+//req_hub('COMMANDS');
+
+/*
+var ifaces = os.networkInterfaces();
 for (var a in ifaces) {
 	for (var b in ifaces[a]) {
 	    var addr = ifaces[a][b];
@@ -24,6 +133,7 @@ for (var a in ifaces) {
 	    }
 	}
 }
+*/
 
 var mime = {
     html: 'text/html',
@@ -36,11 +146,6 @@ var mime = {
 	ico: 'image/x-icon',
     js: 'application/javascript',
 	pbf: 'application/octet-stream'
-};
-
-var options = {
-  key: fs.readFileSync('certificate/key.pem'),
-  cert: fs.readFileSync('certificate/cert.pem')
 };
 
 function serve_check(req, resp, type){
@@ -61,6 +166,11 @@ function serve_no_check(req_url, resp, type){
 	resp.writeHead(200, {"Content-Type": type}); 
 	fs.createReadStream(__dirname + req_url).pipe(resp);
 }
+
+var options = {
+  key: fs.readFileSync('certificate/key.pem'),
+  cert: fs.readFileSync('certificate/cert.pem')
+};
 
 var server = https.createServer(options, function(req, resp) {
 	var type = mime[req.url.split('.').pop()] || 'text/plain';
@@ -120,6 +230,7 @@ function get_location(){
 	}
 }
 
+/*
 function set_location(msg){
 	
 	if (fs.existsSync('/tmp/gps.json')) {
@@ -134,14 +245,39 @@ function set_location(msg){
 	}
 	return msg;
 }
+*/
 
+//messages received from the client to be passed to the hub process locally
 io.sockets.on("connection", function(socket) {
-    console.log("connected: " + socket.handshake.query.username);
-    currentUsers.push(socket.handshake.query.username);
-    socket.on('newMessage', function(msg) {
-		spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(msg) + "\"", "newMessage"]);
-        io.emit('newMessage', msg);
-    });
+	console.log('connected');
+	
+	//set up handlers for commands going to the hub
+	for (const command of COMMANDS) {
+		socket.on(command, function(pay){
+			req_hub(command, JSON.stringify(pay))
+		});
+		//console.log('registered handler for ', command)
+	}
+	
+	//set up handlers for packets being sent to the hub for transmission
+	for (const type of TLV_TYPES){
+		if (type == 'location'){
+			socket.on(type, function(msg) {
+				msg.type = type;
+				push.send(JSON.stringify(msg)); 
+				io.emit('location', msg);
+			});
+		}
+		else {
+			socket.on(type, function(msg) {
+				msg.type = type;
+				push.send(JSON.stringify(msg))
+				io.emit(type, msg);
+			});
+		}
+		
+	}
+	
 	socket.on('time', function(msg) {
 		if ((timeSet == false) && ("timestamp" in msg)){   
 			timeSet = true; 
@@ -150,127 +286,17 @@ io.sockets.on("connection", function(socket) {
 			//spawn('date',["-s", "@"+msg.timestamp]);
 			spawn('timedatectl',[]);
 		}
-	});
-	socket.on('location', function(msg) {
-		msg = set_location(msg)
-		if (msg !== null){
-			//console.log('new location for ' + msg.username + ': ' + msg.coords)
-			spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(msg) + "\"", "location"]);
-			io.emit('location', msg);
-			if (msg.coords !== undefined){
-				last_user_location = msg.coords;
-			}
-		}
-	});
-	socket.on('waypoint', function(msg) {
-		//console.log('new location for ' + msg.username + ': ' + msg.coords)
-		spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(msg) + "\"", "waypoint"]);
-		io.emit('waypoint', msg);
 	});	
-	socket.on('get_radio_configs', function(msg) {
-		var files;
-		console.log(msg)
-		if (msg['type'] == 'modem'){
-			files = fs.readdirSync('/bridge/conf/si4463/all/wds_generated');
-		}
-		else if (msg['type'] == 'general'){
-			files = fs.readdirSync('/bridge/conf/si4463/all/general');
-		}
-		else if (msg['type'] == 'packet'){
-			files = fs.readdirSync('/bridge/conf/si4463/all/packet');
-		}
-		else if (msg['type'] == 'preamble'){
-			files = fs.readdirSync('/bridge/conf/si4463/all/preamble');
-		}
-
-		console.log(files);
-		io.emit('get_radio_configs', {'config_paths':files,'config_type':msg['type']});
-	});
-	socket.on('get_current_radio_config', function(msg) {
-		var files = fs.readdirSync('/bridge/conf/si4463/modem/');
-		console.log(files);
-		if (files.length == 0){return;}
-		io.emit('get_current_radio_config', fs.realpathSync('/bridge/conf/si4463/modem/' + files[0]));
-	});
-	socket.on('get_current_radio_config_other', function(msg) {
-		var files = fs.readdirSync('/bridge/conf/si4463/other/');
-		console.log(files);
-		//if (files.length == 0){return;}
-		var to_return = [];
-		for (i in files) {
-			to_return.push(fs.realpathSync('/bridge/conf/si4463/other/'+files[i]));
-		}
-		//console.log(to_return);
-		io.emit('get_current_radio_config_other', to_return);
-	});
-	socket.on('select_radio_config', function(msg) {
-		console.log('reconfiguring bridge ' + msg);
-		spawn('/usr/bin/python3', ["/bridge/scripts/bridge_configure.py", "-t", msg['config_type'], "-sm", msg['selected']]); 
-	});
-	socket.on('ping_request', function(msg) {
-		//console.log(msg);
-		if (msg['dst'] == safe_execute(get_station_callsign)){
-			var rsp = {'src':safe_execute(get_station_callsign),'dst':msg['src'],'ping_id':msg['ping_id']}
-			io.emit('ping_response', rsp);
-			spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(rsp) + "\"", "ping_response"]);
-		} else {
-			spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(msg) + "\"", "ping_request"]);
-			io.emit('ping_request', msg);			
-		}
-	});
-	socket.on('ping_response', function(msg) {
-		//console.log(msg);
-		spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(msg) + "\"", "ping_response"]);
-		io.emit('ping_response', msg);			
-	});
-	socket.on('properties', function(msg){
-		if (msg.name === undefined){return;}
-		if (msg.action === undefined) {msg.action = 'get';}
-		
-		if (msg.name == 'station_callsign'){
-			if (msg.action == 'get'){
-				io.emit('properties', {'name':'station_callsign','action':'rep','value':safe_execute(get_station_callsign)});
-			}
-		}
-		
-	});
-	
 });
 
-sub.on("message", function(topic, msg) {
-	var topic = topic.toString()
-	var str = msg.toString().split(String.fromCharCode(0)).join("")	
-	str = str.substr(1,str.length-2); //strip off the quotes
-	//console.log(str)
-	//console.log(":" + topic + ":");
-	if (topic.startsWith("location")){
-		io.emit('location', JSON.parse(str));
-	}
-	else if (topic.startsWith("newMessage")){
-		io.emit('newMessage', JSON.parse(str));
-	}
-	else if (topic.startsWith("waypoint")){
-		io.emit('waypoint', JSON.parse(str));
-	} 
-	else if (topic.startsWith("ping_request")){
-		msg = JSON.parse(str);
-		if (msg['dst'] == safe_execute(get_station_callsign)){
-			console.log('ping response sent to ' + msg['src']);
-			var rsp = {'src':safe_execute(get_station_callsign),'dst':msg['src'],'ping_id':msg['ping_id']}
-			spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(rsp) + "\"", "ping_response"]);
-		} else {
-			io.emit('ping_request', msg);			
-		}
-	}
-	else if (topic.startsWith("ping_response")){
-		io.emit('ping_response', JSON.parse(str));
-	}
-	else {
-		console.log("message received on unknown topic " + topic);
-		console.log(str)
-	}	
+//packet received from the hub process locally, passively forward to the client
+sub.on("message", function(type_bytes, msg_bytes) {
+	var cmd = text_decoder.decode(type_bytes);
+	var msg = JSON.parse(text_decoder.decode(msg_bytes));
+	io.emit(cmd, msg);
 });
 
+/*
 var intervalId = setInterval(function() {
 	callsign = safe_execute(get_station_callsign);
 	if (callsign === null){return;}
@@ -278,23 +304,23 @@ var intervalId = setInterval(function() {
 	if (gps_location === null) {
 		gps_location = [0,0]; //set to dummy coordinates
 	}
-	msg = {'username':callsign, 'coords':gps_location,'type':'station'};
+	//msg = {'username':callsign, 'coords':gps_location,'type':'station'};
 	//console.log(msg);
-	spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(msg) + "\"", "location"]);
-	io.emit('location', msg);
+	//spawn('/bridge/src/prj-zmq-send/test',["\"" + JSON.stringify(msg) + "\"", "location"]);
+	//io.emit('location', msg);
 }, 15000);
+*/
 
 //server.listen(8085);
 server.listen(443);
 io.listen(server);
 
-const express = require('express');
-const httpApp = express();
+const http_app = express();
 
-httpApp.get("*", function(req, res, next) {
+http_app.get("*", function(req, res, next) {
     res.redirect("https://" + req.headers.host + req.path);
 });
 
-http.createServer(httpApp).listen(80, function() {
+http.createServer(http_app).listen(80, function() {
     console.log("Express TTP server listening on port 80");
 });

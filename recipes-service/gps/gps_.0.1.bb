@@ -9,7 +9,7 @@ prj="gps"
 inherit systemd
 
 # Create dependency to library packages
-RDEPENDS:${PN} += " bridge "
+RDEPENDS:${PN} += " node  "
 RDEPENDS:${PN} += " python-pynmea2 "
 
 #src uri's for the source code and .service conf file

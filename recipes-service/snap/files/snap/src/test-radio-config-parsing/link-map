@@ -1,0 +1,808 @@
+Archive member included to satisfy reference by file (symbol)
+
+/bridge/src/test-radio-config-parsing/test.a(main.o)
+                              /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o (main)
+/bridge/src/test-radio-config-parsing/test.a(print_util.o)
+                              /bridge/src/test-radio-config-parsing/test.a(main.o) (printArrHex)
+/bridge/src/test-radio-config-parsing/test.a(radio.o)
+                              /bridge/src/test-radio-config-parsing/test.a(main.o) (radio_load_configs)
+/bridge/src/test-radio-config-parsing/test.a(radio_hal.o)
+                              /bridge/src/test-radio-config-parsing/test.a(radio.o) (radio_hal_init)
+/bridge/src/test-radio-config-parsing/test.a(si446x_api_lib.o)
+                              /bridge/src/test-radio-config-parsing/test.a(radio.o) (Si446xCmd)
+/bridge/src/test-radio-config-parsing/test.a(spidev.o)
+                              /bridge/src/test-radio-config-parsing/test.a(radio_hal.o) (spi_open)
+/bridge/src/test-radio-config-parsing/test.a(gpio.o)
+                              /bridge/src/test-radio-config-parsing/test.a(radio_hal.o) (gpio_set_shutdown)
+/bridge/src/test-radio-config-parsing/test.a(radio_comm.o)
+                              /bridge/src/test-radio-config-parsing/test.a(si446x_api_lib.o) (radio_comm_SendCmd)
+
+Discarded input sections
+
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-radio-config-parsing/test.a(main.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-radio-config-parsing/test.a(print_util.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-radio-config-parsing/test.a(radio.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-radio-config-parsing/test.a(radio_hal.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-radio-config-parsing/test.a(si446x_api_lib.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-radio-config-parsing/test.a(spidev.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-radio-config-parsing/test.a(gpio.o)
+ .note.GNU-stack
+                0x00000000        0x0 /bridge/src/test-radio-config-parsing/test.a(radio_comm.o)
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .note.GNU-stack
+                0x00000000        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+LOAD /bridge/src/test-radio-config-parsing/test.a
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libz.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libserialport.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libzmq.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libczmq.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libgpiod.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libm.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libturbofec.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libpthread.so
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+LOAD /lib/libgcc_s.so
+START GROUP
+LOAD /lib/libgcc_s.so.1
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+END GROUP
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../libc.so
+START GROUP
+LOAD /lib/libc.so.6
+LOAD /usr/lib/libc_nonshared.a
+LOAD /lib/ld-linux-armhf.so.3
+END GROUP
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+LOAD /lib/libgcc_s.so
+START GROUP
+LOAD /lib/libgcc_s.so.1
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/libgcc.a
+END GROUP
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                [!provide]                        PROVIDE (__executable_start = SEGMENT_START ("text-segment", 0x10000))
+                0x00010154                        . = (SEGMENT_START ("text-segment", 0x10000) + SIZEOF_HEADERS)
+
+.interp         0x00010154       0x19
+ *(.interp)
+ .interp        0x00010154       0x19 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.note.gnu.build-id
+                0x00010170       0x24
+ *(.note.gnu.build-id)
+ .note.gnu.build-id
+                0x00010170       0x24 linker stubs
+
+.note.ABI-tag   0x00010194       0x20
+ .note.ABI-tag  0x00010194       0x20 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.hash
+ *(.hash)
+
+.gnu.hash       0x000101b4      0x290
+ *(.gnu.hash)
+ .gnu.hash      0x000101b4      0x290 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.dynsym         0x00010444      0x510
+ *(.dynsym)
+ .dynsym        0x00010444      0x510 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.dynstr         0x00010954      0x614
+ *(.dynstr)
+ .dynstr        0x00010954      0x614 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.gnu.version    0x00010f68       0xa2
+ *(.gnu.version)
+ .gnu.version   0x00010f68       0xa2 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.gnu.version_d  0x0001100c        0x0
+ *(.gnu.version_d)
+ .gnu.version_d
+                0x0001100c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.gnu.version_r  0x0001100c       0x30
+ *(.gnu.version_r)
+ .gnu.version_r
+                0x0001100c       0x30 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.rel.dyn        0x0001103c        0x8
+ *(.rel.init)
+ *(.rel.text .rel.text.* .rel.gnu.linkonce.t.*)
+ *(.rel.fini)
+ *(.rel.rodata .rel.rodata.* .rel.gnu.linkonce.r.*)
+ *(.rel.data.rel.ro .rel.data.rel.ro.* .rel.gnu.linkonce.d.rel.ro.*)
+ .rel.data.rel.ro
+                0x0001103c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.rel.data .rel.data.* .rel.gnu.linkonce.d.*)
+ *(.rel.tdata .rel.tdata.* .rel.gnu.linkonce.td.*)
+ *(.rel.tbss .rel.tbss.* .rel.gnu.linkonce.tb.*)
+ *(.rel.ctors)
+ *(.rel.dtors)
+ *(.rel.got)
+ .rel.got       0x0001103c        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*)
+ .rel.bss       0x00011044        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                [!provide]                        PROVIDE (__rel_iplt_start = .)
+ *(.rel.iplt)
+ .rel.iplt      0x00011044        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                [!provide]                        PROVIDE (__rel_iplt_end = .)
+
+.rela.dyn       0x00011044        0x0
+ *(.rela.init)
+ *(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)
+ *(.rela.fini)
+ *(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r.*)
+ *(.rela.data .rela.data.* .rela.gnu.linkonce.d.*)
+ *(.rela.tdata .rela.tdata.* .rela.gnu.linkonce.td.*)
+ *(.rela.tbss .rela.tbss.* .rela.gnu.linkonce.tb.*)
+ *(.rela.ctors)
+ *(.rela.dtors)
+ *(.rela.got)
+ *(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*)
+                [!provide]                        PROVIDE (__rela_iplt_start = .)
+ *(.rela.iplt)
+                [!provide]                        PROVIDE (__rela_iplt_end = .)
+
+.rel.plt        0x00011044      0x270
+ *(.rel.plt)
+ .rel.plt       0x00011044      0x270 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.rela.plt
+ *(.rela.plt)
+
+.init           0x000112b4        0xc
+ *(SORT_NONE(.init))
+ .init          0x000112b4        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x000112b4                _init
+ .init          0x000112bc        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.plt            0x000112c0      0x3bc
+ *(.plt)
+ .plt           0x000112c0      0x3bc /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x000112d4                zhashx_lookup
+                0x000112e0                zrex_matches
+                0x000112ec                zdir_new
+                0x000112f8                gpiod_request_config_set_consumer
+                0x00011304                zclock_sleep
+                0x00011310                gpiod_request_config_free
+                0x0001131c                gpiod_line_config_reset
+                0x00011328                zdir_list
+                0x00011334                gpiod_chip_close
+                0x00011340                zchunk_new
+                0x0001134c                gpiod_line_request_read_edge_events
+                0x00011358                printf@@GLIBC_2.4
+                0x00011364                zhashx_new
+                0x00011370                puts@@GLIBC_2.4
+                0x0001137c                zdir_count
+                0x00011388                gpiod_line_settings_set_direction
+                0x00011394                strtoul@@GLIBC_2.4
+                0x000113a0                putchar@@GLIBC_2.4
+                0x000113ac                memset@@GLIBC_2.4
+                0x000113b8                gpiod_line_settings_set_edge_detection
+                0x000113c4                zrex_hit
+                0x000113d0                zfile_is_directory
+                0x000113dc                gpiod_line_settings_free
+                0x000113e8                __libc_start_main@@GLIBC_2.34
+                0x000113f4                snprintf@@GLIBC_2.4
+                0x00011400                gpiod_edge_event_buffer_get_event
+                0x0001140c                gpiod_line_settings_set_event_clock
+                0x00011418                close@@GLIBC_2.4
+                0x00011424                fopen@@GLIBC_2.4
+                0x00011430                zlistx_first
+                0x0001143c                abort@@GLIBC_2.4
+                0x00011448                gpiod_line_request_wait_edge_events
+                0x00011454                zchunk_size
+                0x00011460                zlist_first
+                0x0001146c                ioctl@@GLIBC_2.4
+                0x00011478                __assert_fail@@GLIBC_2.4
+                0x00011484                gpiod_request_config_new
+                0x00011490                gpiod_edge_event_buffer_free
+                0x0001149c                zhashx_set_destructor
+                0x000114a8                zhashx_update
+                0x000114b4                open@@GLIBC_2.4
+                0x000114c0                gpiod_line_request_set_value
+                0x000114cc                gpiod_line_config_new
+                0x000114d8                gpiod_line_settings_set_output_value
+                0x000114e4                gpiod_line_settings_new
+                0x000114f0                gpiod_line_config_add_line_settings
+                0x000114fc                gpiod_edge_event_buffer_new
+                0x00011508                gpiod_chip_request_lines
+                0x00011514                gpiod_line_config_free
+                0x00011520                zhashx_first
+                0x0001152c                zchunk_destroy
+                0x00011538                gpiod_line_request_release
+                0x00011544                gpiod_line_request_get_value
+                0x00011550                gpiod_line_settings_set_bias
+                0x0001155c                gpiod_chip_open
+                0x00011568                zdir_destroy
+                0x00011574                zhashx_set_key_duplicator
+                0x00011580                zhashx_next
+                0x0001158c                zrex_destroy
+                0x00011598                gpiod_line_settings_set_active_low
+                0x000115a4                memcpy@@GLIBC_2.4
+                0x000115b0                gpiod_edge_event_get_event_type
+                0x000115bc                zrex_valid
+                0x000115c8                fclose@@GLIBC_2.4
+                0x000115d4                zlistx_next
+                0x000115e0                zstr_free
+                0x000115ec                zhashx_set_key_destructor
+                0x000115f8                zhashx_delete
+                0x00011604                zfile_is_readable
+                0x00011610                zfile_filename
+                0x0001161c                strncpy@@GLIBC_2.4
+                0x00011628                getline@@GLIBC_2.4
+                0x00011634                zlist_next
+                0x00011640                zdir_path
+                0x0001164c                zrex_new
+                0x00011658                zchunk_data
+                0x00011670                strdup@@GLIBC_2.4
+
+.iplt           0x0001167c        0x0
+ *(.iplt)
+ .iplt          0x0001167c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.text           0x0001167c     0x41d4
+ *(.text.unlikely .text.*_unlikely .text.unlikely.*)
+ *(.text.exit .text.exit.*)
+ *(.text.startup .text.startup.*)
+ *(.text.hot .text.hot.*)
+ *(SORT_BY_NAME(.text.sorted.*))
+ *(.text .stub .text.* .gnu.linkonce.t.*)
+ .text          0x0001167c       0x34 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x0001167c                _start
+ .text          0x000116b0       0x24 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .text          0x000116d4       0x6c /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .text          0x00011740       0xb0 /bridge/src/test-radio-config-parsing/test.a(main.o)
+                0x00011740                main
+ .text          0x000117f0      0x2a0 /bridge/src/test-radio-config-parsing/test.a(print_util.o)
+                0x000117f0                printArrHex
+                0x0001188c                printArrHex_no_new_line
+                0x00011924                print_uint32_arr
+                0x000119c0                snprintArrHex
+ .text          0x00011a90      0xb50 /bridge/src/test-radio-config-parsing/test.a(radio.o)
+                0x00011b38                radio_init
+                0x00011bc8                radio_print_part_info
+                0x00011c60                radio_print_func_info
+                0x00011cfc                radio_get_state_string
+                0x00011e60                radio_print_state
+                0x00011f2c                radio_print_modem_status
+                0x00011ff4                radio_get_modem_state
+                0x00012018                radio_get_modem_interrupt_pending
+                0x0001203c                radio_start_rx
+                0x000121b0                radio_load_configs
+                0x0001234c                radio_parse_config
+ .text          0x000125e0      0x1cc /bridge/src/test-radio-config-parsing/test.a(radio_hal.o)
+                0x000125e0                radio_hal_init
+                0x00012650                radio_hal_deinit
+                0x00012688                radio_hal_AssertShutdown
+                0x000126a0                radio_hal_DeassertShutdown
+                0x000126b8                radio_hal_NirqLevel
+                0x000126d8                radio_hal_SpiWriteData
+                0x00012718                radio_hal_SpiReadData
+                0x00012758                radio_hal_transfer
+ .text          0x000127ac     0x2084 /bridge/src/test-radio-config-parsing/test.a(si446x_api_lib.o)
+                0x000127ac                si446x_reset
+                0x000127d4                si446x_power_up
+                0x000129a0                si446x_configuration_init_enhanced
+                0x00012aa0                si446x_configuration_init
+                0x00012be4                si446x_apply_patch
+                0x00012d38                si446x_part_info
+                0x00012e64                si446x_start_tx
+                0x00012f1c                si446x_start_rx
+                0x00012ff0                si446x_get_int_status
+                0x0001313c                si446x_gpio_pin_cfg
+                0x000132c8                si446x_set_property
+                0x000133ac                si446x_change_state
+                0x000133fc                si446x_nop
+                0x0001342c                si446x_fifo_info
+                0x000134b8                si446x_write_tx_fifo
+                0x000134f0                si446x_read_rx_fifo
+                0x00013528                si446x_get_property
+                0x0001373c                si446x_func_info
+                0x000137d8                si446x_frr_a_read
+                0x00013870                si446x_frr_b_read
+                0x00013908                si446x_frr_c_read
+                0x000139a0                si446x_frr_d_read
+                0x00013a38                si446x_get_adc_reading
+                0x00013b6c                si446x_get_packet_info
+                0x00013c70                si446x_get_ph_status
+                0x00013cfc                si446x_get_modem_status
+                0x00013e30                si446x_get_chip_status
+                0x00013ed4                si446x_ircal
+                0x00013f7c                si446x_ircal_manual
+                0x00014024                si446x_request_device_state
+                0x00014090                si446x_tx_hop
+                0x00014178                si446x_rx_hop
+                0x00014240                si446x_start_tx_fast
+                0x00014270                si446x_start_rx_fast
+                0x000142a0                si446x_get_int_status_fast_clear
+                0x000142d0                si446x_get_int_status_fast_clear_read
+                0x000143cc                si446x_gpio_pin_cfg_fast
+                0x000144b0                si446x_get_ph_status_fast_clear
+                0x000144f0                si446x_get_ph_status_fast_clear_read
+                0x0001455c                si446x_get_modem_status_fast_clear
+                0x0001459c                si446x_get_modem_status_fast_clear_read
+                0x000146b0                si446x_get_chip_status_fast_clear
+                0x000146f0                si446x_get_chip_status_fast_clear_read
+                0x00014774                si446x_fifo_info_fast_reset
+                0x000147c4                si446x_fifo_info_fast_read
+ .text          0x00014830      0x300 /bridge/src/test-radio-config-parsing/test.a(spidev.o)
+                0x00014830                spi_open
+                0x00014994                spi_close
+                0x000149bc                spi_xfer
+                0x00014a48                spi_read
+                0x00014abc                spi_write
+ .text          0x00014b30      0x968 /bridge/src/test-radio-config-parsing/test.a(gpio.o)
+                0x00014d74                gpio_init
+                0x00015218                gpio_poll
+                0x0001530c                gpio_get
+                0x00015348                gpio_set_shutdown
+                0x000153ac                gpio_deinit
+ .text          0x00015498      0x3b8 /bridge/src/test-radio-config-parsing/test.a(radio_comm.o)
+                0x00015498                radio_comm_GetResp
+                0x00015570                radio_comm_SendCmd
+                0x000155c0                radio_comm_ReadData
+                0x000156a4                radio_comm_WriteData
+                0x00015748                radio_comm_PollCTS
+                0x000157f4                radio_comm_SendCmdGetResp
+ .text          0x00015850        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .text          0x00015850        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ *(.gnu.warning)
+ *(.glue_7t)
+ .glue_7t       0x00015850        0x0 linker stubs
+ *(.glue_7)
+ .glue_7        0x00015850        0x0 linker stubs
+ *(.vfp11_veneer)
+ .vfp11_veneer  0x00015850        0x0 linker stubs
+ *(.v4_bx)
+ .v4_bx         0x00015850        0x0 linker stubs
+
+.fini           0x00015850        0x8
+ *(SORT_NONE(.fini))
+ .fini          0x00015850        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x00015850                _fini
+ .fini          0x00015854        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                [!provide]                        PROVIDE (__etext = .)
+                [!provide]                        PROVIDE (_etext = .)
+                [!provide]                        PROVIDE (etext = .)
+
+.rodata         0x00015858      0x8dc
+ *(.rodata .rodata.* .gnu.linkonce.r.*)
+ .rodata.cst4   0x00015858        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00015858                _IO_stdin_used
+ .rodata        0x0001585c       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .rodata        0x000158ec       0x81 /bridge/src/test-radio-config-parsing/test.a(main.o)
+ *fill*         0x0001596d        0x3 
+ .rodata        0x00015970       0x15 /bridge/src/test-radio-config-parsing/test.a(print_util.o)
+ *fill*         0x00015985        0x3 
+ .rodata        0x00015988      0x27a /bridge/src/test-radio-config-parsing/test.a(radio.o)
+ *fill*         0x00015c02        0x2 
+ .rodata        0x00015c04        0xc /bridge/src/test-radio-config-parsing/test.a(radio_hal.o)
+ .rodata        0x00015c10      0x223 /bridge/src/test-radio-config-parsing/test.a(si446x_api_lib.o)
+ *fill*         0x00015e33        0x1 
+ .rodata        0x00015e34      0x22e /bridge/src/test-radio-config-parsing/test.a(gpio.o)
+ *fill*         0x00016062        0x2 
+ .rodata        0x00016064       0x3d /bridge/src/test-radio-config-parsing/test.a(radio_comm.o)
+ *fill*         0x000160a1        0x3 
+ .rodata        0x000160a4       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+
+.rodata1
+ *(.rodata1)
+
+.ARM.extab      0x00016134        0x0
+ *(.ARM.extab* .gnu.linkonce.armextab.*)
+ .ARM.extab     0x00016134        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.ARM.exidx      0x00016134        0x8
+                [!provide]                        PROVIDE (__exidx_start = .)
+ *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+ .ARM.exidx     0x00016134        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                [!provide]                        PROVIDE (__exidx_end = .)
+
+.eh_frame_hdr
+ *(.eh_frame_hdr)
+ *(.eh_frame_entry .eh_frame_entry.*)
+
+.eh_frame       0x0001613c        0x4
+ *(.eh_frame)
+ .eh_frame      0x0001613c        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ *(.eh_frame.*)
+
+.sframe
+ *(.sframe)
+ *(.sframe.*)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.gnu_extab
+ *(.gnu_extab*)
+
+.exception_ranges
+ *(.exception_ranges*)
+                0x00017ed0                        . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
+
+.eh_frame
+ *(.eh_frame)
+ *(.eh_frame.*)
+
+.sframe
+ *(.sframe)
+ *(.sframe.*)
+
+.gnu_extab
+ *(.gnu_extab)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.exception_ranges
+ *(.exception_ranges*)
+
+.tdata          0x00017ed0        0x0
+                [!provide]                        PROVIDE (__tdata_start = .)
+ *(.tdata .tdata.* .gnu.linkonce.td.*)
+
+.tbss
+ *(.tbss .tbss.* .gnu.linkonce.tb.*)
+ *(.tcommon)
+
+.preinit_array  0x00017ed0        0x0
+                [!provide]                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array)
+                [!provide]                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x00017ed0        0x4
+                [!provide]                        PROVIDE (__init_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
+ *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
+ .init_array    0x00017ed0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                [!provide]                        PROVIDE (__init_array_end = .)
+
+.fini_array     0x00017ed4        0x4
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
+ *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
+ .fini_array    0x00017ed4        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                [!provide]                        PROVIDE (__fini_array_end = .)
+
+.ctors
+ *crtbegin.o(.ctors)
+ *crtbegin?.o(.ctors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+ *(SORT_BY_NAME(.ctors.*))
+ *(.ctors)
+
+.dtors
+ *crtbegin.o(.dtors)
+ *crtbegin?.o(.dtors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+ *(SORT_BY_NAME(.dtors.*))
+ *(.dtors)
+
+.jcr
+ *(.jcr)
+
+.data.rel.ro    0x00017ed8        0x0
+ *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
+ *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
+ .data.rel.ro   0x00017ed8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+
+.dynamic        0x00017ed8      0x128
+ *(.dynamic)
+ .dynamic       0x00017ed8      0x128 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00017ed8                _DYNAMIC
+                0x00018000                        . = DATA_SEGMENT_RELRO_END (., 0x0)
+
+.got            0x00018000      0x14c
+ *(.got.plt)
+ .got.plt       0x00018000      0x144 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00018000                _GLOBAL_OFFSET_TABLE_
+ *(.igot.plt)
+ .igot.plt      0x00018144        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.got)
+ .got           0x00018144        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.igot)
+
+.data           0x0001814c      0x1e8
+                [!provide]                        PROVIDE (__data_start = .)
+ *(.data .data.* .gnu.linkonce.d.*)
+ .data          0x0001814c        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x0001814c                data_start
+                0x0001814c                __data_start
+ .data          0x00018150        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .data          0x00018150        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                0x00018150                __dso_handle
+ .data          0x00018154        0x0 /bridge/src/test-radio-config-parsing/test.a(main.o)
+ .data          0x00018154        0x0 /bridge/src/test-radio-config-parsing/test.a(print_util.o)
+ .data          0x00018154        0x0 /bridge/src/test-radio-config-parsing/test.a(radio.o)
+ .data          0x00018154        0x0 /bridge/src/test-radio-config-parsing/test.a(radio_hal.o)
+ .data          0x00018154      0x1d8 /bridge/src/test-radio-config-parsing/test.a(si446x_api_lib.o)
+                0x00018154                Si446xPatchCommands
+ .data          0x0001832c        0x0 /bridge/src/test-radio-config-parsing/test.a(spidev.o)
+ .data          0x0001832c        0x8 /bridge/src/test-radio-config-parsing/test.a(gpio.o)
+                0x0001832c                line_offsets
+                0x00018330                shutdown_line_offsets
+ .data          0x00018334        0x0 /bridge/src/test-radio-config-parsing/test.a(radio_comm.o)
+ .data          0x00018334        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .data          0x00018334        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.tm_clone_table
+                0x00018334        0x0
+ .tm_clone_table
+                0x00018334        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .tm_clone_table
+                0x00018334        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+
+.data1
+ *(.data1)
+                0x00018334                        _edata = .
+                [!provide]                        PROVIDE (edata = .)
+                0x00018334                        . = .
+                0x00018334                        __bss_start = .
+                0x00018334                        __bss_start__ = .
+
+.bss            0x00018334      0x2e8
+ *(.dynbss)
+ .dynbss        0x00018334        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ *(.bss .bss.* .gnu.linkonce.b.*)
+ .bss           0x00018334        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .bss           0x00018334        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .bss           0x00018334        0x1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .bss           0x00018335        0x0 /bridge/src/test-radio-config-parsing/test.a(main.o)
+ .bss           0x00018335        0x0 /bridge/src/test-radio-config-parsing/test.a(print_util.o)
+ *fill*         0x00018335        0x3 
+ .bss           0x00018338      0x210 /bridge/src/test-radio-config-parsing/test.a(radio.o)
+ .bss           0x00018548        0x4 /bridge/src/test-radio-config-parsing/test.a(radio_hal.o)
+                0x00018548                si4463_spi_fd
+ .bss           0x0001854c       0x24 /bridge/src/test-radio-config-parsing/test.a(si446x_api_lib.o)
+                0x0001854c                Si446xCmd
+                0x00018560                Pro2Cmd
+ .bss           0x00018570        0x0 /bridge/src/test-radio-config-parsing/test.a(spidev.o)
+ .bss           0x00018570       0x2c /bridge/src/test-radio-config-parsing/test.a(gpio.o)
+                0x00018570                line_request_config
+                0x00018574                line_config
+                0x00018578                line_settings
+                0x0001857c                chip
+                0x00018580                line_request
+                0x00018584                events
+                0x00018588                shutdown_line_request_config
+                0x0001858c                shutdown_line_config
+                0x00018590                shutdown_line_settings
+                0x00018594                chip_E
+                0x00018598                line_request_E10
+ .bss           0x0001859c       0x80 /bridge/src/test-radio-config-parsing/test.a(radio_comm.o)
+                0x0001859c                tx
+                0x000185dc                rx
+ .bss           0x0001861c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .bss           0x0001861c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ *(COMMON)
+                0x0001861c                        . = ALIGN ((. != 0x0)?0x4:0x1)
+                0x0001861c                        _bss_end__ = .
+                0x0001861c                        __bss_end__ = .
+                0x0001861c                        . = ALIGN (0x4)
+                0x0001861c                        . = SEGMENT_START ("ldata-segment", .)
+                0x0001861c                        . = ALIGN (0x4)
+                0x0001861c                        __end__ = .
+                0x0001861c                        _end = .
+                [!provide]                        PROVIDE (end = .)
+                0x0001861c                        . = DATA_SEGMENT_END (.)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x00000000       0x12
+ *(.comment)
+ .comment       0x00000000       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                                 0x39 (size before relaxing)
+ .comment       0x00000012       0x13 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .comment       0x00000012       0x13 /bridge/src/test-radio-config-parsing/test.a(main.o)
+ .comment       0x00000012       0x13 /bridge/src/test-radio-config-parsing/test.a(print_util.o)
+ .comment       0x00000012       0x13 /bridge/src/test-radio-config-parsing/test.a(radio.o)
+ .comment       0x00000012       0x13 /bridge/src/test-radio-config-parsing/test.a(radio_hal.o)
+ .comment       0x00000012       0x13 /bridge/src/test-radio-config-parsing/test.a(si446x_api_lib.o)
+ .comment       0x00000012       0x13 /bridge/src/test-radio-config-parsing/test.a(spidev.o)
+ .comment       0x00000012       0x13 /bridge/src/test-radio-config-parsing/test.a(gpio.o)
+ .comment       0x00000012       0x13 /bridge/src/test-radio-config-parsing/test.a(radio_comm.o)
+ .comment       0x00000012       0x13 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+
+.ARM.attributes
+                0x00000000       0x3b
+ .ARM.attributes
+                0x00000000       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .ARM.attributes
+                0x0000003b       0x2b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .ARM.attributes
+                0x00000066       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .ARM.attributes
+                0x000000a1       0x39 /bridge/src/test-radio-config-parsing/test.a(main.o)
+ .ARM.attributes
+                0x000000da       0x39 /bridge/src/test-radio-config-parsing/test.a(print_util.o)
+ .ARM.attributes
+                0x00000113       0x39 /bridge/src/test-radio-config-parsing/test.a(radio.o)
+ .ARM.attributes
+                0x0000014c       0x39 /bridge/src/test-radio-config-parsing/test.a(radio_hal.o)
+ .ARM.attributes
+                0x00000185       0x39 /bridge/src/test-radio-config-parsing/test.a(si446x_api_lib.o)
+ .ARM.attributes
+                0x000001be       0x39 /bridge/src/test-radio-config-parsing/test.a(spidev.o)
+ .ARM.attributes
+                0x000001f7       0x39 /bridge/src/test-radio-config-parsing/test.a(gpio.o)
+ .ARM.attributes
+                0x00000230       0x39 /bridge/src/test-radio-config-parsing/test.a(radio_comm.o)
+ .ARM.attributes
+                0x00000269       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .ARM.attributes
+                0x000002a4       0x2b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.gnu.build.attributes
+ *(.gnu.build.attributes .gnu.build.attributes.*)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x00000000       0xa8
+ *(.debug_aranges)
+ .debug_aranges
+                0x00000000       0x50 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_aranges
+                0x00000050       0x30 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_aranges
+                0x00000080       0x28 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info     0x00000000      0x564
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x00000000      0x51e /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_info    0x0000051e       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_info    0x00000541       0x23 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_abbrev   0x00000000      0x198
+ *(.debug_abbrev)
+ .debug_abbrev  0x00000000      0x174 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_abbrev  0x00000174       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_abbrev  0x00000186       0x12 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_line     0x00000000      0x2b9
+ *(.debug_line .debug_line.* .debug_line_end)
+ .debug_line    0x00000000      0x1f1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_line    0x000001f1       0x70 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_line    0x00000261       0x58 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str      0x00000000      0x485
+ *(.debug_str)
+ .debug_str     0x00000000      0x459 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                                0x76c (size before relaxing)
+ .debug_str     0x00000459       0x16 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                                 0x43 (size before relaxing)
+ .debug_str     0x0000046f       0x16 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                                 0x43 (size before relaxing)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges
+ *(.debug_ranges)
+
+.debug_addr
+ *(.debug_addr)
+
+.debug_line_str
+                0x00000000       0x46
+ *(.debug_line_str)
+ .debug_line_str
+                0x00000000       0x38 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .debug_line_str
+                0x00000038        0x7 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                                 0x37 (size before relaxing)
+ .debug_line_str
+                0x0000003f        0x7 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                                 0x37 (size before relaxing)
+
+.debug_loclists
+ *(.debug_loclists)
+
+.debug_macro
+ *(.debug_macro)
+
+.debug_names
+ *(.debug_names)
+
+.debug_rnglists
+                0x00000000       0x38
+ *(.debug_rnglists)
+ .debug_rnglists
+                0x00000000       0x1f /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .debug_rnglists
+                0x0000001f       0x19 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+
+.debug_str_offsets
+ *(.debug_str_offsets)
+
+.debug_sup
+ *(.debug_sup)
+
+.gnu.attributes
+ *(.gnu.attributes)
+
+.note.gnu.arm.ident
+ *(.note.gnu.arm.ident)
+
+/DISCARD/
+ *(.note.GNU-stack)
+ *(.gnu_debuglink)
+ *(.gnu.lto_*)
+OUTPUT(/bridge/src/test-radio-config-parsing/test elf32-littlearm)
+LOAD linker stubs

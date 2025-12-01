@@ -1,6 +1,6 @@
 [Unit]
 Description=lan chat service
-After=network.target var-volatile.mount
+After=network.target var-volatile.mount hub.service
 
 [Install]
 WantedBy=multi-user.target

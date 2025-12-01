@@ -6,130 +6,240 @@ function get_iso_timestamp(date) {
     return date.toLocaleString('sv').replace(' ', 'T');
 }
 
-var my_username;
-var location_beacon_ms;
-var my_location = null;
-var my_waypoint = null;
+var my_addr;
+var my_callsign;
+var location_beacon_ms = 30000;
 
 var socket;
-var started = false;
 
-var hdr = '';
-var pay = '';
+const COMMANDS = ["GET_HUB_CONFIG", "SET_HUB_CONFIG","GET_RADIO_CONFIG","SET_RADIO_CONFIG","SET_MY_CALLSIGN","GET_MY_CALLSIGN","GET_MY_ADDR","GET_PEERS","GET_LINK_PEERS"]
+const TLV_TYPES = ["ack","peer_info","location","message","waypoint","ping_request","ping_response","beacon"];
 
-var waypoint_beacon = null;
-
-
-handlers = {
-	"newMessage" : function(data){socket.emit('newMessage', data);},
-	"location" 	 : function(data){socket.emit('location', data);},
-	"waypoint"	 : function(data){my_waypoint=data; socket.emit('waypoint', data);},
-	"my_location": function(data){my_location = data;},
-	"start_waypoint_beacon" : setup_waypoint_beacon,
-	"stop_waypoint_beacon" : cancel_waypoint_beacon,
-	"username"   : function(data){my_username=data},
+//handlers for receiving messages from the frontend javascript
+var handlers = {
 	"get_radio_configs" : function(data){socket.emit('get_radio_configs', data);},
 	"get_current_radio_config" : function(data){socket.emit('get_current_radio_config', data);},
 	"get_current_radio_config_other" : function(data){socket.emit('get_current_radio_config_other', data);},
-	"select_radio_config" : function(config){socket.emit('select_radio_config', config);},
-	"ping_request" : function(data){socket.emit('ping_request', data);},
-	"ping_response" : function(data){socket.emit('ping_response', data);},
-	"properties" : function(data){socket.emit('properties', data);}
+	"select_radio_config" : function(config){socket.emit('select_radio_config', config);}
 };
 
+function setup_handlers(){
+	var wb = new WaypointBeacon();
+	var b = new Beacon();
+	
+	for (const topic of COMMANDS) {
+		handlers[topic] = function(pay){socket.emit(topic, pay);}
+	}
+	for (const topic of TLV_TYPES){
+		if (topic == 'waypoint'){
+			handlers[topic] = function(pay) {wb.update(pay);}		
+		} 
+		else {
+			handlers[topic] = function(pay){ 
+				socket.emit(topic,pay);
+			}
+		}
+	}
+	handlers["my_location"] = function(pay){b.update(pay);}
+	
+	//handlers for receiving messages from the server
+	socket = io.connect();
+	for (const topic in handlers) {
+		if (topic == 'GET_MY_CALLSIGN'){
+			socket.on(topic, function(pay){
+				my_callsign = pay.callsign;
+				postMessage([topic, pay, get_iso_timestamp()]);
+			});
+		}
+		else if (topic == 'GET_MY_ADDR') {
+			socket.on(topic, function(pay){
+				my_addr = pay.addr;
+				postMessage([topic, pay, get_iso_timestamp()]);
+			});
+		} else { //passively pass the message along to the frontend
+			socket.on(topic, function(pay){postMessage([topic, pay, get_iso_timestamp()]);});
+		}
+	}
+}
+
+var state = 'stopped'
+
 onmessage = function(e) {
-	//console.log('Worker: Message received');
-	//console.log(e);
+	let hdr = e.data[0];
+	let pay = e.data[1];
+	//console.log('message from frontend',hdr,pay);
 	
-	hdr = e.data[0];
-	pay = e.data[1];
-	
-	if ((started == false) && (hdr == 'start')){
-		console.log("worker starting...");
-		started = true;
-		my_username = pay['username'];
-		location_beacon_ms = pay['location_beacon_ms'];
-		socket = io.connect({query: "username=" + my_username});
-		socket.on("newMessage", function(data){postMessage(['newMessage',data, get_iso_timestamp()]);});
-		socket.on("location", 	function(data){postMessage(['location',data, get_iso_timestamp()]);});
-		socket.on("waypoint", 	function(data){postMessage(['waypoint',data, get_iso_timestamp()]);});
-		socket.on("get_radio_configs", 	function(data){postMessage(['get_radio_configs',data]);});
-		socket.on("get_current_radio_config", function(data){postMessage(['get_current_radio_config',data]);});
-		socket.on("get_current_radio_config_other", function(data){postMessage(['get_current_radio_config_other',data]);});
-		socket.on("ping_request", function(data){postMessage(['ping_request',data]);});
-		socket.on("ping_response", function(data){postMessage(['ping_response',data]);});
-		socket.on("properties", function(data){postMessage(['properties',data]);});
-		setup_location_beacon();
+	if ((state == 'stopped') && (hdr == 'init')){
+		console.log("backend initializing...");
+		state = 'init';
+		setup_handlers();
+		handlers['GET_MY_CALLSIGN']();
+		handlers['GET_PEERS']();
+		handlers['GET_LINK_PEERS']();
 		return;
 	}
-	else if (started == false){
+	else if ((state=='init') && (hdr == 'start')){
+		console.log("backend starting...");
+		state = 'started';
 		return;
 	}
+	else if (state != 'started'){
+		return;
+	}
+	
 	
 	const handler = handlers[hdr];
 	if (handler === undefined){
 		console.log("worker received unknown header: " + hdr);
 		return;
+	} else {
+		if (pay !== undefined){
+			pay.type = hdr;
+		}
+		handler(pay);
 	}
-	handler(pay);
 }
 
 ////////////////////////////////////////////////////////////////
 ///////////////////////LOCATION RELATED/////////////////////////
 ////////////////////////////////////////////////////////////////
 
-function setup_location_beacon(){
-	setInterval(send_location_beacon, location_beacon_ms);
+
+class WaypointBeacon {
+	constructor(){
+		this.w = undefined;
+		this.running = false;
+		this.waypoint_beacon_interval = undefined;
+		this.last_tx = 0;
+	}
+	
+	update(data){
+		console.log('WaypointBeacon.update',data);
+		let old = this.w;
+		this.w = data;
+		if (this.running === true){
+			if (this.w.cancel === true){ //stop
+				this.stop()
+			}
+			else if (this.w.period == 0){
+				this.stop();
+				this.run();
+			}
+			else if (this.w.period != old.period){ //period change
+				this.stop()
+				this.start()
+			}
+			else { //any other data change
+				this.run();
+			}
+		}
+		else { //not running
+			if ((this.w.cancel !== true) && (this.w.lat != 0) && (this.w.lon != 0)){
+				if (this.w.period == 0){ //send once only
+					this.run();
+				} else { //send on a schedule
+					this.run();
+					this.start()
+				}
+			}
+			else if (this.w.cancel == true){
+				this.stop();
+			}
+		}
+	}
+	
+	stop(){
+		console.log('WaypointBeacon.stop',this.w); 
+		if (this.waypoint_beacon_interval !== undefined){
+			clearInterval(this.waypoint_beacon_interval);
+			this.waypoint_beacon_interval = undefined;
+		}
+		socket.emit('waypoint',this.w);
+		this.running = false;
+	}
+	
+	start(){
+		this.running = true;
+		console.log('WaypointBeacon.start',this.w);
+		this.run = this.run.bind(this); //very important to ensure "this" is always this object
+		this.waypoint_beacon_interval = setInterval(this.run, this.w.period*1000)
+	}
+	
+	run(){
+		//console.log('WaypointBeacon.run',this.w);
+		if ((Date.now()-this.last_tx)<this.w.period*1000){
+			return;
+		} else {
+			this.last_tx = Date.now();
+		}
+		socket.emit('waypoint',this.w);
+	}
 }
 
-function setup_waypoint_beacon(period_seconds){
-	cancel_waypoint_beacon();
-	if (period_seconds == 0) {return;}
-	waypoint_period_ms = period_seconds*1000;
-	waypoint_beacon = setInterval(send_waypoint_beacon, waypoint_period_ms);
-}
-
-function cancel_waypoint_beacon(){
-	if (waypoint_beacon !== null){
-		clearInterval(waypoint_beacon);
-		
-		waypoint_beacon = null;
+class Beacon {
+	constructor(){
+		this.w = undefined;
+		this.running = false;
+		this.beacon_interval = undefined;
+		this.last_tx = 0;	
 	}
-	socket.emit('waypoint',{'username':my_username,'cancel':true});
-}
-
-const MAX_LOCATION_TX = 5000;
-var waypoint_period_ms = 5000;
-var last_location_tx = -1;
-
-
-function send_location_beacon(){
-	if ((Date.now()-last_location_tx)<MAX_LOCATION_TX){
-		return;
-	} else {
-		last_location_tx = Date.now();
+	
+	update(data){
+		//console.log('Beacon.update',data);
+		let old = this.w;
+		this.w = data;
+		if (this.running === true){
+			if (this.w.cancel === true){ //stop
+				this.stop()
+			}
+			else if (this.w.period == 0){
+				this.stop();
+				this.run();
+			}
+			else if (this.w.period != old.period){ //period change
+				this.stop()
+				this.start()
+			}
+		}
+		else { //not running
+			if ((this.w.cancel !== true) && (this.w.lat != 0) && (this.w.lon != 0)){
+				if (this.w.period == 0){ //send once only
+					this.run();
+				} else { //send on a schedule
+					this.start()
+				}
+			}
+			else if (this.w.cancel == true){
+				this.stop();
+			}
+		}
 	}
-	//console.log("send_location_beacon()");
-	if (my_location !== null){
-		my_location.username = my_username;
-		socket.emit('location', my_location)
-	} else {
-		socket.emit({'username':my_username, 'coords':null});
-		//console.log("user location unknown, no location beacon sent");
+	
+	stop(){
+		//console.log('Beacon.stop',this.w); 
+		if (this.beacon_interval !== undefined){
+			clearInterval(this.beacon_interval);
+			this.beacon_interval = undefined;
+		}
+		this.running = false;
 	}
-}
-
-var last_waypoint_tx = -1;
-
-function send_waypoint_beacon(){
-	if ((Date.now()-last_waypoint_tx)<waypoint_period_ms){
-		return;
-	} else {
-		last_waypoint_tx = Date.now();
+	
+	start(){
+		this.running = true;
+		//console.log('Beacon.start',this.w);
+		this.run = this.run.bind(this); //very important to ensure "this" is always this object
+		this.beacon_interval = setInterval(this.run, this.w.period*1000)
 	}
-	if ((my_waypoint !== null) && (my_waypoint.coords[0] != 0) && (my_waypoint.coords[1] != 0)){
-		console.log("send_waypoint_beacon()");
-		my_waypoint.username = my_username;
-		socket.emit('waypoint', my_waypoint)
+	
+	run(){
+		//console.log('Beacon.run',this.w);
+		if ((Date.now()-this.last_tx)<this.w.period*1000){
+			return;
+		} else {
+			this.last_tx = Date.now();
+		}
+		//socket.emit('location', {'src':my_addr, 'dst':0, 'lat':37.5479, 'lon':-97.2802});
+		socket.emit('location',this.w);
 	}
+	
 }

@@ -1,0 +1,5 @@
+# to be included in Makefile
+override CFLAGS += -Wall
+#override CFLAGS += -Wall -fpic
+#override CFLAGS += -Wall -Wextra -pedantic
+

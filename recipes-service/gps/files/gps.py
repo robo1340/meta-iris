@@ -95,7 +95,7 @@ if __name__=="__main__":
 					delete(GPS_PATH)
 					last_update = -1
 					log.info('Lock Lost')
-				delete_known_hosts.run()
+				#delete_known_hosts.run()
 				time.sleep(1)
 		except KeyboardInterrupt:
 			print("stopping")
