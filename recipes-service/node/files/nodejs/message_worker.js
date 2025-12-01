@@ -14,6 +14,7 @@ var socket;
 
 const COMMANDS = ["GET_HUB_CONFIG", "SET_HUB_CONFIG","GET_RADIO_CONFIG","SET_RADIO_CONFIG","SET_MY_CALLSIGN","GET_MY_CALLSIGN","GET_MY_ADDR","GET_PEERS","GET_LINK_PEERS"]
 const TLV_TYPES = ["ack","peer_info","location","message","waypoint","ping_request","ping_response","beacon"];
+const META = ['rx_msg_cnt'];
 
 //handlers for receiving messages from the frontend javascript
 var handlers = {
@@ -60,6 +61,7 @@ function setup_handlers(){
 			socket.on(topic, function(pay){postMessage([topic, pay, get_iso_timestamp()]);});
 		}
 	}
+	socket.on('rx_msg_cnt', function(pay){postMessage(['rx_msg_cnt', pay, get_iso_timestamp()]);});
 }
 
 var state = 'stopped'

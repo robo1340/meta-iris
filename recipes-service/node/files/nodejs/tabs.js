@@ -8,10 +8,18 @@ var user_input;
 var load;
 var markers = {}; //a dictionary of location markers for other users
 
-const hub_control_messages = ["GET_MY_CALLSIGN","GET_MY_ADDR","GET_PEERS","GET_LINK_PEERS"]
-const packet_types = ["ack","peer_info","location","message","waypoint","ping_request","ping_response","beacon"];
+const COMMANDS = ["GET_MY_CALLSIGN","GET_MY_ADDR","GET_PEERS","GET_LINK_PEERS"]
+const TLV_TYPES = ["ack","peer_info","location","message","waypoint","ping_request","ping_response","beacon"];
+const META = ['rx_msg_cnt'];
 
 class Util {
+
+	static contains_object(list, obj) {
+		for (const ele of list){
+			if (ele == obj) {return true;}
+		}
+		return false;
+	}
 
 	static safe_execute(func, ...args){
 		try {
@@ -113,10 +121,6 @@ class Util {
 		} catch {return "";}
 	}
 	
-	static fix_coords(lat,lon,d=5){
-		return `${lat.toFixed(d)}, ${lon.toFixed(d)}`;
-	}
-	
 }
 
 class LoadStatus {
@@ -170,8 +174,12 @@ class State {
 		this.list_users 	= Util.get_cookie('list_users', 'true')=='true';
 		this.list_stations 	= Util.get_cookie('list_stations', 'true')=='true';
 		this.ping_requests 	= {}; //dictionary of ping requests keys are user id's and values are the time of the last request
-		this.msg_req_ack 	= Util.get_cookie('msg_req_ack','true')=='true';
+		this.msg_req_ack 	= Util.get_cookie('msg_req_ack','false')=='true';
+		this.display_decimal_minute_second 	= Util.get_cookie('display_decimal_minute_second','true')=='true';
 		this.messages_with_ack_pending = {};
+		this.rx_msg_cnt = 0;
+		this.randomize_locations = Util.get_cookie('randomize_locations','false')=='true';
+		this.location_period_s = Util.get_cookie('location_period_s', 15, parseInt);
 	}
 	
 	user_string(){
@@ -469,11 +477,24 @@ class UserView {
 		return false;
 	}
 	
+	static clear_inactive_users(){
+		console.log('clear_inactive_users() currently incomplete');
+		User.load_users(function(users){
+			for (const user of users){
+				var d = new Date(user.last_activity_time);
+				var r = d.getTime();
+				console.log(user.callsign,user.last_activity_time, r, Date.now()-r);
+			}
+			
+		});
+		
+	}
+	
 	static tooltip_contents(callsign, last_location_beacon_time, lat, lon){
 		if (callsign == state.my_callsign){
-			return `(Me) ${callsign}<br>${Util.fix_coords(lat,lon)}`;
+			return `(Me) ${callsign}<br>${Map.coords_string(lat,lon)}`;
 		} else {
-			return `${callsign} ${Util.iso_to_time(last_location_beacon_time)}<br>${Util.fix_coords(lat,lon)}`;
+			return `${callsign} ${Util.iso_to_time(last_location_beacon_time)}<br>${Map.coords_string(lat,lon)}`;
 		}
 		return to_return;
 	}
@@ -535,7 +556,21 @@ class Map {
 		var md = Math.abs(deg - d) * 60;
 		var m = parseInt(md);
 		var sd = (md - m) * 60;
-		return `${d}D ${m}M ${sd.toFixed(2)}S`; // Format as desired 
+		return `${d}d${m}'${sd.toFixed(2)}"`; // Format as desired 
+	}
+	
+	static coords_string(lat,lon,d=6){
+		if (((typeof lat) != 'number')&&((typeof lon) != 'number')){return '';}
+		let lat_str;
+		let lon_str;
+		if (state.display_decimal_minute_second == true){ //display in degree mode
+			lat_str = Map.DD_to_DMS(lat);
+			lon_str = Map.DD_to_DMS(lon);
+		} else { //display in decimal mode
+			lat_str = lat.toFixed(d);
+			lon_str = lon.toFixed(d);
+		}
+		return `${lat_str}, ${lon_str}`;
 	}
 	
 	static create_popup(contents, lat, lon, close_ms=1500){
@@ -566,6 +601,8 @@ class Map {
 }
 
 class View {
+	static message_counter_color = document.getElementById('rx_msg_cnt').style.backgroundColor;
+
 
 	//temporarily highlight a UI element by changing its background color
 	static highlight(id, color, timeout_ms){
@@ -577,8 +614,11 @@ class View {
 		}, timeout_ms);
 	}
 	
-	static highlight_element(ele, color, timeout_ms){
+	static highlight_element(ele, color, timeout_ms, return_color=null){
 		let prev_color = ele.style.backgroundColor;
+		if (return_color !== null){
+			prev_color = return_color;
+		}
 		ele.style.backgroundColor = color;
 		setTimeout(function(){
 			ele.style.backgroundColor = prev_color;
@@ -653,14 +693,26 @@ class UserInput {
 		document.getElementById("send_button").onclick = UserInput.send_msg;
 		document.getElementById("clear_messages").onclick = MessageView.clear;
 		document.getElementById("clear_users").onclick = UserView.clear_users_ui;
+		document.getElementById("clear_inactive_users").onclick = UserView.clear_inactive_users;
 		document.getElementById("clear_waypoints").onclick = WaypointView.clear;
 		document.getElementById("set_radio_config").onclick = this.set_radio_config;
 		document.getElementById("set_hub_config").onclick = this.set_hub_config;
 		document.getElementById("set_callsign").onclick = UserInput.set_callsign;
 		document.getElementById("msg_req_ack").onclick = this.msg_req_ack;
-		document.getElementById("do_nothing").onclick = function() {return false;};
+		document.getElementById("display_decimal_minute_second").onclick = this.display_decimal_minute_second;
 		document.getElementById("refresh_address_list").onclick = this.refresh_address_list;
-		document.getElementById("destination_address").addEventListener('change', this.destination_address);
+		document.getElementById("destination_address").addEventListener('change', this.destination_address); 
+		document.getElementById("randomize_locations").onclick = this.randomize_locations;
+		document.getElementById("location_period_s").addEventListener("input", this.location_period_s);
+	}
+	
+	location_period_s(e){
+		//console.log('location_period_s',e.target.value);
+		let x = parseInt(e.target.value);
+		if (Number.isNaN(x)){return;}
+		state.location_period_s = x;
+		Cookies.set('location_period_s',state.location_period_s, {expires:COOKIE_EXP});
+		messenger.postMessage(["my_location",{'src':state.my_addr,'dst':0,'lat':state.my_lat,'lon':state.my_lon,'period':state.location_period_s}]);
 	}
 	
 	destination_address(){ //change the destination address
@@ -689,6 +741,20 @@ class UserInput {
 		let b = document.getElementById("msg_req_ack");
 		b.checked = state.msg_req_ack;
 		Cookies.set('msg_req_ack',state.msg_req_ack, {expires:COOKIE_EXP});
+	}
+	
+	display_decimal_minute_second(){
+		state.display_decimal_minute_second = !state.display_decimal_minute_second;
+		let b = document.getElementById("display_decimal_minute_second");
+		b.checked = state.display_decimal_minute_second;
+		Cookies.set('display_decimal_minute_second', state.display_decimal_minute_second, {expires:COOKIE_EXP});
+	}
+	
+	randomize_locations(){
+		state.randomize_locations = !state.randomize_locations;
+		let b = document.getElementById('randomize_locations');
+		b.checked = state.randomize_locations;
+		Cookies.set('randomize_locations', state.randomize_locations, {expires:COOKIE_EXP});
 	}
 	
 	set_radio_config(){
@@ -897,8 +963,10 @@ class Handlers {
 		/////////////////////////////////////
 		//add some error to the coordinates//
 		/////////////////////////////////////
-		data.lat = data.lat+Util.randfloat(-0.01,0.01);
-		data.lon = data.lon+Util.randfloat(-0.01,0.01);
+		if (state.randomize_locations == true){
+			data.lat = data.lat+Util.randfloat(-0.01,0.01);
+			data.lon = data.lon+Util.randfloat(-0.01,0.01);
+		}
 		
 		if (data.src == state.my_addr){
 			state.my_lat = data.lat;
@@ -1097,21 +1165,30 @@ class Handlers {
 				});
 			});
 		}
-		
+	}
+	
+	static rx_msg_cnt_cb(pay){
+		//console.log('rx_msg_cnt_cb',pay);
+		state.rx_msg_cnt = pay.rx_msg_cnt;
+		let b = document.getElementById('rx_msg_cnt');
+		b.textContent = `RX: ${state.rx_msg_cnt}`;
+		View.highlight_element(b, 'lime', 250, View.message_counter_color);	
 	}
 	
 	init(){
-		for (const topic of hub_control_messages) {
+		for (const topic of COMMANDS) {
 			if (this.handlers[topic] === undefined){
 				this.handlers[topic] = function(pay, timestamp){console.log(topic,pay);}
 			}
 		}
 		
-		for (const topic of packet_types){
+		for (const topic of TLV_TYPES){
 			if (this.handlers[topic] === undefined){
 				this.handlers[topic] = function(pay, timestamp){console.log(topic,pay);}
 			}
 		}
+		
+		this.handlers['rx_msg_cnt'] = Handlers.rx_msg_cnt_cb;
 		
 		this.handlers['peer_info'] = Handlers.peer_info_cb;
 		this.handlers['message'] = Handlers.message;
@@ -1182,9 +1259,6 @@ function user_accepted() {
 	
 	View.set_tab_buttons(false);
 	map = L.map('themap');
-	
-
-	
 
 	var vectorTileStyling = {
 		water: {
@@ -1369,6 +1443,9 @@ function user_accepted() {
 	}
 
 	document.getElementById("msg_req_ack").checked = state.msg_req_ack;
+	document.getElementById("display_decimal_minute_second").checked = state.display_decimal_minute_second;
+	document.getElementById('randomize_locations').checked = state.randomize_locations;
+	document.getElementById("location_period_s").value = state.location_period_s;
 	
 	if (state.list_users == false){
 		b = document.getElementById('list_users');

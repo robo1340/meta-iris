@@ -271,7 +271,7 @@ class Waypoint {
 
 	static update(addr, lat=null, lon=null, msg="", timestamp=null, color=null, complete_cb=do_nothing){
 		if (addr === undefined) {return;}
-		console.log('Waypoint.update',addr,lat,lon,msg,timestamp,color);
+		//console.log('Waypoint.update',addr,lat,lon,msg,timestamp,color);
 		if (waypoint_db === undefined){return;}
 		if (timestamp == null){
 			timestamp = Util.get_iso_timestamp();
@@ -409,7 +409,7 @@ class WaypointView {
 	}
 	
 	static loaded_cb(wps){
-		//console.log('WaypointView.loaded_cb',wps);
+		console.log('WaypointView.loaded_cb',wps);
 		for (const i in wps) {
 			let w = wps[i];
 			User.get(w.addr, function(user){
@@ -443,8 +443,13 @@ class WaypointView {
 	}
 	
 	static update_span(addr, new_text){
+		//console.log('WaypointView.update_span()',addr,new_text); 
 		let e = $('#'+addr+'.user-entry-waypoint');
 		e.html(new_text);
+		e.css("font-weight","bold");
+		setTimeout(function(){
+			e.css("font-weight","normal");
+		}, 2000);
 	}
 	
 	received_cb(data, timestamp){
@@ -482,7 +487,7 @@ class WaypointView {
 					waypoints[w.addr].bindTooltip(txt,{permanent: false, direction: 'right', className: 'leaflet-tooltip'});	
 				}	
 				
-				WaypointView.update_span(w.addr, 'WAYPOINT ' + state.get_distance(waypoints[w.addr]) + 'm');
+			WaypointView.update_span(w.addr, `WAYPOINT ${state.get_distance(waypoints[w.addr])}m`);
 				
 				//need to make this popup more conditional
 				if ((changed == true) && (c[0] != 0) && (c[1] != 0)){

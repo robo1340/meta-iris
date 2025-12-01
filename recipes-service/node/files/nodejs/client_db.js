@@ -300,9 +300,6 @@ function setup_db(msg_db_cb=do_nothing,user_db_cb=do_nothing) {
 	
 }
 
-
-
-
 ////////////////////////////////////////////////////////////////
 ///////////////////////LOCATION RELATED/////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -312,11 +309,9 @@ function position_received_cb(position){
 	if ((position.coords.latitude == 0) && (position.coords.longitude == 0)){return;}
 	if (state === undefined){return;}
 	
-
-	var location_period_s = Util.get_cookie('location_period_s', 15, parseInt);
 	state.my_lat = position.coords.latitude;
 	state.my_lon = position.coords.longitude;
-	messenger.postMessage(["my_location",{'src':state.my_addr,'dst':0,'lat':state.my_lat,'lon':state.my_lon,'period':location_period_s}]);
+	messenger.postMessage(["my_location",{'src':state.my_addr,'dst':0,'lat':state.my_lat,'lon':state.my_lon,'period':state.location_period_s}]);
 	
 	if (load.complete() != true){return;} //don't do database things until the database is loaded
 	

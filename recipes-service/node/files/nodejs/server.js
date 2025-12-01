@@ -7,6 +7,7 @@ var express = require('express');
 var child_process = require("child_process");
 var zmq = require("zeromq");
 var sub = zmq.socket("sub");
+var rx_msg_cnt = 0;
 const ZMQ_ID = 'hub';
 sub.connect("ipc:///tmp/received_msg.ipc");
 sub.subscribe("");
@@ -293,7 +294,9 @@ io.sockets.on("connection", function(socket) {
 sub.on("message", function(type_bytes, msg_bytes) {
 	var cmd = text_decoder.decode(type_bytes);
 	var msg = JSON.parse(text_decoder.decode(msg_bytes));
+	rx_msg_cnt += 1;
 	io.emit(cmd, msg);
+	io.emit('rx_msg_cnt',{'rx_msg_cnt':rx_msg_cnt});
 });
 
 /*

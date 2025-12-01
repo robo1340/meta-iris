@@ -19,6 +19,7 @@ print_help() {
   echo "tailf         | follow a log file"
   echo "ussh          | ssh without strict host key checking"
   echo "uscp          | scp without scrit host key checking"
+  echo "version       | get software version"
 }
 
 alias ussh='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null"'
@@ -38,6 +39,7 @@ alias scan='/home/wifi/scan_wifi.sh'
 alias join='/home/wifi/join_wifi.sh'
 alias ap='systemctl restart wifi'
 alias help="print_help"
+alias version='cat /home/version.json'
 
 
 print_help

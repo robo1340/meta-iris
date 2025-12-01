@@ -45,6 +45,23 @@
 	cursor: pointer;
 	padding: 4px;
 	transition: 0.3s;
+	
+}
+
+.tab label {
+	height: 100%;
+	width: 25%;
+	font-size: 1.5em;
+	background-color: inherit;
+	float: left;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 4px;
+	transition: 0.1s;
+	display: flex;
+    align-items: center;
+	justify-content: center; 
 }
 
 /* Change background color of buttons on hover */
