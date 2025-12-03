@@ -1,48 +1,59 @@
-DESCRIPTION = "Recipe to build and install the gps service "
+DESCRIPTION = "service to control a hexapod"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 LICENSE="LICENSE"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2ba5c6e4c336f3d9e4d191d4a74fb91c"
-
+RM_WORK_EXCLUDE += "${PN}"
 # project name
-prj="gps"
+prj="hexapod"
 
 inherit systemd
 
 # Create dependency to library packages
-RDEPENDS:${PN} += " node  "
-RDEPENDS:${PN} += " python-pynmea2 "
+RDEPENDS:${PN} += " python3-pyzmq python3-pyserial "
+RDEPENDS:${PN} += " hub  "
+DEPENDS = " "
 
 #src uri's for the source code and .service conf file
+SRC_URI +="file://${prj}"
 SRC_URI +="file://${prj}.service"
 SRC_URI +="file://logrotate.d"
 SRC_URI +="file://LICENSE"
-SRC_URI +="file://${prj}.py"
 
 SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 SYSTEMD_SERVICE:${PN} = "${prj}.service"
 
 S = "${WORKDIR}"
+PACKAGES = "${PN}"
 
 #skip this part of the qa check
 do_package_qa[noexec] = "1"
 
+INSANE_SKIP:${PN}:append = "already-stripped"
+
 service_dir = "/etc/systemd/system"
 
 #add dir to the package files variable
-FILES:${PN} += "${service_dir}/* "
-FILES:${PN} += "/root/${prj}.py"
+#FILES:${PN} += "${service_dir}/* "
+FILES:${PN} += "/${prj}"
 
-do_install(){ 
+do_install(){
+ 
+  #navigate to the working directory where everything was compiled and install
+  #all the files and subdirectories in the proxy directory  
 	cd ${WORKDIR}
-	
+	find ${prj} -type f -exec install -Dm 644 "{}" "${D}/{}" \;
+        cd -
+       
+        cd ${D}/${prj}/scripts
+        chmod +x *.sh
+        cd -
+        
+        cd ${WORKDIR}	
 	#install the service file to /etc/systemd/system
 	install -Dm 644 ${prj}.service ${D}${service_dir}/${prj}.service
-	
-        install -Dm 644 ${prj}.py ${D}/root/${prj}.py
 
 	#install the logrotate configuration file
 	install -Dm 644 logrotate.d/${prj} ${D}/etc/logrotate.d/${prj}
-
 	cd -
 	
 }

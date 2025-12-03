@@ -59,6 +59,8 @@ TYPE_WAYPOINT	= 0x05
 TYPE_PING_REQ	= 0x06
 TYPE_PING_REP	= 0x07
 TYPE_BEACON 	= 0x08
+TYPE_KEY_PRESS  = 0x09
+TYPE_HEXAPOD  	= 0x0A
 
 FORMAT_STRUCT 		= 0x00
 FORMAT_STRING 		= 0x01
@@ -81,7 +83,9 @@ type_to_string = {
 	TYPE_WAYPOINT	: 'waypoint',
 	TYPE_PING_REQ	: 'ping_request',
 	TYPE_PING_REP	: 'ping_response',
-	TYPE_BEACON 	: 'beacon'
+	TYPE_BEACON 	: 'beacon',
+	TYPE_KEY_PRESS	: 'key_press',
+	TYPE_HEXAPOD	: 'hexapod'
 }
 string_to_type = {value: key for key, value in type_to_string.items()}
 
@@ -137,15 +141,15 @@ class TLV_Handler:
 				raise ValueError('add_tlv_to_packet requires "%s" keyword argument' % (r,))
 	
 	def add_tlv_to_packet(self, p, **kwargs):
-		
+		#log.debug(kwargs)
 		self.__require_args(required=self.dict_template.keys(), provided=kwargs)
 		arr = []
 		for key in self.dict_template.keys():
 			arr.append(kwargs[key])	
-		#val = self.value_packer(arr,self.dict_template) if (self.form == FORMAT_JSON_DICT) else 
+		#log.debug(arr)
 		val = self.value_packer(arr)
-		p.append_payload(self.typ, val)
-
+		if (not p.append_payload(self.typ, val)):
+			log.warning('Not enough space to append TLV %s to Packet' % (kwargs,))
 
 def waypoint_value_packer(arr):
 	lat = arr[0]
@@ -175,6 +179,8 @@ waypoint_handler 	= TLV_Handler(TYPE_WAYPOINT, FORMAT_JSON_DICT, dict_template={
 ping_req_handler	= TLV_Handler(TYPE_PING_REQ, FORMAT_STRUCT, dict_template={'ping_id' : 0}, value_unpacker=lambda length, val : struct.unpack('<B', val), value_packer=lambda arr : struct.pack('<B', arr[0]))
 ping_rep_handler	= TLV_Handler(TYPE_PING_REP, FORMAT_STRUCT, dict_template={'ping_id' : 0}, value_unpacker=lambda length, val : struct.unpack('<B', val), value_packer=lambda arr : struct.pack('<B', arr[0]))
 beacon_handler		= TLV_Handler(TYPE_BEACON,   FORMAT_STRUCT)
+key_press_handler	= TLV_Handler(TYPE_KEY_PRESS, FORMAT_STRUCT, dict_template={'expires':0,'pressed':1,'held':2,'released':3,'key':4}, value_unpacker=lambda length, val : struct.unpack('<H???%ds' % (length-5,),val), value_packer=lambda arr : struct.pack('<H???', *arr[:-1])+arr[-1].encode())
+hexapod_handler		= TLV_Handler(TYPE_HEXAPOD, FORMAT_STRUCT, dict_template={}, value_unpacker=lambda length, val : b'', value_packer=lambda arr : b'')
 
 tlv_handlers = {
 	TYPE_ACK 		: ack_handler,
@@ -184,7 +190,9 @@ tlv_handlers = {
 	TYPE_WAYPOINT	: waypoint_handler,
 	TYPE_PING_REQ	: ping_req_handler,
 	TYPE_PING_REP	: ping_rep_handler,
-	TYPE_BEACON 	: beacon_handler
+	TYPE_BEACON 	: beacon_handler,
+	TYPE_KEY_PRESS	: key_press_handler,
+	TYPE_HEXAPOD	: hexapod_handler
 }
 tlv_handlers_by_string = tlv_handlers.copy()
 for old,new in type_to_string.items(): 
@@ -338,4 +346,4 @@ class Packet:
 		return self.unique_id == other.unique_id
 	
 	def __str__(self):
-		return 'src:0x%04X, link_src:0x%04X dst:0x%04X, id:0x%04X, crc:0x%04X | "%s"' % (self.src, self.link_src, self.dst, self.unique_id, self.crc, self.payload.strip(b'\x00'))
+		return '%s bytes src:0x%04X, link_src:0x%04X dst:0x%04X, id:0x%04X, crc:0x%04X |"%s"' % (len(self.payload.strip(b'\x00')), self.src, self.link_src, self.dst, self.unique_id, self.crc, self.payload.strip(b'\x00'))

@@ -14,8 +14,7 @@ def read_json(path):
 		with open(path,'r') as f:
 			return json.load(f)
 	except BaseException: #failed to read record so write a default in its place
-		write_json(path)
-		return {}
+		return 'default_ap'
 
 
 #parser = argparse.ArgumentParser()

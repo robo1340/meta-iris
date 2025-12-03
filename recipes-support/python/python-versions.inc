@@ -1,1 +1,1 @@
-PREFERRED_VERSION_python-pynmea2 = "1.19.0"
+PREFERRED_VERSION_python-sshkeyboard = "2.3.1"

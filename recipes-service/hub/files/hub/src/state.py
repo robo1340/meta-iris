@@ -45,19 +45,26 @@ class Task:
 			self.callback()
 
 class RateLimiter:
-	def __init__(self, max_rate_s=1):
+	def __init__(self, topic_rate_limits, default_rate_limit=1):
 		self.topics = {}
-		self.max_rate_s = max_rate_s
+		self.topic_rate_limits = topic_rate_limits
+		self.default_rate_limit = default_rate_limit
 	
 	def ask(self, topic):
 		if (topic not in self.topics):
 			self.topics[topic] = time.monotonic()
 			return True
-		elif (time.monotonic() - self.topics[topic]) > self.max_rate_s:
-			self.topics[topic] = time.monotonic()
-			return True
 		else:
-			return False
+			if (topic in self.topic_rate_limits):
+				if (self.topic_rate_limits[topic] <= 0): #rate limiting disabled for this topic
+					return True
+				elif (time.monotonic() - self.topics[topic]) > self.topic_rate_limits[topic]:
+					self.topics[topic] = time.monotonic()
+					return True
+			elif (time.monotonic() - self.topics[topic]) > self.default_rate_limit:
+				self.topics[topic] = time.monotonic()
+				return True
+		return False
 
 #a task scheduler that only allows the callback to be called with a
 #specific set of arguments up to a maximum rate
@@ -108,6 +115,9 @@ class CappedDict(collections.OrderedDict):
 				if (deleted >= diff):
 					break
 
+def read_ini(path='/tmp/packet_length.txt'):
+	with open(path, 'r') as f:
+		return int(f.read())
 		
 
 # A class to hold the state of the program
@@ -123,7 +133,9 @@ class State:
 		self.my_addr = my_addr
 		self.my_callsign = my_callsign
 		
-		self.MAX_LENGTH = lambda : self.config['max_length']
+		self.max_length = read_ini()
+		log.info('packet length %d' % (self.max_length,))
+		self.MAX_LENGTH = lambda : self.max_length
 		self.BROADCAST_ADDR = lambda : self.config['broadcast_addr'] 
 		self.PEER_TIMEOUT_S = lambda : self.config['peer_timeout_s']
 		self.DEFAULT_HOPS = lambda : self.config['default_hops']
@@ -137,7 +149,7 @@ class State:
 		#self.peers[1] = Peer(1,'fake')
 		#self.sync_peers()
 		
-		self.rate_limiter = RateLimiter(self.config['topic_rate_limit_s'])
+		self.rate_limiter = RateLimiter(self.config['topic_rate_limits'], self.config['default_topic_rate_limit_s'])
 		
 		self.sync_peers_task   = Task(60, self.sync_peers)
 		self.tx_peer_info_task    = Task(self.config['peer_info_tx_s'], self.tx_peer_info, random_precharge=True, variance_ratio=0.5)
@@ -290,7 +302,6 @@ class State:
 		self.pub.send_string('GET_LINK_PEERS', flags=zmq.SNDMORE)
 		self.pub.send_json(pay)
 
-	
 	def retransmit_task(self):
 		now = time.monotonic()
 		to_remove = []

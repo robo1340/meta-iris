@@ -55,6 +55,7 @@ IMAGE_INSTALL:append = " linux-firmware-ath9k "
 IMAGE_INSTALL:append = " nodejs frr libmicrohttpd random-mac wifi gps " 
 
 IMAGE_INSTALL:append = " snap hub node " 
+IMAGE_INSTALL:append = " hexapod key-pub " 
 #IMAGE_INSTALL:append = " bridge " 
 #IMAGE_INSTALL:append = " chat " 
 IMAGE_INSTALL:append = " bash " 
@@ -62,3 +63,5 @@ IMAGE_INSTALL:append = " bash "
 #IMAGE_INSTALL:append = " apache2 " 
 #IMAGE_INSTALL:append = " nginx " 
 
+#IMAGE_INSTALL:append = " python3-terminal " 
+IMAGE_INSTALL:append = " python3-modules " 

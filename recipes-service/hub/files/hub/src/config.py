@@ -11,13 +11,15 @@ ANIMALS = ['otter','dog','cat','horse','sheep','aligator','kowala','hippo','coyo
 ATTRIBUTES = ['shy','angry','sad','rapey','pensive','bored','excited','nervous','happy']
 
 hardcoded_default_config = {
-	'max_length' : 100,
 	'retransmit_wait_multiplier_s' : 0.1, #wait this long times the rssi of the received packet
 	'broadcast_addr' : 0,
 	'peer_timeout_s' : 300,
 	'peer_info_tx_s' : 30,
 	'default_hops'	: 3,
-	'topic_rate_limit_s' : 1,
+	'topic_rate_limits' : {
+		'key_press' : -1
+	},
+	'default_topic_rate_limit_s' : 1,
 	'peers_to_ignore' : [] #a list of peers to ignore messages from to better simulate a mesh network, should be left empty during normal operation
 }
 

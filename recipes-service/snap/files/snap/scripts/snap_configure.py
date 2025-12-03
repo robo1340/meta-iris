@@ -80,6 +80,7 @@ if __name__ == "__main__":
 	parser.add_argument('-t',   '--config-type', choices=['modem','general','packet','preamble'], default='modem', help='the config type being set')
 	parser.add_argument('-lm',  '--list-configs', action='store_true', help='list available modem configs')
 	parser.add_argument('-sm',  '--set-config', type=str, default='', help='set the modem config by name')
+	parser.add_argument('-s',   '--set-config-by-match', type=str, default='', help='set the modem config matching comma delimitted strings')
 	parser.add_argument('-nr',  '--no-restart', action='store_true', help='do not restart the snap service after making configuration changes')
 	parser.add_argument('-mcln','--modem-config-link-name', type=str, default='1000_modem_config.h', help='set the modem config link name')
 	parser.add_argument('-gcln','--general-config-link-name', type=str, default='9000_general.h', help='set the general config link name')
@@ -110,6 +111,26 @@ if __name__ == "__main__":
 			os.system('ln -s %s %s' % (os.path.join('..','all',os.path.basename(MODEM_CONFIGS_PATHS[args['config_type']]),args['set_config']), args[link_name_key]))
 			os.chdir(old_cd)
 			config_changed = True
+
+	elif (args['set_config_by_match'] != ''):
+		to_match = args['set_config_by_match'].split(',')
+		log.info('Match Patterns %s' % (to_match,))
+		for file in os.listdir(MODEM_CONFIGS_PATH):
+			match_found = True
+			for tm in to_match:
+				if (tm not in file):
+					match_found = False
+			if (not match_found):
+				continue
+			log.info('Match Found %s' % (file,))
+			os.system('rm %s' % (os.path.join(MODEM_CONFIG_SELECTED_PATH,args[link_name_key] if (args['config_type'] != 'modem') else '*'),))
+			old_cd = os.getcwd()
+			os.chdir(MODEM_CONFIG_SELECTED_PATH)
+			os.system('ln -s %s %s' % (os.path.join('..','all',os.path.basename(MODEM_CONFIGS_PATHS[args['config_type']]),file), args[link_name_key]))
+			os.chdir(old_cd)
+			config_changed = True
+			break
+			
 
 	if (config_changed) and (args['no_restart'] == False):
 		os.system('systemctl restart snap')

@@ -111,6 +111,11 @@ int main(int argc, char **argv) {
 	
 	composite_encoder_t * encoder = composite_encoder(payload_len, rs_mode, block_len, NULL);
 	
+	FILE *fptr;
+    fptr = fopen("/tmp/packet_length.txt", "w");
+    fprintf(fptr, "%d", encoder->uncoded_len);
+    fclose(fptr);
+	
 	bridge_t * br = bridge_create(encoder);
 	assert(br != NULL);
 	
