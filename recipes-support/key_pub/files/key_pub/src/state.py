@@ -32,8 +32,13 @@ class Task:
 
 @dataclass
 class KeyPress:
-    key: str
-    time_pressed: float
+	key: str
+	time_pressed: float
+	
+	def held(self, check_keys_s):
+		return (time.monotonic() > (self.time_pressed + check_keys_s))
+	
+	
 
 class State:
 	def __init__(self, config, args):
@@ -44,7 +49,10 @@ class State:
 		self.stopped = False
 		self.key_queue = Queue()
 		self.keys_pressed = {}
-		self.check_keys_task = Task(0.5, self.check_keys)
+		
+		self.CHECK_KEYS_S = lambda : self.config['check_keys_s']
+		
+		self.check_keys_task = Task(self.CHECK_KEYS_S(), self.check_keys)
 		self.EXPIRES_MS = lambda : self.config['expires_ms']
 		self.key_pressed_actions = {
 			'w' 	: lambda : self.send('w',pressed=True),
@@ -105,12 +113,17 @@ class State:
 			'key'		: key
 		}
 		log.debug('state.send %s' % (to_send,))
-		self.push.send_json(to_send)
+		if (self.args['send_local'] == True):
+			to_send['src'] = 0
+			self.push.send_string('key_press', flags=zmq.SNDMORE)
+			self.push.send_json(to_send)
+		else:
+			self.push.send_json(to_send)
 	
 	def check_keys(self):
 		if (len(self.keys_pressed) > 0):
 			for key in self.keys_pressed:
-				if (key in self.key_held_actions):
+				if (key in self.key_held_actions) and (self.keys_pressed[key].held(self.CHECK_KEYS_S())):
 					self.key_held_actions[key]()
 			#log.info(self.keys_pressed)
 	

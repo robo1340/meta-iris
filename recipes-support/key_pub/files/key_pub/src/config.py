@@ -6,7 +6,8 @@ import time
 CONFIG_PATH = '/key_pub/conf/config.json'
 
 hardcoded_default_config = {
-	'expires_ms' : 300
+	'expires_ms' : 1000,
+	'check_keys_s' : 0.75
 }
 
 #for each key not in dst, place the key and value in src

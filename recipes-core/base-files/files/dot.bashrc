@@ -19,6 +19,8 @@ print_help() {
   echo "tailf         | follow a log file"
   echo "ussh          | ssh without strict host key checking"
   echo "uscp          | scp without scrit host key checking"
+  echo "key_pub       | start the key publishing client"
+  echo "servo         | take direct control of several servos"
   echo "version       | get software version"
 }
 
@@ -38,6 +40,8 @@ alias scan='/home/wifi/scan_wifi.sh'
 #alias join='join() { /bridge/scripts/join_wifi.sh "$1" "$2"; }; join'
 alias join='/home/wifi/join_wifi.sh'
 alias ap='systemctl restart wifi'
+alias key_pub='python3 /key_pub/src/main.py'
+alias servo='python3 /rover/scripts/servo.py'
 alias help="print_help"
 alias version='cat /home/version.json'
 

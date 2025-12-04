@@ -9,18 +9,12 @@ hardcoded_default_config = {
 	'serial_path' 		: '/dev/ttySTM1',
 	'serial_baud'		: 115200,
 	'serial_timeout'	: 0.1,
-	'LH' 	: 1000,
-	'LM' 	: 1400,
-	'LL'	: 1800,
-	'RH' 	: 2000,
-	'RM' 	: 1600,
-	'RL'	: 1200,
-	"offsets" : {
-		2 : 80,
-		8 : 80
-	},
-	'base_speed' : 150,
-	'max_speed' : 200,
+	'left_ch'			: 0,
+	'right_ch'			: 1,
+	'left_offset_us' 	: -34,
+	'right_offset_us' 	: -34,
+	'pan_ch'			: 2,
+	'tilt_ch'			: 3,
 	'advertisment_rate' : 15
 }
 

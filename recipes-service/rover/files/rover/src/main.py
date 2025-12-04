@@ -9,7 +9,8 @@ import traceback
 import functools
 from state import State
 from state import SSC32
-from state import Hexapod
+from state import Rover
+from state import PanTilt
 from config import read_config
 import argparse
 
@@ -21,7 +22,7 @@ def configure_logging(verbose=True):
 	formatter = log.Formatter('%(asctime)s %(levelname)s %(message)s')
 	lvl = log.DEBUG if (verbose) else log.INFO
 	
-	path = '/var/log/hexapod.log'
+	path = '/var/log/rover.log'
 	handler = RotatingFileHandler(path, maxBytes=10*10000, backupCount=5)
 	handler.setFormatter(formatter)
 	
@@ -65,12 +66,12 @@ if __name__ == "__main__":
 		#configure_logging(verbose=False)
 
 	ssc32 = SSC32(config['serial_path'], config['serial_baud'], config['serial_timeout'])
-	hexapod = Hexapod(ssc32, config)
-	state = State(hexapod, config, command_line_config)
+	pantilt = PanTilt(ssc32, config)
+	rover = Rover(ssc32, config)
+	state = State(rover, pantilt, config, command_line_config)  
 	
 	#4. create global state object
 	zmq_ctx = zmq.Context()
-	state = State(hexapod, config, command_line_config)
 	state.zmq_ctx = zmq_ctx
 	
 	#5. set up zeroMQ objects
@@ -80,7 +81,7 @@ if __name__ == "__main__":
 	poller = zmq.Poller()
 	poller.register(subscriber, zmq.POLLIN)
 	
-	log.info('hexapod entering main loop')
+	log.info('rover entering main loop')
 	while (not state.stopped):
 		try:
 			socks = dict(poller.poll(timeout=100))
@@ -109,7 +110,7 @@ if __name__ == "__main__":
 			#time.sleep(10)
 			
 	#cleanup
-	log.info('hexapod Shutting Down')
+	log.info('rover Shutting Down')
 	subscriber.close()
 	state.push.close()
 	state.zmq_ctx.term()

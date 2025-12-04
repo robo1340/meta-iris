@@ -108,12 +108,12 @@ class Hexapod:
 	def panh(self, amt):
 		self.panh_pos = max(575, min(self.panh_pos + amt, 2475))
 		#log.debug('panh %d' % (self.panh_pos,))
-		self.ssc32.move(25, self.panh_pos)
+		self.ssc32.move(25, self.panh_pos, time_ms=500)
 
 	def panv(self, amt):
 		self.panv_pos = max(1250, min(self.panv_pos + amt, 2425))
 		#log.debug('panv %d' % (self.panv_pos,))
-		self.ssc32.move(24, self.panv_pos)
+		self.ssc32.move(24, self.panv_pos, time_ms=500)
 
 	def stand(self):
 		log.info('stand')
@@ -125,6 +125,14 @@ class Hexapod:
 		#for ch in [0,1,2,3,4,5,16,17,18,19,20,21,24,25]:
 		for ch in [24,25]:
 			self.ssc32.move(ch, 1500)
+
+	def lower_legs(self):
+		log.info('lower_legs')
+		L = self.config['LL']
+		R = self.config['RL']
+		n = 1500
+		self.ssc32.write('#0 P%d #2 P%d #4 P%d #16 P%d #18 P%d #20 P%d T500' % (R, R, R, L, L, L))
+
 
 	def increment_speed(self):
 		self.speed = min(self.speed+self.increment_amount, self.max_speed)
@@ -148,13 +156,17 @@ class Hexapod:
 		if (speed is None):
 			speed = self.speed
 		cmd = 'XL %d XR %d XS %d' % (left, right, speed)
-		log.debug('Hexapod.move(%s)' % (cmd,))
+		#log.debug('Hexapod.move(%s)' % (cmd,))
 		self.ssc32.write(cmd)
+	
+	def stop_sequencer(self):
+		self.ssc32.write('XSTOP')
 		
 	def stop(self):
 		log.info('stop')
-		self.ssc32.write('XSTOP')
-		self.stand()
+		self.stop_sequencer()
+		self.speed = self.base_speed
+		self.lower_legs()
 
 @dataclass
 class KeyPress:
@@ -197,9 +209,9 @@ class State:
 		
 		self.advertisment_task = Task(self.ADVERTISMENT_RATE(), self.advertise_self)
 		self.handle_key_press_task = Task(0.25, self.handle_key_press)
-		self.check_task = Task(3, self.hexapod.check)
+		self.check_task = Task(2, self.hexapod.check)
 		
-		self.pan_amt = 50
+		self.pan_amt = 75
 		
 		self.key_pressed_actions = {
 			'w' 	: lambda : self.hexapod.move(100,100),
@@ -214,10 +226,10 @@ class State:
 			'enter' : lambda : self.hexapod.stand()
 		}
 		self.key_released_actions = {
-			'w'		: lambda : self.hexapod.reset_speed(),
-			's'		: lambda : self.hexapod.reset_speed(),
-			'a'		: lambda : self.hexapod.reset_speed(),
-			'd'		: lambda : self.hexapod.reset_speed(),
+			'w'		: lambda : self.hexapod.stop_sequencer(),
+			's'		: lambda : self.hexapod.stop_sequencer(),
+			'a'		: lambda : self.hexapod.stop_sequencer(),
+			'd'		: lambda : self.hexapod.stop_sequencer(),
 			'left'	: lambda : self.hexapod.panh(0),
 			'right'	: lambda : self.hexapod.panh(0),
 			'down'	: lambda : self.hexapod.panv(0),
@@ -261,7 +273,7 @@ class State:
 	
 	def handle_sub(self,cmd, msg):
 		if (cmd == 'key_press'):
-			#log.debug('%s, %s' % (cmd, msg))
+			log.debug('%s, %s' % (cmd, msg))
 			self.last_key = KeyPress.from_dict(msg)
 	
 	def advertise_self(self):

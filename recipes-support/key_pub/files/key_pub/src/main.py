@@ -40,6 +40,11 @@ def create_push(context, endpoint):
 	socket.connect(endpoint)
 	return socket
 
+def create_pub(context, endpoint):
+	socket = context.socket(zmq.PUB)
+	socket.linger = 1000
+	socket.bind(endpoint)
+	return socket
 
 if __name__ == "__main__":
 	#1. import config file
@@ -48,6 +53,7 @@ if __name__ == "__main__":
 	#1.1 parse command line arguments
 	parser = argparse.ArgumentParser(description='execute unittest')
 	parser.add_argument('-F', '--force-output-stdout' , action='store_true', help='log everything to stdout')
+	parser.add_argument('-l', '--send-local' , action='store_true', help='send key press events locally instead of over the radio')
 	args = parser.parse_args()
 	command_line_config = args.__dict__
 
@@ -59,7 +65,13 @@ if __name__ == "__main__":
 	state.zmq_ctx = zmq_ctx
 	
 	#5. set up zeroMQ objects
-	state.push = create_push(state.zmq_ctx, "ipc:///tmp/transmit_msg.ipc") #zmq socket to send messages to the hub
+	if (command_line_config['send_local'] == True):
+		log.info('Sending key press events locally, shutting down hub while key press client is running')
+		os.system('systemctl stop hub')
+		state.push = create_pub(state.zmq_ctx, "ipc:///tmp/received_msg1.ipc")
+		time.sleep(1)
+	else:
+		state.push = create_push(state.zmq_ctx, "ipc:///tmp/transmit_msg.ipc") #zmq socket to send messages to the hub
 	subscriber = create_subscriber(state.zmq_ctx, "ipc:///tmp/received_msg.ipc") #zmq socket to receive messages from the hub
 	
 	poller = zmq.Poller()
@@ -70,7 +82,7 @@ if __name__ == "__main__":
 			on_press=functools.partial(on_key_press, state.key_queue),
 			on_release=functools.partial(on_key_release, state.key_queue),
 			delay_second_char=0.75,
-			delay_other_chars=0.05,
+			delay_other_chars=0.1,
 			sequential=True,
 			#debug=True
 		)
@@ -80,7 +92,7 @@ if __name__ == "__main__":
 	log.info('key_pub entering main loop')
 	while (not state.stopped):
 		try:
-			socks = dict(poller.poll(timeout=50))
+			socks = dict(poller.poll(timeout=10))
 			for sock in socks:
 				if (socks[sock] != zmq.POLLIN):
 					continue
@@ -108,6 +120,8 @@ if __name__ == "__main__":
 			
 	#cleanup
 	log.info('key_pub Shutting Down')
+	if (command_line_config['send_local'] == True):
+		os.system('systemctl start hub')
 	stop_listening() # Stop listening for key presses
 	keyboard_thread.join()
 	subscriber.close()
