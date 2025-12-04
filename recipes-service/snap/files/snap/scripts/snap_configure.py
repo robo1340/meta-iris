@@ -75,10 +75,33 @@ CONFIG_LINK_NAME_KEY = {
 	'preamble': 'preamble_config_link_name'	
 }
 
+QUICK_CONFIG_OPTIONS = {
+	'' : {},
+	'default' : {
+		'set_config' : 'radio_config_Si4463_430M_10kbps.h',
+		'payload'	 : 100,
+		'block'		 : 20,
+		'disable_reed_solomon' : False,
+	},
+	'expanded' : {
+		'set_config' : 'radio_config_Si4463_430M_10kbps.h',
+		'payload'	 : 200,
+		'block'		 : 20,
+		'disable_reed_solomon' : False,
+	},
+	'rc' : {
+		'set_config' : 'radio_config_Si4463_430M_20kbps.h',
+		'payload'	 : 22,
+		'block'		 : 22,
+		'disable_reed_solomon' : False,
+	}
+}
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description = 'configure the snap interface')
+	parser.add_argument('-q',   '--quick-config', choices=list(QUICK_CONFIG_OPTIONS.keys()), default='', help='configure modem setting to one of several pre-canned options')
 	parser.add_argument('-t',   '--config-type', choices=['modem','general','packet','preamble'], default='modem', help='the config type being set')
-	parser.add_argument('-lm',  '--list-configs', action='store_true', help='list available modem configs')
+	parser.add_argument('-l',  '--list-configs', action='store_true', help='list available modem configs')
 	parser.add_argument('-sm',  '--set-config', type=str, default='', help='set the modem config by name')
 	parser.add_argument('-s',   '--set-config-by-match', type=str, default='', help='set the modem config matching comma delimitted strings')
 	parser.add_argument('-nr',  '--no-restart', action='store_true', help='do not restart the snap service after making configuration changes')
@@ -111,7 +134,6 @@ if __name__ == "__main__":
 			os.system('ln -s %s %s' % (os.path.join('..','all',os.path.basename(MODEM_CONFIGS_PATHS[args['config_type']]),args['set_config']), args[link_name_key]))
 			os.chdir(old_cd)
 			config_changed = True
-
 	elif (args['set_config_by_match'] != ''):
 		to_match = args['set_config_by_match'].split(',')
 		log.info('Match Patterns %s' % (to_match,))
@@ -130,7 +152,25 @@ if __name__ == "__main__":
 			os.chdir(old_cd)
 			config_changed = True
 			break
+	elif (args['quick_config'] != ''): 
+			q = QUICK_CONFIG_OPTIONS[args['quick_config']]
+			log.info('setting quick config\n%s' %(q,))
+			args['set_config'] = q['set_config']
+
+			os.system('rm %s' % (os.path.join(MODEM_CONFIG_SELECTED_PATH,args[link_name_key] if (args['config_type'] != 'modem') else '*'),))
+			old_cd = os.getcwd()
+			os.chdir(MODEM_CONFIG_SELECTED_PATH)
+			os.system('ln -s %s %s' % (os.path.join('..','all',os.path.basename(MODEM_CONFIGS_PATHS[args['config_type']]),args['set_config']), args[link_name_key]))
+			os.chdir(old_cd)
 			
+			os.system('rm /snap/conf/config.ini')
+			with open('/snap/conf/config.ini', 'w') as f:
+				f.write('payload=%s\n' % (q['payload'],))
+				f.write('block=%s\n' % (q['block'],))
+				f.write('disable_reed_solomon=%s\n' % ('true' if q['disable_reed_solomon'] else 'false',))
+			
+			config_changed = True		
+		
 
 	if (config_changed) and (args['no_restart'] == False):
 		os.system('systemctl restart snap')
