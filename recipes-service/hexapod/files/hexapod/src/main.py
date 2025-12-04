@@ -75,7 +75,7 @@ if __name__ == "__main__":
 	
 	#5. set up zeroMQ objects
 	state.push = create_push(state.zmq_ctx, "ipc:///tmp/transmit_msg.ipc") #zmq socket to send messages to the hub
-	subscriber = create_subscriber(state.zmq_ctx, "ipc:///tmp/received_msg1.ipc") #zmq socket to receive messages from the hub
+	subscriber = create_subscriber(state.zmq_ctx, "ipc:///tmp/received_msg.ipc") #zmq socket to receive messages from the hub
 	
 	poller = zmq.Poller()
 	poller.register(subscriber, zmq.POLLIN)

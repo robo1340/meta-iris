@@ -21,6 +21,9 @@ class Task:
 			self.last_update = self.last_update - random.uniform(0, self.period)
 	def reset(self):
 		self.last_update = 0
+	def now(self):
+		self.last_update = 0
+		self.run()
 	def run(self):
 		if ((time.monotonic() - self.last_update) > self.period):
 			self.last_update = time.monotonic()
@@ -49,7 +52,8 @@ class SSC32:
 		self.write(cmd)
 
 class PanTilt:
-	def __init__(self, ssc32, config):
+	def __init__(self, ssc32, config, servo_time_s=250):
+		self.servo_time_ms = servo_time_s * 1000
 		self.ssc32 = ssc32
 		self.config = config
 		self.panh_pos = 1500
@@ -57,37 +61,43 @@ class PanTilt:
 		self.pan_ch = config['pan_ch']
 		self.tilt_ch = config['tilt_ch']
 
+	def set_position(self, pan, tilt):
+		self.panh_pos = pan
+		self.panv_pos = tilt
+		self.ssc32.move(self.pan_ch, self.panh_pos)
+		self.ssc32.move(self.tilt_ch, self.panv_pos)		
+	
 	def reset(self):
-		self.ssc32.move(self.pan_ch, 1500)
-		self.ssc32.move(self.tilt_ch, 1500)
+		self.set_position(1500,1500)
 
 	def panh(self, amt):
 		self.panh_pos = max(575, min(self.panh_pos + amt, 2475))
-		#log.debug('panh %d' % (self.panh_pos,))
-		self.ssc32.move(self.pan_ch, self.panh_pos, time_ms=500)
+		log.debug('panh %d' % (self.panh_pos,))
+		self.ssc32.move(self.pan_ch, self.panh_pos, time_ms=self.servo_time_ms)
 
 	def panv(self, amt):
-		self.panv_pos = max(1250, min(self.panv_pos + amt, 2425))
-		#log.debug('panv %d' % (self.panv_pos,))
-		self.ssc32.move(self.tilt_ch, self.panv_pos, time_ms=500)
+		self.panv_pos = max(1050, min(self.panv_pos + amt, 2425))
+		log.debug('panv %d' % (self.panv_pos,))
+		self.ssc32.move(self.tilt_ch, self.panv_pos, time_ms=self.servo_time_ms)
 
 class Rover:
 	def __init__(self, ssc32, config):
 		self.ssc32 = ssc32
 		
 		self.config = config
-		self.increment_amount = 20
 
 		self.left_ch = self.config['left_ch']
 		self.right_ch = self.config['right_ch']
 		self.left = 1500 + self.config['left_offset_us']
 		self.right = 1500 + self.config['right_offset_us']
 
-		self.max_limits = [1700,1825,2000]
-		self.min_limits = [1300,1175,1000]
+		self.max_limits 		= [1700,1825,2000]
+		self.min_limits 		= [1300,1175,1000]
+		self.increment_amounts 	= [  25,  50,  75]
 
 		self.max_limit = lambda : self.max_limits[0]
 		self.min_limit = lambda : self.min_limits[0]
+		self.increment_amount = lambda : self.increment_amounts[0]
 
 		self.initialized = False
 		self.init()
@@ -128,35 +138,37 @@ class Rover:
 		self.right = 1500
 		self.set_motors(1500, 1500)
 
-	def turn_left(self):
+	def turn_left(self,add=0):
 		log.debug('Rover.turn_left')
-		self.left += self.increment_amount
-		self.right -= self.increment_amount
+		self.left += (self.increment_amount() + add)
+		self.right -= (self.increment_amount() + add)
 		self.set_motors(self.left, self.right)
 
-	def turn_right(self):
+	def turn_right(self,add=0):
 		log.debug('Rover.turn_right')
-		self.left -= self.increment_amount
-		self.right += self.increment_amount
+		self.left -= (self.increment_amount() + add)
+		self.right += (self.increment_amount() + add)
 		self.set_motors(self.left, self.right)
 
-	def forward(self):
+	def forward(self, add=0):
 		log.debug('Rover.forward')
-		self.left -= self.increment_amount
-		self.right -= self.increment_amount
+		self.left -= (self.increment_amount() + add)
+		self.right -= (self.increment_amount() + add)
 		self.set_motors(self.left, self.right)
 
 	def change_limits(self):
 		prev_max = self.max_limits.pop(0)
 		prev_min = self.min_limits.pop(0)
+		prev_inc = self.increment_amounts.pop(0)
 		self.max_limits.append(prev_max)
 		self.min_limits.append(prev_min)
-		log.info('limits changed to [%d,%d]' % (self.min_limit(), self.max_limit()))	
+		self.increment_amounts.append(prev_inc)
+		log.info('limits changed to [%d,%d,%d]' % (self.min_limit(), self.max_limit(), self.increment_amount()))	
 
-	def backward(self):
+	def backward(self, add=0):
 		log.debug('Rover.backward')
-		self.left += self.increment_amount
-		self.right += self.increment_amount
+		self.left += (self.increment_amount() + add)
+		self.right += (self.increment_amount() + add)
 		self.set_motors(self.left, self.right)
 
 @dataclass
@@ -169,9 +181,16 @@ class KeyPress:
 	dst : int
 	expires : float
 	first_use : bool = True
+	action_taken : bool = False
 
 	def expired(self):
 		return time.monotonic() > self.expires
+
+	def used(self):
+		if (self.action_taken == False):
+			self.action_taken = True
+			return False
+		return True
 
 	def hold(self):
 		self.pressed = False
@@ -191,10 +210,13 @@ class KeyPress:
 
 class State:
 	def __init__(self, rover, pantilt, config, args):
+		self.handle_key_press_update_rate_s = 0.25
+		
 		self.zmq_ct = None
 		self.push = None
 		self.rover = rover
 		self.pantilt = pantilt
+		self.pantilt.servo_time_ms = self.handle_key_press_update_rate_s * 1000 * 2
 		self.machine_stopped = False
 		self.config = config
 		self.args = args
@@ -205,27 +227,28 @@ class State:
 		self.ADVERTISMENT_RATE = lambda : self.config['advertisment_rate']
 		
 		self.advertisment_task = Task(self.ADVERTISMENT_RATE(), self.advertise_self)
-		self.handle_key_press_task = Task(0.25, self.handle_key_press)
+		self.handle_key_press_task = Task(self.handle_key_press_update_rate_s, self.handle_key_press)
 		self.check_task = Task(2, self.rover.check)
 		
-		self.pan_amt = 75
+		self.pan_amt = 100
+		self.deadzone_offset = 50
 		
 		def stand():
-			self.hexapod.stand()
+			self.rover.stop()
 			self.pantilt.reset()
 			
 		
 		self.key_pressed_actions = {
-			'w' 	: lambda : self.rover.forward(),
-			'a' 	: lambda : self.rover.turn_left(),
-			's' 	: lambda : self.rover.backward(),
-			'd' 	: lambda : self.rover.turn_right(),
-			'left'	: lambda : self.pantilt.panh(-self.pan_amt),
-			'right'	: lambda : self.pantilt.panh(self.pan_amt),
-			'down'	: lambda : self.pantilt.panv(-self.pan_amt),
-			'up'	: lambda : self.pantilt.panv(self.pan_amt),
+			'w' 	: lambda : self.rover.forward(self.deadzone_offset),
+			'a' 	: lambda : self.rover.turn_left(self.deadzone_offset),
+			's' 	: lambda : self.rover.backward(self.deadzone_offset),
+			'd' 	: lambda : self.rover.turn_right(self.deadzone_offset),
+			#'left'	: lambda : self.pantilt.panh(-self.pan_amt),
+			#'right'	: lambda : self.pantilt.panh(self.pan_amt),
+			#'down'	: lambda : self.pantilt.panv(-self.pan_amt),
+			#'up'	: lambda : self.pantilt.panv(self.pan_amt),
 			'space' : lambda : self.rover.change_limits(),
-			'enter' : lambda : self.stand()
+			'enter' : lambda : stand()
 		}
 		self.key_released_actions = {
 			'w'		: lambda : self.rover.stop(),
@@ -266,19 +289,23 @@ class State:
 			self.rover.stop()
 			return
 		
-		if (self.last_key.pressed == True) and (self.last_key.key in self.key_pressed_actions):
+		if (self.last_key.pressed == True) and (self.last_key.key in self.key_pressed_actions) and (self.last_key.used()==False):
+			log.info('pressed')
 			self.key_pressed_actions[self.last_key.key]()
-			self.last_key.hold()
 		elif (self.last_key.held == True) and (self.last_key.key in self.key_held_actions):
+			log.info('held')
 			self.key_held_actions[self.last_key.key]()
-		elif (self.last_key.released == True) and (self.last_key.key in self.key_released_actions):
+		elif (self.last_key.released == True) and (self.last_key.key in self.key_released_actions) and (self.last_key.used()==False):
+			log.info('released')
 			self.key_released_actions[self.last_key.key]()
-			self.last_key.hold()
 	
 	def handle_sub(self,cmd, msg):
 		if (cmd == 'key_press'):
-			log.debug('%s, %s' % (cmd, msg))
+			#log.debug('%s, %s' % (cmd, msg))
 			self.last_key = KeyPress.from_dict(msg)
+			log.debug('%s %s%s%s %d' % (self.last_key.key, 'T' if (self.last_key.pressed) else 'F', 'T' if self.last_key.held else 'F', 'T' if self.last_key.released else 'F', int(time.monotonic()*1000)))
+			if (self.last_key.pressed == True)or(self.last_key.released==True):
+				self.handle_key_press_task.now()
 	
 	def advertise_self(self):
 		to_send = {

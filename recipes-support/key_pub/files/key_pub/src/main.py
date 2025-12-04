@@ -68,7 +68,7 @@ if __name__ == "__main__":
 	if (command_line_config['send_local'] == True):
 		log.info('Sending key press events locally, shutting down hub while key press client is running')
 		os.system('systemctl stop hub')
-		state.push = create_pub(state.zmq_ctx, "ipc:///tmp/received_msg1.ipc")
+		state.push = create_pub(state.zmq_ctx, "ipc:///tmp/received_msg.ipc")
 		time.sleep(1)
 	else:
 		state.push = create_push(state.zmq_ctx, "ipc:///tmp/transmit_msg.ipc") #zmq socket to send messages to the hub
