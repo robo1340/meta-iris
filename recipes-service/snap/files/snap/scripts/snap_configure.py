@@ -2,6 +2,7 @@ import sys
 import argparse
 import os
 import json
+import time
 import logging as log
 
 def write_json(path, to_write={}, indent=2):
@@ -121,8 +122,10 @@ if __name__ == "__main__":
 	if (args['list_configs']):
 		print("Currently Selected Radio Config")
 		os.system('ls -lh %s' % (MODEM_CONFIG_SELECTED_PATH,))
+		os.system('cat /snap/conf/config.ini')
 		print("\nAvailable:")
 		os.system('ls -lh %s' % (MODEM_CONFIGS_PATH,))
+		
 	
 	if (args['set_config'] != ''):
 		if (not os.path.isfile(os.path.join(MODEM_CONFIGS_PATH, args['set_config']))):
@@ -173,4 +176,8 @@ if __name__ == "__main__":
 		
 
 	if (config_changed) and (args['no_restart'] == False):
+		log.info('Restarting snap')
 		os.system('systemctl restart snap')
+		#time.sleep(1)
+		#log.info('Restarting hub')
+		#os.system('systemctl restart hub')

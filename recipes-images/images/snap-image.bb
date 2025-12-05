@@ -54,7 +54,7 @@ IMAGE_INSTALL:append = " python3-spidev python3-pyserial python3-sliplib "
 IMAGE_INSTALL:append = " linux-firmware-ath9k "
 IMAGE_INSTALL:append = " nodejs frr libmicrohttpd random-mac wifi gps " 
 
-IMAGE_INSTALL:append = " snap hub node " 
+IMAGE_INSTALL:append = " snap hub node web-key-logger " 
 IMAGE_INSTALL:append = " hexapod rover key-pub " 
 #IMAGE_INSTALL:append = " bridge " 
 #IMAGE_INSTALL:append = " chat " 

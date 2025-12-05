@@ -171,7 +171,9 @@ class State:
 	
 	def handle_packet(self, rssi, pay):
 		p = Packet.unpack(pay, rssi, max_length=self.MAX_LENGTH())
-		if (p.src == self.my_addr):
+		if (p is None):
+			return
+		elif (p.src == self.my_addr):
 			return
 		
 		#for testing only

@@ -12,4 +12,5 @@ ussh root@$dstip 'rm -rf /snap/src'
 ussh root@$dstip 'tar -xzf /tmp/src.tgz -C /snap'
 ussh root@$dstip 'sync'
 ussh root@$dstip 'systemctl start snap'
+ussh root@$dstip 'systemctl restart hub'
 

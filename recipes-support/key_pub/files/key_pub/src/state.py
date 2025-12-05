@@ -146,9 +146,10 @@ class State:
 	
 	def handle_sub(self, cmd, msg):
 		#log.debug('%s, %s' % (cmd, msg))
-		if (cmd == 'hexapod') and (msg['src'] not in self.dst_addresses):
-			log.info('New Hexapod found at address 0x%04X' % (msg['src'],))
-			self.dst_addresses.append(msg['src'])
+		if (msg['src'] not in self.dst_addresses):
+			if ((cmd == 'hexapod') or (cmd == 'rover')):
+				log.info('New %s found at address 0x%04X' % (cmd, msg['src'],))
+				self.dst_addresses.append(msg['src'])
 	
 	def run(self):
 		self.read_key_presses()

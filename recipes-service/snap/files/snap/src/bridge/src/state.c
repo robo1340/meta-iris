@@ -86,7 +86,7 @@ state_t * state(composite_encoder_t * encoder, zsock_t * pub){
 }
 
 bool state_process_receive_frame(state_t * state, zframe_t ** to_rx, uint8_t latched_rssi){
-	printf("DEBUG: state_process_receive_frame(%u)\n", zframe_size(*to_rx));
+	//printf("DEBUG: state_process_receive_frame(%u)\n", zframe_size(*to_rx));
 	//printArrHex(zframe_data(*to_rx), zframe_size(*to_rx));
 	
 	zframe_t * rssi = zframe_new (&latched_rssi, 1);
@@ -119,7 +119,7 @@ bool state_add_frame_to_send_queue(state_t * state, uint8_t * pay, uint32_t len)
 	
 	//printArrHex(to_tx->frame_ptr, to_tx->frame_len);
 	
-	printf("DEBUG: state_add_frame_to_send_queue(%u)\n", to_tx->frame_len);
+	//printf("DEBUG: state_add_frame_to_send_queue(%u)\n", to_tx->frame_len);
 	zlistx_add_end(state->send_queue, to_tx);
 	return true;
 }

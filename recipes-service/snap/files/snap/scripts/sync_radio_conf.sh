@@ -12,5 +12,5 @@ ussh root@$dstip 'rm -rf /snap/conf/si4463'
 ussh root@$dstip 'tar -xzf /tmp/radio.tgz -C /snap/conf/'
 ussh root@$dstip 'sync'
 ussh root@$dstip 'systemctl start snap'
-ussh root@$dstip 'systemctl start hub'
+ussh root@$dstip 'systemctl restart hub'
 

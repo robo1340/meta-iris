@@ -70,6 +70,12 @@ class PanTilt:
 	def reset(self):
 		self.set_position(1500,1500)
 
+	def cancel_pan(self):
+		self.ssc32.write('#%d P1500 %c' % (self.pan_ch,27))
+		
+	def cancel_tilt(self):
+		self.ssc32.write('#%d P1500 %c' % (self.tilt_ch,27))
+
 	def panh(self, amt):
 		self.panh_pos = max(575, min(self.panh_pos + amt, 2475))
 		log.debug('panh %d' % (self.panh_pos,))
@@ -134,6 +140,10 @@ class Rover:
 
 	def stop(self):
 		log.debug('Rover.stop')
+		self.ssc32.write('#%d P0' % (self.left_ch,))
+		self.ssc32.write('#%d P0' % (self.right_ch,))
+		#self.ssc32.write('#%d P1500 %c' % (self.left_ch,27))
+		#self.ssc32.write('#%d P1500 %c' % (self.right_ch,27))
 		self.left = 1500
 		self.right = 1500
 		self.set_motors(1500, 1500)
@@ -222,12 +232,12 @@ class State:
 		self.args = args
 		self.stopped = False
 		
-		self.last_key = None
+		self.active_keys = {}
 		
 		self.ADVERTISMENT_RATE = lambda : self.config['advertisment_rate']
 		
 		self.advertisment_task = Task(self.ADVERTISMENT_RATE(), self.advertise_self)
-		self.handle_key_press_task = Task(self.handle_key_press_update_rate_s, self.handle_key_press)
+		self.handle_key_press_task = Task(self.handle_key_press_update_rate_s, self.handle_key_presses)
 		self.check_task = Task(2, self.rover.check)
 		
 		self.pan_amt = 100
@@ -255,10 +265,10 @@ class State:
 			's'		: lambda : self.rover.stop(),
 			'a'		: lambda : self.rover.stop(),
 			'd'		: lambda : self.rover.stop(),
-			'left'	: lambda : self.pantilt.panh(0),
-			'right'	: lambda : self.pantilt.panh(0),
-			'down'	: lambda : self.pantilt.panv(0),
-			'up'	: lambda : self.pantilt.panv(0),
+			'left'	: lambda : self.pantilt.cancel_pan(),#self.pantilt.panh(0),
+			'right'	: lambda : self.pantilt.cancel_pan(),#self.pantilt.panh(0),
+			'down'	: lambda : self.pantilt.cancel_tilt(),#self.pantilt.panv(0),
+			'up'	: lambda : self.pantilt.cancel_tilt(),#self.pantilt.panv(0),
 		}
 		self.key_held_actions = {
 			'w' 	: lambda : self.rover.forward(),
@@ -274,37 +284,35 @@ class State:
 	def stop(self):
 		self.stopped = True
 	
-	def handle_key_press(self):
-		if (self.last_key is None):
-			if (self.machine_stopped == False):
-				self.machine_stopped = True
-				self.rover.stop()
-			return
-		self.machine_stopped = False
-		if (self.last_key.expired()) and (self.last_key.first_use == True):
-			self.last_key.first_use = False
-		elif (self.last_key.expired()):
-			log.debug('expired %s' % (self.last_key,))
-			self.last_key = None
-			self.rover.stop()
-			return
-		
-		if (self.last_key.pressed == True) and (self.last_key.key in self.key_pressed_actions) and (self.last_key.used()==False):
-			log.info('pressed')
-			self.key_pressed_actions[self.last_key.key]()
-		elif (self.last_key.held == True) and (self.last_key.key in self.key_held_actions):
-			log.info('held')
-			self.key_held_actions[self.last_key.key]()
-		elif (self.last_key.released == True) and (self.last_key.key in self.key_released_actions) and (self.last_key.used()==False):
-			log.info('released')
-			self.key_released_actions[self.last_key.key]()
+	def handle_key_presses(self):
+		for key in self.active_keys.values():
+			if (key.expired()) and (key.first_use == True):
+				key.first_use = False
+			elif (key.expired()):
+				log.debug('%s expired' % (key.key,))
+				self.active_keys.pop(key.key)
+				if (len(self.active_keys) == 0):
+					self.rover.stop()
+				return
+			
+			if (key.pressed == True) and (key.key in self.key_pressed_actions) and (key.used()==False):
+				log.debug('%s pressed' % (key.key,))
+				self.key_pressed_actions[key.key]()
+			elif (key.held == True) and (key.key in self.key_held_actions):
+				log.debug('%s held' % (key.key,))
+				self.key_held_actions[key.key]()
+			elif (key.released == True) and (key.key in self.key_released_actions) and (key.used()==False):
+				log.debug('%s released' % (key.key,))
+				self.key_released_actions[key.key]()
+
 	
 	def handle_sub(self,cmd, msg):
 		if (cmd == 'key_press'):
 			#log.debug('%s, %s' % (cmd, msg))
-			self.last_key = KeyPress.from_dict(msg)
-			log.debug('%s %s%s%s %d' % (self.last_key.key, 'T' if (self.last_key.pressed) else 'F', 'T' if self.last_key.held else 'F', 'T' if self.last_key.released else 'F', int(time.monotonic()*1000)))
-			if (self.last_key.pressed == True)or(self.last_key.released==True):
+			new = KeyPress.from_dict(msg)
+			self.active_keys[msg['key']] = new
+			#log.debug('%s %s%s%s %d' % (self.last_key.key, 'T' if (self.last_key.pressed) else 'F', 'T' if self.last_key.held else 'F', 'T' if self.last_key.released else 'F', int(time.monotonic()*1000)))
+			if (new.pressed == True)or(new.released==True):
 				self.handle_key_press_task.now()
 	
 	def advertise_self(self):

@@ -12,6 +12,7 @@ print_help() {
 	echo "send          | broadcast a short chat message to other radios"
   echo "bridge-config | reconfigure the radio bridge"
   echo "snap-config   | reconfigure the snap service"
+  echo "rsnap-config  | remotely execute snap config, pass in ip as first argument"
   echo "scan          | scan for available wifi SSIDs"
   echo "join          | join a wifi network first arg is SSID, second is passphrase"
   echo "ap            | bring up the wifi access point"
@@ -42,8 +43,10 @@ alias join='/home/wifi/join_wifi.sh'
 alias ap='systemctl restart wifi'
 alias key_pub='python3 /key_pub/src/main.py'
 alias servo='python3 /rover/scripts/servo.py'
+alias rsnap-config='remote_config_alias() { ussh root@$1 python3 /snap/scripts/snap_configure.py $2 $3 $4 $5 $6 $7 $8 $9; }; remote_config_alias'
+#alias ttt='ttt() { echo $2 $3 $4 $5; }; ttt'
+
 alias help="print_help"
 alias version='cat /home/version.json'
-
 
 print_help

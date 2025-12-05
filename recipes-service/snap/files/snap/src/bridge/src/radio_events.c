@@ -29,7 +29,7 @@
 //#define RADIO_EVENTS_INFO
 //#define RADIO_PRINT_STATE_CHANGE_INFO 
 //#define RADIO_PRINT_TX_TIME
-#define RADIO_RECEIVE_PEDNING_INFO
+//#define RADIO_RECEIVE_PEDNING_INFO
 //#define RADIO_SYNC_INFO
 //#define RADIO_PREAMBE_INFO
 
@@ -68,13 +68,17 @@ bool radio_sync_cb(state_t * state){
 }
 
 bool radio_receive_pending_callback(state_t * state){
+	static int report_cnt = 0;
 #ifdef RADIO_RECEIVE_PEDNING_INFO
 	printf("INFO: radio_receive_pending_callback()\n");
 	if (!state_receiving(state)){
 		printf("not receiving\n");
 		return true;
 	}
-
+#else
+	if (!state_receiving(state)){
+		return true;
+	}
 #endif 
 	if (state_transmitting(state)) { //ignore if transmitting
 		return true;
@@ -91,7 +95,10 @@ bool radio_receive_pending_callback(state_t * state){
 	//printf("%u %u\n", latched_rssi, radio_get_rssi());
 	
 	uint8_t * decoded = composite_encoder_decode(state->encoder, state->receiving->frame_ptr, state->receiving->frame_len);
-	composite_encoder_report(state->encoder);
+	report_cnt++;
+	if ((report_cnt % 50)==0){
+		composite_encoder_report(state->encoder);
+	}
 	if (decoded == NULL){
 		printf("WARNING: failed to decode received radio frame\n");
 	} else {

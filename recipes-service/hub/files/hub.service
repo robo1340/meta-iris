@@ -1,7 +1,7 @@
 [Unit]
 Description=starts the hub service
 After=network.target var-volatile.mount wifi_reset.service snap.service
-
+PartOf=snap.service
 [Install]
 WantedBy=multi-user.target
 
