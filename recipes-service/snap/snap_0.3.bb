@@ -22,6 +22,7 @@ SRC_URI +="file://${prj}"
 SRC_URI +="file://${prj}.service"
 SRC_URI +="file://logrotate.d"
 SRC_URI +="file://LICENSE"
+SRC_URI +="file://config.ini.default"
 
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 SYSTEMD_SERVICE:${PN} = "${prj}.service"
@@ -95,7 +96,10 @@ do_install(){
 	#install the logrotate configuration file
 	install -Dm 644 logrotate.d/${prj} ${D}/etc/logrotate.d/${prj}
 
-	#install the compiled binary
+	#write in the default config.ini
+	install -Dm 644 config.ini.default ${D}/snap/conf/config.ini
+	
+        #install the compiled binary
         install -Dm 755 ${prj}/src/prj-${prj}/test ${D}/${prj}/src/prj-${prj}/test	
         
 	install -Dm 755 ${prj}/scripts/sync_radio_conf.sh ${D}/${prj}/scripts/sync_radio_conf.sh	
