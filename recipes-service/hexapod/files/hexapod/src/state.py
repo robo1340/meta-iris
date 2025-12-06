@@ -21,6 +21,9 @@ class Task:
 			self.last_update = self.last_update - random.uniform(0, self.period)
 	def reset(self):
 		self.last_update = 0
+	def now(self):
+		self.last_update = 0
+		self.run()
 	def run(self):
 		if ((time.monotonic() - self.last_update) > self.period):
 			self.last_update = time.monotonic()
@@ -68,14 +71,18 @@ class Hexapod:
 	def check(self):
 		self.ssc32.write('R4')
 		val = self.ssc32.read()
+		if (val != b''):
+			return True
 		try:
 			val = int(val.decode().rstrip('\r') + '0')
 			if (val == self.ssc32.baud):
 				#log.debug(val)
 				return True
 			else:
+				log.warning('no ssc32')
 				return False
 		except BaseException as ex:
+			log.warning('no ssc32')
 			pass
 			#log.warning(ex)
 		self.initialized = False
@@ -178,9 +185,21 @@ class KeyPress:
 	dst : int
 	expires : float
 	first_use : bool = True
+	action_taken : bool = False
 
 	def expired(self):
 		return time.monotonic() > self.expires
+
+	def used(self):
+		if (self.action_taken == False):
+			self.action_taken = True
+			return False
+		return True
+
+	def hold(self):
+		self.pressed = False
+		self.released = False
+		self.held = True
 
 	@staticmethod
 	def from_dict(d):
@@ -193,6 +212,7 @@ class KeyPress:
 			expires = d['expires']/1000 + time.monotonic()
 		)
 
+
 class State:
 	def __init__(self, hexapod, config, args):
 		self.zmq_ct = None
@@ -203,12 +223,12 @@ class State:
 		self.args = args
 		self.stopped = False
 		
-		self.last_key = None
+		self.active_keys = {}
 		
 		self.ADVERTISMENT_RATE = lambda : self.config['advertisment_rate']
 		
 		self.advertisment_task = Task(self.ADVERTISMENT_RATE(), self.advertise_self)
-		self.handle_key_press_task = Task(0.25, self.handle_key_press)
+		self.handle_key_press_task = Task(0.25, self.handle_key_presses)
 		self.check_task = Task(2, self.hexapod.check)
 		
 		self.pan_amt = 75
@@ -249,32 +269,34 @@ class State:
 	def stop(self):
 		self.stopped = True
 	
-	def handle_key_press(self):
-		if (self.last_key is None):
-			if (self.hex_stopped == False):
-				self.hex_stopped = True
-				self.hexapod.stop()
-			return
-		self.hex_stopped = False
-		if (self.last_key.expired()) and (self.last_key.first_use == True):
-			self.last_key.first_use = False
-		elif (self.last_key.expired()):
-			log.debug('expired %s' % (self.last_key,))
-			self.last_key = None
-			self.hexapod.stop()
-			return
-		
-		if (self.last_key.pressed == True) and (self.last_key.key in self.key_pressed_actions):
-			self.key_pressed_actions[self.last_key.key]()
-		elif (self.last_key.held == True) and (self.last_key.key in self.key_held_actions):
-			self.key_held_actions[self.last_key.key]()
-		elif (self.last_key.released == True) and (self.last_key.key in self.key_released_actions):
-			self.key_released_actions[self.last_key.key]()
+	def handle_key_presses(self):
+		for key in self.active_keys.values():
+			if (key.expired()) and (key.first_use == True):
+				key.first_use = False
+			elif (key.expired()):
+				log.debug('%s expired' % (key.key,))
+				self.active_keys.pop(key.key)
+				if (len(self.active_keys) == 0):
+					self.hexapod.stop()
+				return
+			
+			if (key.pressed == True) and (key.key in self.key_pressed_actions) and (key.used()==False):
+				log.debug('%s pressed' % (key.key,))
+				self.key_pressed_actions[key.key]()
+			elif (key.held == True) and (key.key in self.key_held_actions):
+				log.debug('%s held' % (key.key,))
+				self.key_held_actions[key.key]()
+			elif (key.released == True) and (key.key in self.key_released_actions) and (key.used()==False):
+				log.debug('%s released' % (key.key,))
+				self.key_released_actions[key.key]()
 	
 	def handle_sub(self,cmd, msg):
 		if (cmd == 'key_press'):
 			log.debug('%s, %s' % (cmd, msg))
-			self.last_key = KeyPress.from_dict(msg)
+			new = KeyPress.from_dict(msg)
+			self.active_keys[msg['key']] = new
+			if (new.pressed == True)or(new.released==True):
+				self.handle_key_press_task.now()
 	
 	def advertise_self(self):
 		to_send = {

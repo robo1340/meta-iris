@@ -118,6 +118,8 @@ class Rover:
 	def check(self):
 		self.ssc32.write('R4')
 		val = self.ssc32.read()
+		if (val != b''):
+			return True
 		try:
 			val = int(val.decode().rstrip('\r') + '0')
 			if (val == self.ssc32.baud):
