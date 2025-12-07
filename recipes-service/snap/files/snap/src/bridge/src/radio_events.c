@@ -25,6 +25,7 @@
 #include "si446x_patch.h" 
 #include "radio.h"
 
+//#define RADIO_EVENTS_DEBUG_MORE
 //#define RADIO_EVENTS_DEBUG
 //#define RADIO_EVENTS_INFO
 //#define RADIO_PRINT_STATE_CHANGE_INFO 
@@ -42,11 +43,12 @@
 bool radio_preamble_detect_callback(state_t * state){
 #ifdef RADIO_PREAMBE_INFO
 	printf("INFO: preamble\n");
-
 #endif
 	if (state_transmitting(state)){
+#ifdef RADIO_PREAMBE_INFO
 		printf("WARNING: received my own preamble\n");
-		printf("radio->%s\n", radio_get_state_string(radio_get_modem_state()));
+#endif
+		//printf("radio->%s\n", radio_get_state_string(radio_get_modem_state()));
 		//si446x_change_state(0x7); //change to transmitting state
 		return true;
 	}
@@ -69,6 +71,7 @@ bool radio_sync_cb(state_t * state){
 
 bool radio_receive_pending_callback(state_t * state){
 	static int report_cnt = 0;
+	static uint8_t null_frame[10] = {0};
 #ifdef RADIO_RECEIVE_PEDNING_INFO
 	printf("INFO: radio_receive_pending_callback()\n");
 	if (!state_receiving(state)){
@@ -99,8 +102,12 @@ bool radio_receive_pending_callback(state_t * state){
 	if ((report_cnt % 50)==0){
 		composite_encoder_report(state->encoder);
 	}
+	
 	if (decoded == NULL){
 		printf("WARNING: failed to decode received radio frame\n");
+	}
+	else if (memcmp(decoded, null_frame, sizeof(null_frame))==0){
+		//printf("caught!\n");
 	} else {
 		zframe_t * to_rx = zframe_new(decoded, state->encoder->uncoded_len);
 		state_process_receive_frame(state, &to_rx, latched_rssi);
@@ -224,7 +231,7 @@ bool radio_event_callback(state_t * state) {
 	
 	if (NO_INTERRUPT_PENDING){return true;}
 
-#ifdef RADIO_EVENTS_DEBUG
+#ifdef RADIO_EVENTS_DEBUG_MORE
 	printf("[INTPT-P/S,PHDLR-P/S,MODEM-P/S,CHIP-P/S ]\n");
 	printArrHex((uint8_t*)&Si446xCmd.GET_INT_STATUS, 8);
 #endif
@@ -246,7 +253,7 @@ bool radio_event_callback(state_t * state) {
 		handled = true;
 		if (!radio_receive_fifo_almost_full_callback(state, RADIO_RX_ALMOST_FULL_THRESHOLD)) {return false;}
 #ifdef HANDLING_TIMER
-		printf("handled %lld us at %lld\n", zclock_usecs()-start,zclock_usecs());
+		printf("rx handled %lld us at %lld\n", zclock_usecs()-start,zclock_usecs());
 #endif
 	}
 	
@@ -254,7 +261,7 @@ bool radio_event_callback(state_t * state) {
 		handled = true;
 		if (!radio_transmit_fifo_almost_full_callback(state, RADIO_TX_ALMOST_EMPTY_THRESHOLD)) {return false;}
 #ifdef HANDLING_TIMER
-		printf("handled %lld us\n", zclock_usecs()-start);
+		printf("tx handled %lld us\n", zclock_usecs()-start);
 #endif
 	}
 

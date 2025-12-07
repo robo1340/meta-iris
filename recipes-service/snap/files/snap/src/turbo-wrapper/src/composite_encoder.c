@@ -103,7 +103,7 @@ static bool validate_composite_encoder_inputs(uint32_t uncoded_bytes_len_desired
  * @param coded_bytes_len - output - point to a variable containing the length of an encoded packet, in bytes
  * @return returns a pointer to the composite_encoder_t on success, returns NULL otherwise
 */
-composite_encoder_t * composite_encoder(uint32_t uncoded_bytes_len, uint8_t rs_encoder_mode, uint8_t rs_block_len, uint32_t * coded_bytes_len){
+composite_encoder_t * composite_encoder(uint32_t uncoded_bytes_len, uint8_t rs_encoder_mode, uint8_t rs_block_len, bool disable_convolutional, uint32_t * coded_bytes_len){
 	printf("INFO: composite_encoder(%u, %u, %u)\n", uncoded_bytes_len, rs_encoder_mode, rs_block_len);
 	generate_gf(); //generate gallois fields used by the reed solomon encoder
 
@@ -119,19 +119,25 @@ composite_encoder_t * composite_encoder(uint32_t uncoded_bytes_len, uint8_t rs_e
 		printf("ERROR: failed to validate inputs\n");
 		return NULL;
 	}
+	
 	uncoded_bytes_len = x;
 	rs_block_len = y;
-
+	
 	assert((uncoded_bytes_len%rs_block_len) == 0);
-
+	
 	composite_encoder_t * to_return = (composite_encoder_t*)malloc(sizeof(composite_encoder_t));
 	if (to_return == NULL) {return NULL;}
-
+	
+	to_return->conv.disabled = disable_convolutional;
 	to_return->conv.enc = encoder(WiMax_FCH);
 	if (to_return->conv.enc == NULL) {return NULL;}
 	
 	to_return->conv.uncoded_len = to_return->conv.enc->attr.in_len/8  + ((to_return->conv.enc->attr.in_len%8) ? 1 : 0);
-	to_return->conv.coded_len   = to_return->conv.enc->attr.out_len/8 + ((to_return->conv.enc->attr.out_len%8) ? 1 : 0);
+	if (!disable_convolutional){
+		to_return->conv.coded_len   = to_return->conv.enc->attr.out_len/8 + ((to_return->conv.enc->attr.out_len%8) ? 1 : 0);
+	} else {
+		to_return->conv.coded_len = to_return->conv.uncoded_len;
+	}
 	
 	to_return->rs.uncoded_len = rs_block_len;
 	if ((rs_encoder_mode != 0) && (rs_encoder_mode != 2)){
@@ -194,11 +200,16 @@ uint8_t * composite_encoder_encode(composite_encoder_t * encoder, uint8_t * inpu
 	}
 	
 	for (i=0; i<encoder->conv_blocks; i++){
-		coded_bytes = encoder_encode(encoder->conv.enc, encoder->uncoded_bytes+(i*encoder->conv.uncoded_len), encoder->conv.uncoded_len);
-		if (coded_bytes == NULL){
-			return NULL;
+		if (!encoder->conv.disabled){
+			coded_bytes = encoder_encode(encoder->conv.enc, encoder->uncoded_bytes+(i*encoder->conv.uncoded_len), encoder->conv.uncoded_len);
+			if (coded_bytes == NULL){
+				return NULL;
+			}
+			memcpy(encoder->coded_bytes+(i*encoder->conv.coded_len), coded_bytes, encoder->conv.coded_len);
+		} else { //convolutional encoding disabled
+			memcpy(encoder->coded_bytes+(i*encoder->conv.uncoded_len), encoder->uncoded_bytes+(i*encoder->conv.uncoded_len), encoder->conv.uncoded_len);
 		}
-		memcpy(encoder->coded_bytes+(i*encoder->conv.coded_len), coded_bytes, encoder->conv.coded_len);
+
 	}
 	return encoder->coded_bytes;
 }
@@ -216,11 +227,15 @@ uint8_t * composite_encoder_decode(composite_encoder_t * encoder, uint8_t * inpu
 	}
 	
 	for (i=0; i<encoder->conv_blocks; i++){
-		decoded_bytes = encoder_decode(encoder->conv.enc, input+(i*encoder->conv.coded_len), encoder->conv.coded_len);
-		if (decoded_bytes == NULL){
-			return NULL;
+		if (!encoder->conv.disabled){
+			decoded_bytes = encoder_decode(encoder->conv.enc, input+(i*encoder->conv.coded_len), encoder->conv.coded_len);
+			if (decoded_bytes == NULL){
+				return NULL;
+			}
+			memcpy(encoder->uncoded_bytes+(i*encoder->conv.uncoded_len), decoded_bytes, encoder->conv.uncoded_len);
+		} else { //convolutional encoding disabled
+			memcpy(encoder->uncoded_bytes+(i*encoder->conv.uncoded_len), input+(i*encoder->conv.uncoded_len), encoder->conv.uncoded_len);
 		}
-		memcpy(encoder->uncoded_bytes+(i*encoder->conv.uncoded_len), decoded_bytes, encoder->conv.uncoded_len);
 	}
 	
 	//Reed solomon decoding

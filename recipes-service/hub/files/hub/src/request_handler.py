@@ -9,6 +9,7 @@ import util
 from pathlib import Path
 from util import safe_write_json
 from util import safe_read_json
+import time
 
 SNAP_INI_PATH = '/snap/conf/config.ini'
 ACK  = 'ACK'
@@ -167,7 +168,7 @@ def handle_set_radio_config(cmd, pay, state):
 		if (typ in ['modem','general','packet','preamble']):
 			os.system('/usr/bin/python3 /snap/scripts/snap_configure.py -t %s -sm %s --no-restart' % (typ, path))
 	write_ini(SNAP_INI_PATH, pay_dict['snap_args'])
-	os.system('systemctl restart snap')
+	state.restart_snap = time.monotonic()
 	return handle_get_radio_config(cmd, '', state)
 
 @exception_suppressor

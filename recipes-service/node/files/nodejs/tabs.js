@@ -801,6 +801,7 @@ class UserInput {
 				throw new Error("block value is not an integer");
 			}
 			new_rc.snap_args.disable_reed_solomon = document.getElementById('disable_reed_solomon').value;
+			new_rc.snap_args.disable_convolutional  = document.getElementById('disable_convolutional').value;
 			
 			console.log('set_radio_config',new_rc);
 			messenger.postMessage(["SET_RADIO_CONFIG",new_rc]);

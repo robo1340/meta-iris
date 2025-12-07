@@ -7,5 +7,9 @@
   "peers_to_ignore": [],
   "peer_info_tx_s": 12,
   "topic_rate_limit_s": 1,
-  "type": "SET_HUB_CONFIG"
+  "type": "SET_HUB_CONFIG",
+  "topic_rate_limits": {
+    "key_press": -1
+  },
+  "default_topic_rate_limit_s": 1
 }

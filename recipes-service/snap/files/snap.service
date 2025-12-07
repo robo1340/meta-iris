@@ -9,7 +9,7 @@ WantedBy=multi-user.target
 [Service]
 Type=simple
 EnvironmentFile=/snap/conf/config.ini
-ExecStart=/snap/src/prj-snap/test --payload=${payload} --block=${block} --disable-reed-solomon=${disable_reed_solomon}
+ExecStart=/snap/src/prj-snap/test --payload=${payload} --block=${block} --disable-reed-solomon=${disable_reed_solomon} --disable-convolutional=${disable_convolutional}
 WorkingDirectory=/snap/src/prj-snap
 #ExecStartPre=/bin/sleep 11
 Restart=always

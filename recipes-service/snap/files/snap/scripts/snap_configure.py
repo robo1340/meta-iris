@@ -83,19 +83,51 @@ QUICK_CONFIG_OPTIONS = {
 		'payload'	 : 100,
 		'block'		 : 20,
 		'disable_reed_solomon' : False,
+		'disable_convolutional' : False
 	},
 	'expanded' : {
 		'set_config' : 'radio_config_Si4463_430M_10kbps.h',
 		'payload'	 : 200,
 		'block'		 : 20,
 		'disable_reed_solomon' : False,
+		'disable_convolutional' : False
 	},
 	'rc' : {
 		'set_config' : 'radio_config_Si4463_430M_20kbps.h',
 		'payload'	 : 22,
 		'block'		 : 22,
 		'disable_reed_solomon' : False,
+		'disable_convolutional' : False
+	},
+	'rc_no_conv' : {
+		'set_config' : 'radio_config_Si4463_430M_20kbps.h',
+		'payload'	 : 22,
+		'block'		 : 22,
+		'disable_reed_solomon' : False,
+		'disable_convolutional' : True	
+	},
+	'rc_no_reed' : {
+		'set_config' : 'radio_config_Si4463_430M_20kbps.h',
+		'payload'	 : 22,
+		'block'		 : 22,
+		'disable_reed_solomon' : True,
+		'disable_convolutional' : False	
+	},
+	'rc_no_ecc' : {
+		'set_config' : 'radio_config_Si4463_430M_20kbps.h',
+		'payload'	 : 22,
+		'block'		 : 22,
+		'disable_reed_solomon' : True,
+		'disable_convolutional' : True	
+	},
+	'default_no_ecc' : {
+		'set_config' : 'radio_config_Si4463_430M_10kbps.h',
+		'payload'	 : 100,
+		'block'		 : 20,
+		'disable_reed_solomon' : True,
+		'disable_convolutional' : True
 	}
+	
 }
 
 if __name__ == "__main__":
@@ -171,6 +203,7 @@ if __name__ == "__main__":
 				f.write('payload=%s\n' % (q['payload'],))
 				f.write('block=%s\n' % (q['block'],))
 				f.write('disable_reed_solomon=%s\n' % ('true' if q['disable_reed_solomon'] else 'false',))
+				f.write('disable_convolutional=%s\n' % ('true' if q['disable_convolutional'] else 'false',))
 			
 			config_changed = True		
 		

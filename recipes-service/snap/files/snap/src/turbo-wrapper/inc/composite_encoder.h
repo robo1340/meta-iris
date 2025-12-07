@@ -37,6 +37,7 @@ typedef struct __attribute__((__packed__)) conv_settings_DEFINITION {
 	uint16_t uncoded_len; 	///<uncoded length (bytes)
 	uint16_t coded_len; 	///<coded length (bytes)
 	encoder_t * enc; ///<the WiMaX FCH encoder object
+	bool disabled;
 } conv_settings_t;
 
 struct __attribute__((__packed__)) composite_encoder_DEFINITION {
@@ -51,7 +52,7 @@ struct __attribute__((__packed__)) composite_encoder_DEFINITION {
 	uint8_t * coded_bytes;
 };
 
-composite_encoder_t * composite_encoder(uint32_t uncoded_bytes_len, uint8_t rs_encoder_mode, uint8_t rs_block_len, uint32_t * coded_bytes_len);
+composite_encoder_t * composite_encoder(uint32_t uncoded_bytes_len, uint8_t rs_encoder_mode, uint8_t rs_block_len, bool disable_convolutional, uint32_t * coded_bytes_len);
 
 uint8_t * composite_encoder_encode(composite_encoder_t * encoder, uint8_t * input, uint32_t input_len);
 

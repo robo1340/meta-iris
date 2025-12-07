@@ -132,6 +132,7 @@ class State:
 		self.config = config
 		self.my_addr = my_addr
 		self.my_callsign = my_callsign
+		self.restart_snap = None
 		
 		self.max_length = read_ini()
 		log.info('packet length %d' % (self.max_length,))
@@ -321,6 +322,9 @@ class State:
 		self.tx_peer_info_task.run()
 		#self.send_user_message_task.run()
 		self.retransmit_task()
+		if (self.restart_snap is not None):
+			if (time.monotonic() - self.restart_snap) > 3:
+				os.system('systemctl restart snap')
 		
 		
 	def __str__(self):

@@ -26,13 +26,15 @@ bool set_my_niceness(int niceness){
 
 // Flag for verbose output
 int rs_mode = 2;
+bool disable_conv = false;
 int payload_len=100;
 int block_len = 20;
 
 static void usage(void){
 	printf("snap radio program\n");
 	printf("args:\n");
-	printf("--nrs      -n - disable reed solomon encoding\n");
+	printf("--disable-reed-solomon      -n - disable reed solomon encoding\n");
+	printf("--disable-convolutional      -c - disable convolutional encoding\n");
 	printf("--payload -p - specify the uncoded payload length (in bytes)\n");
 	printf("--block   -b   - specify the reed solomon block length (in bytes)\n");
 	exit(0);
@@ -49,6 +51,7 @@ int main(int argc, char **argv) {
     static struct option long_options[] = {
         // Options that set a flag
         {"disable-reed-solomon", required_argument, NULL, 'n'},
+		{"disable-convolutional ", required_argument, NULL, 'c'},
 		{"help", no_argument, NULL, 'h'},
         //{"brief",   no_argument, &verbose_flag, 0},
         
@@ -66,7 +69,7 @@ int main(int argc, char **argv) {
         // "abc:d:f:" specifies short options and their argument requirements:
         // 'a' and 'b' take no argument.
         // 'c', 'd', and 'f' require an argument.
-        c = getopt_long(argc, argv, "nhp:b:", long_options, &option_index);
+        c = getopt_long(argc, argv, "nchp:b:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -95,6 +98,11 @@ int main(int argc, char **argv) {
 					block_len = atoi(optarg);
 				}
                 break;
+			case 'c':
+				if (optarg != NULL){
+					disable_conv = (strcmp(optarg, "true")==0);
+				}
+				break;			
 			case 'h':
 				usage();
 				break;
@@ -106,10 +114,10 @@ int main(int argc, char **argv) {
                 printf("?? getopt_long returned character code 0%o ??\n", c);
         }
     }
-	//printf("command line options %u, %u, %u\n", rs_mode, payload_len, block_len);
+	printf("command line options %u, %u, %u %u\n", rs_mode, payload_len, block_len, disable_conv);
 	//exit(0);
 	
-	composite_encoder_t * encoder = composite_encoder(payload_len, rs_mode, block_len, NULL);
+	composite_encoder_t * encoder = composite_encoder(payload_len, rs_mode, block_len, disable_conv, NULL);
 	
 	FILE *fptr;
     fptr = fopen("/tmp/packet_length.txt", "w");
