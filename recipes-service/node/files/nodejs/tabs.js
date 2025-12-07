@@ -1,6 +1,6 @@
 
 const COOKIE_EXP=30;
-const LOAD_WAIT_MS=2000;
+const LOAD_WAIT_MS=1000;
 var state;
 var map;
 var waypoint_view;
@@ -169,6 +169,7 @@ class State {
 		this.my_callsign 	= Util.get_cookie('my_callsign', undefined);
 		this.my_lat 		= Util.get_cookie('my_lat', '37.5479', parseFloat);
 		this.my_lon 		= Util.get_cookie('my_lon', '-97.2702', parseFloat);
+		this.os_version		= Util.get_cookie('os_version', '-1.-1.-1', undefined);
 		this.dst_addr		= 0;
 		this.load_on_start 	= Util.get_cookie('load_on_start', "load_chat");
 		this.list_users 	= Util.get_cookie('list_users', 'true')=='true';
@@ -445,7 +446,7 @@ class UserView {
 			let ping_id = Util.randint(256);
 			let now = Date.now();
 			if (state.ping_requests[e.currentTarget.id] !== undefined){
-				if ((now - state.ping_requests[e.currentTarget.id]) < 5000){
+				if ((now - state.ping_requests[e.currentTarget.id]) < 1000){
 					console.log('ping request suppressed, wait');
 					return;
 				}
@@ -531,6 +532,24 @@ class UserView {
 		if (e === undefined){return;}
 		let new_text = (user.addr!=state.my_addr) ? Util.user_string(user) : state.user_string() + '(Me)';
 		e.html(new_text);
+	}
+	
+	static update_all_distances(){
+		console.log('UserView.update_all_distances()')
+		if (user_db !== undefined){
+			User.load_users(function(users){
+				for (const user of users){
+					UserView.update_span_distance(user.addr, state.get_distance(markers[user.addr]) + 'm');
+				}
+			});
+		}
+		if (waypoint_db !== undefined){
+			Waypoint.load(function(waypoints){
+				for (w of waypoints){
+					WaypointView.update_span(w.addr, 'WAYPOINT ' + state.get_distance(waypoints[w.addr]) + 'm');
+				}
+			});
+		}
 	}
 	
 
@@ -1104,7 +1123,7 @@ class Handlers {
 	
 	static peer_info_cb(msg){
 		//console.log('Handlers.peer_info_cb', msg);
-		User.get(msg.addr, function(user){
+		User.get(msg.addr, function(user){ //success callback
 			if (user.callsign != msg.callsign){
 				MessageView.add_saved(0, `User ${user.callsign}(${Util.hex(user.addr)}) changed callsign to ${msg.callsign}`);
 				View.set_tab_pending("chat");
@@ -1116,6 +1135,14 @@ class Handlers {
 					});
 				});
 			}
+		},
+		function() { //failed callback
+			User.update(msg.addr, msg.callsign, null, null, null, null, function(user){
+				UserView.load_user(user);
+			});					
+			
+			
+		
 		});
 		
 	}
@@ -1174,6 +1201,13 @@ class Handlers {
 		b.textContent = `RX: ${state.rx_msg_cnt}`;
 		View.highlight_element(b, 'lime', 250, View.message_counter_color);	
 	}
+
+	static get_os_version(pay){
+		console.log('get_os_version',pay);
+		state.os_version = pay;
+		document.getElementById('os_version').textContent = state.os_version;
+		Cookies.set('os_version',state.os_version, {expires:COOKIE_EXP});
+	}
 	
 	init(){
 		for (const topic of COMMANDS) {
@@ -1204,6 +1238,7 @@ class Handlers {
 		this.handlers['GET_HUB_CONFIG'] = Handlers.get_hub_config_cb;
 		this.handlers['SET_HUB_CONFIG'] = Handlers.get_hub_config_cb;
 		this.handlers['SET_MY_CALLSIGN'] = function(msg){console.log('SET_MY_CALLSIGN success',msg);}
+		this.handlers['GET_OS_VERSION'] = Handlers.get_os_version;
 		this.init_complete = true;
 	}
 	
@@ -1246,6 +1281,7 @@ load = new LoadStatus(250,function(){
 		Map.first_update = true;
 		Map.set_location(state.my_lat, state.my_lon);
 	}
+	UserView.update_all_distances();
 });
 
 function user_accepted() {
@@ -1256,6 +1292,7 @@ function user_accepted() {
 	console.log('main()',state);
 	
 	messenger.postMessage(["GET_MY_CALLSIGN",'']);
+	messenger.postMessage(["GET_OS_VERSION",'']);
 	
 	View.set_tab_buttons(false);
 	map = L.map('themap');
@@ -1446,6 +1483,7 @@ function user_accepted() {
 	document.getElementById("display_decimal_minute_second").checked = state.display_decimal_minute_second;
 	document.getElementById('randomize_locations').checked = state.randomize_locations;
 	document.getElementById("location_period_s").value = state.location_period_s;
+	document.getElementById('os_version').textContent = state.os_version;
 	
 	if (state.list_users == false){
 		b = document.getElementById('list_users');

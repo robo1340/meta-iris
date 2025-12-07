@@ -410,8 +410,7 @@ class WaypointView {
 	
 	static loaded_cb(wps){
 		console.log('WaypointView.loaded_cb',wps);
-		for (const i in wps) {
-			let w = wps[i];
+		for (const w of wps) {
 			User.get(w.addr, function(user){
 				waypoints[w.addr] = L.marker(L.latLng(w.lat, w.lon), {icon: WaypointView.icon()}).addTo(map);
 				waypoints[w.addr].bindTooltip(
@@ -487,7 +486,7 @@ class WaypointView {
 					waypoints[w.addr].bindTooltip(txt,{permanent: false, direction: 'right', className: 'leaflet-tooltip'});	
 				}	
 				
-			WaypointView.update_span(w.addr, `WAYPOINT ${state.get_distance(waypoints[w.addr])}m`);
+				WaypointView.update_span(w.addr, `WAYPOINT ${state.get_distance(waypoints[w.addr])}m`);
 				
 				//need to make this popup more conditional
 				if ((changed == true) && (c[0] != 0) && (c[1] != 0)){

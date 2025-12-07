@@ -5,7 +5,7 @@
   "peer_timeout_s": 300,
   "default_hops": 3,
   "peers_to_ignore": [],
-  "peer_info_tx_s": 30,
+  "peer_info_tx_s": 12,
   "topic_rate_limit_s": 1,
   "type": "SET_HUB_CONFIG"
 }

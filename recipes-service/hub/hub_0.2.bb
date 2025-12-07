@@ -44,6 +44,7 @@ do_install(){
 	find ${prj} -type f -exec install -Dm 644 "{}" "${D}/{}" \;
        
 	install -d ${D}/${prj}/volatile
+        rm ${D}/${prj}/volatile/*.json
 
         rm ${D}/${prj}/conf/callsign.cfg
         rm ${D}/${prj}/conf/addr.cfg

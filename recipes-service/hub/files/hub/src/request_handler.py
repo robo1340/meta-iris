@@ -8,6 +8,7 @@ from config import CALLSIGN_PATH
 import util
 from pathlib import Path
 from util import safe_write_json
+from util import safe_read_json
 
 SNAP_INI_PATH = '/snap/conf/config.ini'
 ACK  = 'ACK'
@@ -169,6 +170,11 @@ def handle_set_radio_config(cmd, pay, state):
 	os.system('systemctl restart snap')
 	return handle_get_radio_config(cmd, '', state)
 
+@exception_suppressor
+def handle_get_os_version(cmd, pay, state):
+	version = safe_read_json('/home/version.json', silent=True, default='-1.-1.-1')
+	return (cmd, json.dumps(version))
+
 COMMANDS = {
 	"GET_MY_CALLSIGN"   : handle_get_my_callsign,
 	"SET_MY_CALLSIGN"	: handle_set_my_callsign,
@@ -178,7 +184,8 @@ COMMANDS = {
 	"GET_RADIO_CONFIG" 	: handle_get_radio_config,
 	"SET_RADIO_CONFIG"	: handle_set_radio_config,
 	"GET_HUB_CONFIG"	: handle_get_hub_config,
-	"SET_HUB_CONFIG"	: handle_set_hub_config
+	"SET_HUB_CONFIG"	: handle_set_hub_config,
+	"GET_OS_VERSION"	: handle_get_os_version
 }
 
 def handle_request(cmd, pay, state):

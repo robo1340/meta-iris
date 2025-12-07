@@ -1,6 +1,7 @@
 [Unit]
 Description=snap
 After=network.target ares-var-run.mount var-volatile.mount
+Wants=hub.service
 
 [Install]
 WantedBy=multi-user.target

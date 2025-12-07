@@ -41,14 +41,18 @@ class User {
 		});		
 	}
 
-	static get(addr, cb) {
+	static get(addr, cb, failed_cb=null) {
 		if (user_db === undefined) {cb(null);}
 		if (typeof addr === "string" || addr instanceof String) {
 			addr = parseInt(addr,10);
 		}
 		const read_request = User.load().get(addr);
 		read_request.onsuccess = function() {
-			if (read_request.result === undefined) {return false;}//{cb(null);}
+			if (read_request.result === undefined) {
+				if (failed_cb !== null){
+					failed_cb();
+				}
+			}
 			return cb(read_request.result);
 		};	
 	}
@@ -311,6 +315,8 @@ function position_received_cb(position){
 	
 	state.my_lat = position.coords.latitude;
 	state.my_lon = position.coords.longitude;
+	Cookies.set('my_lat',state.my_lat, {expires:COOKIE_EXP});
+	Cookies.set('my_lon',state.my_lon, {expires:COOKIE_EXP});
 	messenger.postMessage(["my_location",{'src':state.my_addr,'dst':0,'lat':state.my_lat,'lon':state.my_lon,'period':state.location_period_s}]);
 	
 	if (load.complete() != true){return;} //don't do database things until the database is loaded
@@ -328,6 +334,8 @@ function position_received_cb(position){
 			}
 		}
 	});
+	
+	UserView.update_all_distances();
 	
 }
 

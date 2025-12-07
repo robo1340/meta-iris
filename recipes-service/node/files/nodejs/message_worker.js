@@ -12,7 +12,7 @@ var location_beacon_ms = 30000;
 
 var socket;
 
-const COMMANDS = ["GET_HUB_CONFIG", "SET_HUB_CONFIG","GET_RADIO_CONFIG","SET_RADIO_CONFIG","SET_MY_CALLSIGN","GET_MY_CALLSIGN","GET_MY_ADDR","GET_PEERS","GET_LINK_PEERS"]
+const COMMANDS = ["GET_OS_VERSION", "GET_HUB_CONFIG", "SET_HUB_CONFIG","GET_RADIO_CONFIG","SET_RADIO_CONFIG","SET_MY_CALLSIGN","GET_MY_CALLSIGN","GET_MY_ADDR","GET_PEERS","GET_LINK_PEERS"]
 const TLV_TYPES = ["ack","peer_info","location","message","waypoint","ping_request","ping_response","beacon"];
 const META = ['rx_msg_cnt'];
 
