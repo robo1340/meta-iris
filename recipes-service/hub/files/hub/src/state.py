@@ -153,7 +153,8 @@ class State:
 		self.rate_limiter = RateLimiter(self.config['topic_rate_limits'], self.config['default_topic_rate_limit_s'])
 		
 		self.sync_peers_task   = Task(60, self.sync_peers)
-		self.tx_peer_info_task    = Task(self.config['peer_info_tx_s'], self.tx_peer_info, random_precharge=True, variance_ratio=0.5)
+		#self.tx_peer_info_task    = Task(self.config['peer_info_tx_s'], self.tx_peer_info, random_precharge=True, variance_ratio=0.5)
+		self.tx_peer_info_task    = Task(self.config['peer_info_tx_s'], self.tx_peer_info)
 		#self.send_user_message_task    = Task(60, self.send_user_message, random_precharge=True)
 		self.remove_stale_peers_task    = Task(60, self.remove_stale_peers)
 		#self.module_id_request_task = RateLimitedTask(self.MOD_ID_REQ_RATE_MAX(), self.update_reported_properties)

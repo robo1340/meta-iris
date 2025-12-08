@@ -32,8 +32,6 @@ Archive member included to satisfy reference by file (symbol)
                               /snap/src/prj-snap/test.a(bridge.o) (gpio_init)
 /snap/src/prj-snap/test.a(os_signal.o)
                               /snap/src/prj-snap/test.a(bridge.o) (os_interrupted)
-/snap/src/prj-snap/test.a(avg.o)
-                              /snap/src/prj-snap/test.a(state.o) (exp_moving_avg)
 /snap/src/prj-snap/test.a(csma.o)
                               /snap/src/prj-snap/test.a(state.o) (csma_init)
 /snap/src/prj-snap/test.a(radio_comm.o)
@@ -79,8 +77,6 @@ Discarded input sections
                 0x00000000        0x0 /snap/src/prj-snap/test.a(gpio.o)
  .note.GNU-stack
                 0x00000000        0x0 /snap/src/prj-snap/test.a(os_signal.o)
- .note.GNU-stack
-                0x00000000        0x0 /snap/src/prj-snap/test.a(avg.o)
  .note.GNU-stack
                 0x00000000        0x0 /snap/src/prj-snap/test.a(csma.o)
  .note.GNU-stack
@@ -354,7 +350,7 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(.iplt)
  .iplt          0x000120dc        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.text           0x000120dc     0xa8c4
+.text           0x000120dc     0xa994
  *(.text.unlikely .text.*_unlikely .text.unlikely.*)
  *(.text.exit .text.exit.*)
  *(.text.startup .text.startup.*)
@@ -374,300 +370,299 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
                 0x00012a94                bridge_run
                 0x00012b60                bridge_interrupted
                 0x00012bb8                bridge_destroy
- .text          0x00012c90      0xa14 /snap/src/prj-snap/test.a(radio_events.o)
+ .text          0x00012c90      0xa40 /snap/src/prj-snap/test.a(radio_events.o)
                 0x00012c90                radio_preamble_detect_callback
                 0x00012d14                radio_sync_cb
                 0x00012d38                radio_receive_pending_callback
                 0x00012f18                radio_receive_fifo_almost_full_callback
                 0x00012ff8                radio_transmit_complete_callback
-                0x00013058                radio_transmit_fifo_almost_full_callback
-                0x00013138                radio_state_change_callback
-                0x000131ac                radio_event_callback
- .text          0x000136a4      0xdf0 /snap/src/prj-snap/test.a(state.o)
-                0x000136a4                state
-                0x000138cc                state_process_receive_frame
-                0x00013940                state_transmitting
-                0x00013978                state_receiving
-                0x000139b4                state_transceiving
-                0x00013a0c                state_add_frame_to_send_queue
-                0x00013ac4                state_peek_next_frame_to_transmit
-                0x00013b04                state_get_next_frame_to_transmit
-                0x00013b60                state_finish_receiving
-                0x00013bac                state_abort_transceiving
-                0x00013cb0                state_run
-                0x00013f2c                state_destroy
-                0x00013fb8                uint16_ptr
-                0x00013ff8                uint16_ptr_destroy
-                0x00014030                tlv
-                0x000140fc                tlv_len
-                0x00014128                tlv_destroy
-                0x00014188                radio_frame
-                0x00014230                radio_frame_bytes_remaining
-                0x00014294                radio_frame_transmit_start
-                0x0001438c                radio_frame_receive_start
-                0x000143f0                radio_frame_reset
-                0x00014434                radio_frame_destroy
- .text          0x00014494      0x1fc /snap/src/prj-snap/test.a(timer.o)
-                0x00014494                timer_init
-                0x000144fc                timer_run
-                0x000145e4                timer_reset
-                0x00014618                timer_charge
- .text          0x00014690      0x2a0 /snap/src/prj-snap/test.a(print_util.o)
-                0x00014690                printArrHex
-                0x0001472c                printArrHex_no_new_line
-                0x000147c4                print_uint32_arr
-                0x00014860                snprintArrHex
- .text          0x00014930     0x2c90 /snap/src/prj-snap/test.a(composite_encoder.o)
-                0x00014930                generate_gf
-                0x00014b3c                gf_mul
-                0x00014bd0                gf_div
-                0x00014c6c                gf_sum
-                0x00014c9c                gf_polydiv_recursive
-                0x00014eac                gf_polydiv
-                0x00014f04                gf_matr_det
-                0x00014fc8                gf_matr_mul
-                0x00015170                gf_matr_mul_vector
-                0x000152d0                gf_matr_inv
-                0x00015438                generating_polynomial
-                0x00015534                shift_msg_to_vec
-                0x000155f4                calculate_check_symbols
-                0x000156f8                calculate_syndrome
-                0x00015838                extract_message
-                0x0001589c                fail
-                0x000158dc                pass
-                0x0001591c                REQUIRE
-                0x00015978                AR_EQ
-                0x00015a04                STR_EQ
-                0x00015a88                MX_EQ
-                0x00015b90                encode_message
-                0x00015cc4                decode_message
-                0x000167a8                composite_encoder
-                0x00016d30                composite_encoder_encode
-                0x00017060                composite_encoder_decode
-                0x0001741c                composite_encoder_report
-                0x0001751c                composite_encoder_destroy
- .text          0x000175c0      0x63c /snap/src/prj-snap/test.a(conv_wrapper.o)
-                0x000175c0                encoder
-                0x00017840                encoder_bits_in_padded
-                0x00017868                encoder_bits_out_padded
-                0x00017890                encoder_encode
-                0x00017a18                encoder_decode
-                0x00017b74                encoder_destroy
- .text          0x00017bfc      0x2a0 /snap/src/prj-snap/test.a(turbo_wrapper.o)
-                0x00017bfc                bytes2bits
-                0x00017cc4                bytes2bits_ranged
-                0x00017da0                bits2bytes
- .text          0x00017e9c      0x980 /snap/src/prj-snap/test.a(util.o)
-                0x00017e9c                vector_print
-                0x00017f10                matrix_new
-                0x00017f9c                matrix_free
-                0x00018010                matrix_copy
-                0x000180e0                fatal
-                0x0001811c                swap
-                0x00018168                vector_new
-                0x00018194                vector_copy
-                0x00018214                vector_free
-                0x00018238                stack
-                0x00018320                submatrix
-                0x000183b8                pow2
-                0x000183e4                vector_sum
-                0x000184c0                vector_to_str
-                0x00018550                str_to_vector
-                0x000185d0                sum
-                0x00018648                substring
-                0x0001872c                strlength
-                0x00018794                count
- .text          0x0001881c      0xb80 /snap/src/prj-snap/test.a(radio.o)
-                0x000188c4                radio_init
-                0x00018954                radio_print_part_info
-                0x000189ec                radio_print_func_info
-                0x00018a88                radio_get_state_string
-                0x00018bf8                radio_print_state
-                0x00018cc4                radio_print_modem_status
-                0x00018d8c                radio_get_modem_state
-                0x00018db0                radio_get_latched_rssi
-                0x00018dd4                radio_get_rssi
-                0x00018df8                radio_start_rx
-                0x00018f6c                radio_load_configs
-                0x00019108                radio_parse_config
- .text          0x0001939c      0x1cc /snap/src/prj-snap/test.a(radio_hal.o)
-                0x0001939c                radio_hal_init
-                0x0001940c                radio_hal_deinit
-                0x00019444                radio_hal_AssertShutdown
-                0x0001945c                radio_hal_DeassertShutdown
-                0x00019474                radio_hal_NirqLevel
-                0x00019494                radio_hal_SpiWriteData
-                0x000194d4                radio_hal_SpiReadData
-                0x00019514                radio_hal_transfer
- .text          0x00019568     0x2090 /snap/src/prj-snap/test.a(si446x_api_lib.o)
-                0x00019568                si446x_reset
-                0x0001959c                si446x_power_up
-                0x00019768                si446x_configuration_init_enhanced
-                0x00019868                si446x_configuration_init
-                0x000199ac                si446x_apply_patch
-                0x00019b00                si446x_part_info
-                0x00019c2c                si446x_start_tx
-                0x00019ce4                si446x_start_rx
-                0x00019db8                si446x_get_int_status
-                0x00019f04                si446x_gpio_pin_cfg
-                0x0001a090                si446x_set_property
-                0x0001a174                si446x_change_state
-                0x0001a1c4                si446x_nop
-                0x0001a1f4                si446x_fifo_info
-                0x0001a280                si446x_write_tx_fifo
-                0x0001a2b8                si446x_read_rx_fifo
-                0x0001a2f0                si446x_get_property
-                0x0001a504                si446x_func_info
-                0x0001a5a0                si446x_frr_a_read
-                0x0001a638                si446x_frr_b_read
-                0x0001a6d0                si446x_frr_c_read
-                0x0001a768                si446x_frr_d_read
-                0x0001a800                si446x_get_adc_reading
-                0x0001a934                si446x_get_packet_info
-                0x0001aa38                si446x_get_ph_status
-                0x0001aac4                si446x_get_modem_status
-                0x0001abf8                si446x_get_chip_status
-                0x0001ac9c                si446x_ircal
-                0x0001ad44                si446x_ircal_manual
-                0x0001adec                si446x_request_device_state
-                0x0001ae58                si446x_tx_hop
-                0x0001af40                si446x_rx_hop
-                0x0001b008                si446x_start_tx_fast
-                0x0001b038                si446x_start_rx_fast
-                0x0001b068                si446x_get_int_status_fast_clear
-                0x0001b098                si446x_get_int_status_fast_clear_read
-                0x0001b194                si446x_gpio_pin_cfg_fast
-                0x0001b278                si446x_get_ph_status_fast_clear
-                0x0001b2b8                si446x_get_ph_status_fast_clear_read
-                0x0001b324                si446x_get_modem_status_fast_clear
-                0x0001b364                si446x_get_modem_status_fast_clear_read
-                0x0001b478                si446x_get_chip_status_fast_clear
-                0x0001b4b8                si446x_get_chip_status_fast_clear_read
-                0x0001b53c                si446x_fifo_info_fast_reset
-                0x0001b58c                si446x_fifo_info_fast_read
- .text          0x0001b5f8      0x300 /snap/src/prj-snap/test.a(spidev.o)
-                0x0001b5f8                spi_open
-                0x0001b75c                spi_close
-                0x0001b784                spi_xfer
-                0x0001b810                spi_read
-                0x0001b884                spi_write
- .text          0x0001b8f8      0x978 /snap/src/prj-snap/test.a(gpio.o)
-                0x0001bb3c                gpio_init
-                0x0001bfe0                gpio_poll
-                0x0001c0e4                gpio_get
-                0x0001c120                gpio_set_shutdown
-                0x0001c184                gpio_deinit
- .text          0x0001c270       0x94 /snap/src/prj-snap/test.a(os_signal.o)
-                0x0001c2a0                os_catch_signals
- .text          0x0001c304       0x84 /snap/src/prj-snap/test.a(avg.o)
-                0x0001c304                exp_moving_avg
- .text          0x0001c388      0x25c /snap/src/prj-snap/test.a(csma.o)
-                0x0001c388                csma_init
-                0x0001c418                csma_enabled
-                0x0001c440                csma_reset
-                0x0001c4c8                csma_disable
-                0x0001c504                csma_run_countdown
-                0x0001c56c                csma_run_transmit
- .text          0x0001c5e4      0x3bc /snap/src/prj-snap/test.a(radio_comm.o)
-                0x0001c5e4                radio_comm_GetResp
-                0x0001c6bc                radio_comm_SendCmd
-                0x0001c70c                radio_comm_ReadData
-                0x0001c7f0                radio_comm_WriteData
-                0x0001c894                radio_comm_PollCTS
-                0x0001c944                radio_comm_SendCmdGetResp
- .text          0x0001c9a0        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
- .text          0x0001c9a0        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                0x00013038                radio_transmit_fifo_almost_full_callback
+                0x00013118                radio_state_change_callback
+                0x0001318c                radio_rssi_exceeds_threshhold_callback
+                0x000131b4                radio_event_callback
+ .text          0x000136d0      0xde8 /snap/src/prj-snap/test.a(state.o)
+                0x000136d0                state
+                0x00013918                state_process_receive_frame
+                0x0001398c                state_transmitting
+                0x000139c8                state_receiving
+                0x00013a04                state_transceiving
+                0x00013a60                state_add_frame_to_send_queue
+                0x00013af8                state_peek_next_frame_to_transmit
+                0x00013b38                state_get_next_frame_to_transmit
+                0x00013bf0                state_finish_receiving
+                0x00013c3c                state_abort_transceiving
+                0x00013d1c                state_get_rssi
+                0x00013df0                state_run
+                0x00013f10                state_destroy
+                0x00013fc4                uint16_ptr
+                0x00014004                uint16_ptr_destroy
+                0x0001403c                tlv
+                0x00014108                tlv_len
+                0x00014134                tlv_destroy
+                0x00014194                radio_frame
+                0x0001423c                radio_frame_bytes_remaining
+                0x000142a0                radio_frame_transmit_start
+                0x000143b0                radio_frame_receive_start
+                0x00014414                radio_frame_reset
+                0x00014458                radio_frame_destroy
+ .text          0x000144b8      0x1fc /snap/src/prj-snap/test.a(timer.o)
+                0x000144b8                timer_init
+                0x00014520                timer_run
+                0x00014608                timer_reset
+                0x0001463c                timer_charge
+ .text          0x000146b4      0x2a0 /snap/src/prj-snap/test.a(print_util.o)
+                0x000146b4                printArrHex
+                0x00014750                printArrHex_no_new_line
+                0x000147e8                print_uint32_arr
+                0x00014884                snprintArrHex
+ .text          0x00014954     0x2c90 /snap/src/prj-snap/test.a(composite_encoder.o)
+                0x00014954                generate_gf
+                0x00014b60                gf_mul
+                0x00014bf4                gf_div
+                0x00014c90                gf_sum
+                0x00014cc0                gf_polydiv_recursive
+                0x00014ed0                gf_polydiv
+                0x00014f28                gf_matr_det
+                0x00014fec                gf_matr_mul
+                0x00015194                gf_matr_mul_vector
+                0x000152f4                gf_matr_inv
+                0x0001545c                generating_polynomial
+                0x00015558                shift_msg_to_vec
+                0x00015618                calculate_check_symbols
+                0x0001571c                calculate_syndrome
+                0x0001585c                extract_message
+                0x000158c0                fail
+                0x00015900                pass
+                0x00015940                REQUIRE
+                0x0001599c                AR_EQ
+                0x00015a28                STR_EQ
+                0x00015aac                MX_EQ
+                0x00015bb4                encode_message
+                0x00015ce8                decode_message
+                0x000167cc                composite_encoder
+                0x00016d54                composite_encoder_encode
+                0x00017084                composite_encoder_decode
+                0x00017440                composite_encoder_report
+                0x00017540                composite_encoder_destroy
+ .text          0x000175e4      0x63c /snap/src/prj-snap/test.a(conv_wrapper.o)
+                0x000175e4                encoder
+                0x00017864                encoder_bits_in_padded
+                0x0001788c                encoder_bits_out_padded
+                0x000178b4                encoder_encode
+                0x00017a3c                encoder_decode
+                0x00017b98                encoder_destroy
+ .text          0x00017c20      0x2a0 /snap/src/prj-snap/test.a(turbo_wrapper.o)
+                0x00017c20                bytes2bits
+                0x00017ce8                bytes2bits_ranged
+                0x00017dc4                bits2bytes
+ .text          0x00017ec0      0x980 /snap/src/prj-snap/test.a(util.o)
+                0x00017ec0                vector_print
+                0x00017f34                matrix_new
+                0x00017fc0                matrix_free
+                0x00018034                matrix_copy
+                0x00018104                fatal
+                0x00018140                swap
+                0x0001818c                vector_new
+                0x000181b8                vector_copy
+                0x00018238                vector_free
+                0x0001825c                stack
+                0x00018344                submatrix
+                0x000183dc                pow2
+                0x00018408                vector_sum
+                0x000184e4                vector_to_str
+                0x00018574                str_to_vector
+                0x000185f4                sum
+                0x0001866c                substring
+                0x00018750                strlength
+                0x000187b8                count
+ .text          0x00018840      0xb7c /snap/src/prj-snap/test.a(radio.o)
+                0x000188e8                radio_init
+                0x00018978                radio_print_part_info
+                0x00018a10                radio_print_func_info
+                0x00018aac                radio_get_state_string
+                0x00018c1c                radio_print_state
+                0x00018ce8                radio_print_modem_status
+                0x00018db0                radio_get_modem_state
+                0x00018dd4                radio_get_latched_rssi
+                0x00018df8                radio_get_rssi
+                0x00018e1c                radio_start_rx
+                0x00018f90                radio_load_configs
+                0x0001912c                radio_parse_config
+ .text          0x000193bc      0x1cc /snap/src/prj-snap/test.a(radio_hal.o)
+                0x000193bc                radio_hal_init
+                0x0001942c                radio_hal_deinit
+                0x00019464                radio_hal_AssertShutdown
+                0x0001947c                radio_hal_DeassertShutdown
+                0x00019494                radio_hal_NirqLevel
+                0x000194b4                radio_hal_SpiWriteData
+                0x000194f4                radio_hal_SpiReadData
+                0x00019534                radio_hal_transfer
+ .text          0x00019588     0x2090 /snap/src/prj-snap/test.a(si446x_api_lib.o)
+                0x00019588                si446x_reset
+                0x000195bc                si446x_power_up
+                0x00019788                si446x_configuration_init_enhanced
+                0x00019888                si446x_configuration_init
+                0x000199cc                si446x_apply_patch
+                0x00019b20                si446x_part_info
+                0x00019c4c                si446x_start_tx
+                0x00019d04                si446x_start_rx
+                0x00019dd8                si446x_get_int_status
+                0x00019f24                si446x_gpio_pin_cfg
+                0x0001a0b0                si446x_set_property
+                0x0001a194                si446x_change_state
+                0x0001a1e4                si446x_nop
+                0x0001a214                si446x_fifo_info
+                0x0001a2a0                si446x_write_tx_fifo
+                0x0001a2d8                si446x_read_rx_fifo
+                0x0001a310                si446x_get_property
+                0x0001a524                si446x_func_info
+                0x0001a5c0                si446x_frr_a_read
+                0x0001a658                si446x_frr_b_read
+                0x0001a6f0                si446x_frr_c_read
+                0x0001a788                si446x_frr_d_read
+                0x0001a820                si446x_get_adc_reading
+                0x0001a954                si446x_get_packet_info
+                0x0001aa58                si446x_get_ph_status
+                0x0001aae4                si446x_get_modem_status
+                0x0001ac18                si446x_get_chip_status
+                0x0001acbc                si446x_ircal
+                0x0001ad64                si446x_ircal_manual
+                0x0001ae0c                si446x_request_device_state
+                0x0001ae78                si446x_tx_hop
+                0x0001af60                si446x_rx_hop
+                0x0001b028                si446x_start_tx_fast
+                0x0001b058                si446x_start_rx_fast
+                0x0001b088                si446x_get_int_status_fast_clear
+                0x0001b0b8                si446x_get_int_status_fast_clear_read
+                0x0001b1b4                si446x_gpio_pin_cfg_fast
+                0x0001b298                si446x_get_ph_status_fast_clear
+                0x0001b2d8                si446x_get_ph_status_fast_clear_read
+                0x0001b344                si446x_get_modem_status_fast_clear
+                0x0001b384                si446x_get_modem_status_fast_clear_read
+                0x0001b498                si446x_get_chip_status_fast_clear
+                0x0001b4d8                si446x_get_chip_status_fast_clear_read
+                0x0001b55c                si446x_fifo_info_fast_reset
+                0x0001b5ac                si446x_fifo_info_fast_read
+ .text          0x0001b618      0x300 /snap/src/prj-snap/test.a(spidev.o)
+                0x0001b618                spi_open
+                0x0001b77c                spi_close
+                0x0001b7a4                spi_xfer
+                0x0001b830                spi_read
+                0x0001b8a4                spi_write
+ .text          0x0001b918      0x978 /snap/src/prj-snap/test.a(gpio.o)
+                0x0001bb5c                gpio_init
+                0x0001c000                gpio_poll
+                0x0001c104                gpio_get
+                0x0001c140                gpio_set_shutdown
+                0x0001c1a4                gpio_deinit
+ .text          0x0001c290       0x94 /snap/src/prj-snap/test.a(os_signal.o)
+                0x0001c2c0                os_catch_signals
+ .text          0x0001c324      0x390 /snap/src/prj-snap/test.a(csma.o)
+                0x0001c324                csma_init
+                0x0001c3c0                csma_medium_busy
+                0x0001c414                csma_run
+                0x0001c570                csma_feed_rssi
+ .text          0x0001c6b4      0x3bc /snap/src/prj-snap/test.a(radio_comm.o)
+                0x0001c6b4                radio_comm_GetResp
+                0x0001c78c                radio_comm_SendCmd
+                0x0001c7dc                radio_comm_ReadData
+                0x0001c8c0                radio_comm_WriteData
+                0x0001c964                radio_comm_PollCTS
+                0x0001ca14                radio_comm_SendCmdGetResp
+ .text          0x0001ca70        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .text          0x0001ca70        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(.gnu.warning)
  *(.glue_7t)
- .glue_7t       0x0001c9a0        0x0 linker stubs
+ .glue_7t       0x0001ca70        0x0 linker stubs
  *(.glue_7)
- .glue_7        0x0001c9a0        0x0 linker stubs
+ .glue_7        0x0001ca70        0x0 linker stubs
  *(.vfp11_veneer)
- .vfp11_veneer  0x0001c9a0        0x0 linker stubs
+ .vfp11_veneer  0x0001ca70        0x0 linker stubs
  *(.v4_bx)
- .v4_bx         0x0001c9a0        0x0 linker stubs
+ .v4_bx         0x0001ca70        0x0 linker stubs
 
-.fini           0x0001c9a0        0x8
+.fini           0x0001ca70        0x8
  *(SORT_NONE(.fini))
- .fini          0x0001c9a0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
-                0x0001c9a0                _fini
- .fini          0x0001c9a4        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .fini          0x0001ca70        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+                0x0001ca70                _fini
+ .fini          0x0001ca74        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
                 [!provide]                        PROVIDE (__etext = .)
                 [!provide]                        PROVIDE (_etext = .)
                 [!provide]                        PROVIDE (etext = .)
 
-.rodata         0x0001c9a8     0x260c
+.rodata         0x0001ca78     0x2620
  *(.rodata .rodata.* .gnu.linkonce.r.*)
- .rodata.cst4   0x0001c9a8        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x0001c9a8                _IO_stdin_used
- .rodata        0x0001c9ac       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
- .rodata        0x0001ca3c      0x271 /snap/src/prj-snap/test.a(main.o)
- *fill*         0x0001ccad        0x3 
- .rodata        0x0001ccb0      0x15c /snap/src/prj-snap/test.a(bridge.o)
- .rodata        0x0001ce0c       0xe6 /snap/src/prj-snap/test.a(radio_events.o)
- *fill*         0x0001cef2        0x2 
- .rodata        0x0001cef4      0x208 /snap/src/prj-snap/test.a(state.o)
- .rodata        0x0001d0fc       0x15 /snap/src/prj-snap/test.a(print_util.o)
- *fill*         0x0001d111        0x3 
- .rodata        0x0001d114      0x4e5 /snap/src/prj-snap/test.a(composite_encoder.o)
- *fill*         0x0001d5f9        0x3 
- .rodata        0x0001d5fc     0x1175 /snap/src/prj-snap/test.a(conv_wrapper.o)
-                0x0001d5fc                gsm_conv_xcch
-                0x0001d624                gsm_conv_cs2
-                0x0001d64c                gsm_conv_cs3
-                0x0001d674                gsm_conv_rach
-                0x0001d69c                gsm_conv_sch
-                0x0001d6c4                gsm_conv_tch_fr
-                0x0001d6ec                gsm_conv_tch_hr
-                0x0001d714                gsm_conv_tch_afs_12_2
-                0x0001d73c                gsm_conv_tch_afs_10_2
-                0x0001d764                gsm_conv_tch_afs_7_95
-                0x0001d78c                gsm_conv_tch_afs_7_4
-                0x0001d7b4                gsm_conv_tch_afs_6_7
-                0x0001d7dc                gsm_conv_tch_afs_5_9
-                0x0001d804                gsm_conv_tch_ahs_7_95
-                0x0001d82c                gsm_conv_tch_ahs_7_4
-                0x0001d854                gsm_conv_tch_ahs_6_7
-                0x0001d87c                gsm_conv_tch_ahs_5_9
-                0x0001d8a4                gsm_conv_tch_ahs_5_15
-                0x0001d8cc                gsm_conv_tch_ahs_4_75
-                0x0001d8f4                wimax_conv_fch
-                0x0001d91c                lte_conv_pbch
-                0x0001d944                types
- *fill*         0x0001e771        0x3 
- .rodata        0x0001e774       0x52 /snap/src/prj-snap/test.a(util.o)
- *fill*         0x0001e7c6        0x2 
- .rodata        0x0001e7c8      0x29a /snap/src/prj-snap/test.a(radio.o)
- *fill*         0x0001ea62        0x2 
- .rodata        0x0001ea64        0xc /snap/src/prj-snap/test.a(radio_hal.o)
- .rodata        0x0001ea70      0x23b /snap/src/prj-snap/test.a(si446x_api_lib.o)
- *fill*         0x0001ecab        0x1 
- .rodata        0x0001ecac      0x22e /snap/src/prj-snap/test.a(gpio.o)
- *fill*         0x0001eeda        0x2 
- .rodata        0x0001eedc       0x46 /snap/src/prj-snap/test.a(radio_comm.o)
- *fill*         0x0001ef22        0x2 
- .rodata        0x0001ef24       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .rodata.cst4   0x0001ca78        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x0001ca78                _IO_stdin_used
+ .rodata        0x0001ca7c       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .rodata        0x0001cb0c      0x271 /snap/src/prj-snap/test.a(main.o)
+ *fill*         0x0001cd7d        0x3 
+ .rodata        0x0001cd80      0x15c /snap/src/prj-snap/test.a(bridge.o)
+ .rodata        0x0001cedc       0xe6 /snap/src/prj-snap/test.a(radio_events.o)
+ *fill*         0x0001cfc2        0x2 
+ .rodata        0x0001cfc4      0x21b /snap/src/prj-snap/test.a(state.o)
+ *fill*         0x0001d1df        0x1 
+ .rodata        0x0001d1e0       0x15 /snap/src/prj-snap/test.a(print_util.o)
+ *fill*         0x0001d1f5        0x3 
+ .rodata        0x0001d1f8      0x4e5 /snap/src/prj-snap/test.a(composite_encoder.o)
+ *fill*         0x0001d6dd        0x3 
+ .rodata        0x0001d6e0     0x1175 /snap/src/prj-snap/test.a(conv_wrapper.o)
+                0x0001d6e0                gsm_conv_xcch
+                0x0001d708                gsm_conv_cs2
+                0x0001d730                gsm_conv_cs3
+                0x0001d758                gsm_conv_rach
+                0x0001d780                gsm_conv_sch
+                0x0001d7a8                gsm_conv_tch_fr
+                0x0001d7d0                gsm_conv_tch_hr
+                0x0001d7f8                gsm_conv_tch_afs_12_2
+                0x0001d820                gsm_conv_tch_afs_10_2
+                0x0001d848                gsm_conv_tch_afs_7_95
+                0x0001d870                gsm_conv_tch_afs_7_4
+                0x0001d898                gsm_conv_tch_afs_6_7
+                0x0001d8c0                gsm_conv_tch_afs_5_9
+                0x0001d8e8                gsm_conv_tch_ahs_7_95
+                0x0001d910                gsm_conv_tch_ahs_7_4
+                0x0001d938                gsm_conv_tch_ahs_6_7
+                0x0001d960                gsm_conv_tch_ahs_5_9
+                0x0001d988                gsm_conv_tch_ahs_5_15
+                0x0001d9b0                gsm_conv_tch_ahs_4_75
+                0x0001d9d8                wimax_conv_fch
+                0x0001da00                lte_conv_pbch
+                0x0001da28                types
+ *fill*         0x0001e855        0x3 
+ .rodata        0x0001e858       0x52 /snap/src/prj-snap/test.a(util.o)
+ *fill*         0x0001e8aa        0x2 
+ .rodata        0x0001e8ac      0x29a /snap/src/prj-snap/test.a(radio.o)
+ *fill*         0x0001eb46        0x2 
+ .rodata        0x0001eb48        0xc /snap/src/prj-snap/test.a(radio_hal.o)
+ .rodata        0x0001eb54      0x23b /snap/src/prj-snap/test.a(si446x_api_lib.o)
+ *fill*         0x0001ed8f        0x1 
+ .rodata        0x0001ed90      0x22e /snap/src/prj-snap/test.a(gpio.o)
+ *fill*         0x0001efbe        0x2 
+ .rodata        0x0001efc0       0x46 /snap/src/prj-snap/test.a(radio_comm.o)
+ *fill*         0x0001f006        0x2 
+ .rodata        0x0001f008       0x90 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
 
 .rodata1
  *(.rodata1)
 
-.ARM.extab      0x0001efb4        0x0
+.ARM.extab      0x0001f098        0x0
  *(.ARM.extab* .gnu.linkonce.armextab.*)
- .ARM.extab     0x0001efb4        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .ARM.extab     0x0001f098        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.ARM.exidx      0x0001efb4        0x8
+.ARM.exidx      0x0001f098        0x8
                 [!provide]                        PROVIDE (__exidx_start = .)
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
- .ARM.exidx     0x0001efb4        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .ARM.exidx     0x0001f098        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
                 [!provide]                        PROVIDE (__exidx_end = .)
 
 .eh_frame_hdr
  *(.eh_frame_hdr)
  *(.eh_frame_entry .eh_frame_entry.*)
 
-.eh_frame       0x0001efbc        0x4
+.eh_frame       0x0001f0a0        0x4
  *(.eh_frame)
- .eh_frame      0x0001efbc        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .eh_frame      0x0001f0a0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
  *(.eh_frame.*)
 
 .sframe
@@ -682,7 +677,7 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
 .exception_ranges
  *(.exception_ranges*)
-                0x0001fed0                        . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
+                0x00020ed0                        . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
 
 .eh_frame
  *(.eh_frame)
@@ -701,7 +696,7 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 .exception_ranges
  *(.exception_ranges*)
 
-.tdata          0x0001fed0        0x0
+.tdata          0x00020ed0        0x0
                 [!provide]                        PROVIDE (__tdata_start = .)
  *(.tdata .tdata.* .gnu.linkonce.td.*)
 
@@ -709,23 +704,23 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(.tbss .tbss.* .gnu.linkonce.tb.*)
  *(.tcommon)
 
-.preinit_array  0x0001fed0        0x0
+.preinit_array  0x00020ed0        0x0
                 [!provide]                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array)
                 [!provide]                        PROVIDE (__preinit_array_end = .)
 
-.init_array     0x0001fed0        0x4
+.init_array     0x00020ed0        0x4
                 [!provide]                        PROVIDE (__init_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
  *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
- .init_array    0x0001fed0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .init_array    0x00020ed0        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
                 [!provide]                        PROVIDE (__init_array_end = .)
 
-.fini_array     0x0001fed4        0x4
+.fini_array     0x00020ed4        0x4
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
  *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
- .fini_array    0x0001fed4        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .fini_array    0x00020ed4        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
                 [!provide]                        PROVIDE (__fini_array_end = .)
 
 .ctors
@@ -745,151 +740,150 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 .jcr
  *(.jcr)
 
-.data.rel.ro    0x0001fed8        0x0
+.data.rel.ro    0x00020ed8        0x0
  *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
  *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
- .data.rel.ro   0x0001fed8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .data.rel.ro   0x00020ed8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
 
-.dynamic        0x0001fed8      0x128
+.dynamic        0x00020ed8      0x128
  *(.dynamic)
- .dynamic       0x0001fed8      0x128 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x0001fed8                _DYNAMIC
-                0x00020000                        . = DATA_SEGMENT_RELRO_END (., 0x0)
+ .dynamic       0x00020ed8      0x128 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00020ed8                _DYNAMIC
+                0x00021000                        . = DATA_SEGMENT_RELRO_END (., 0x0)
 
-.got            0x00020000      0x1fc
+.got            0x00021000      0x1fc
  *(.got.plt)
- .got.plt       0x00020000      0x1f4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00020000                _GLOBAL_OFFSET_TABLE_
+ .got.plt       0x00021000      0x1f4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00021000                _GLOBAL_OFFSET_TABLE_
  *(.igot.plt)
- .igot.plt      0x000201f4        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .igot.plt      0x000211f4        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
  *(.got)
- .got           0x000201f4        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .got           0x000211f4        0x8 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
  *(.igot)
 
-.data           0x00020200     0x1284
+.data           0x00021200     0x127c
                 [!provide]                        PROVIDE (__data_start = .)
  *(.data .data.* .gnu.linkonce.d.*)
- .data          0x00020200        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00020200                data_start
-                0x00020200                __data_start
- .data          0x00020204        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .data          0x00020204        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
-                0x00020204                __dso_handle
- .data          0x00020208       0x6c /snap/src/prj-snap/test.a(main.o)
-                0x00020208                rs_mode
-                0x0002020c                payload_len
-                0x00020210                block_len
- .data          0x00020274        0x0 /snap/src/prj-snap/test.a(bridge.o)
- .data          0x00020274        0x0 /snap/src/prj-snap/test.a(radio_events.o)
- *fill*         0x00020274        0x4 
- .data          0x00020278        0x8 /snap/src/prj-snap/test.a(state.o)
- .data          0x00020280        0x0 /snap/src/prj-snap/test.a(timer.o)
- .data          0x00020280        0x0 /snap/src/prj-snap/test.a(print_util.o)
- .data          0x00020280       0x24 /snap/src/prj-snap/test.a(composite_encoder.o)
-                0x00020280                p
- .data          0x000202a4      0xff8 /snap/src/prj-snap/test.a(conv_wrapper.o)
- .data          0x0002129c        0x0 /snap/src/prj-snap/test.a(turbo_wrapper.o)
- .data          0x0002129c        0x0 /snap/src/prj-snap/test.a(util.o)
- .data          0x0002129c        0x0 /snap/src/prj-snap/test.a(radio.o)
- .data          0x0002129c        0x0 /snap/src/prj-snap/test.a(radio_hal.o)
- .data          0x0002129c      0x1d8 /snap/src/prj-snap/test.a(si446x_api_lib.o)
-                0x0002129c                Si446xPatchCommands
- .data          0x00021474        0x0 /snap/src/prj-snap/test.a(spidev.o)
- .data          0x00021474        0x8 /snap/src/prj-snap/test.a(gpio.o)
-                0x00021474                line_offsets
-                0x00021478                shutdown_line_offsets
- .data          0x0002147c        0x0 /snap/src/prj-snap/test.a(os_signal.o)
- .data          0x0002147c        0x8 /snap/src/prj-snap/test.a(avg.o)
- .data          0x00021484        0x0 /snap/src/prj-snap/test.a(csma.o)
- .data          0x00021484        0x0 /snap/src/prj-snap/test.a(radio_comm.o)
- .data          0x00021484        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
- .data          0x00021484        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .data          0x00021200        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00021200                data_start
+                0x00021200                __data_start
+ .data          0x00021204        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .data          0x00021204        0x4 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                0x00021204                __dso_handle
+ .data          0x00021208       0x6c /snap/src/prj-snap/test.a(main.o)
+                0x00021208                rs_mode
+                0x0002120c                payload_len
+                0x00021210                block_len
+ .data          0x00021274        0x0 /snap/src/prj-snap/test.a(bridge.o)
+ .data          0x00021274        0x0 /snap/src/prj-snap/test.a(radio_events.o)
+ *fill*         0x00021274        0x4 
+ .data          0x00021278        0x8 /snap/src/prj-snap/test.a(state.o)
+ .data          0x00021280        0x0 /snap/src/prj-snap/test.a(timer.o)
+ .data          0x00021280        0x0 /snap/src/prj-snap/test.a(print_util.o)
+ .data          0x00021280       0x24 /snap/src/prj-snap/test.a(composite_encoder.o)
+                0x00021280                p
+ .data          0x000212a4      0xff8 /snap/src/prj-snap/test.a(conv_wrapper.o)
+ .data          0x0002229c        0x0 /snap/src/prj-snap/test.a(turbo_wrapper.o)
+ .data          0x0002229c        0x0 /snap/src/prj-snap/test.a(util.o)
+ .data          0x0002229c        0x0 /snap/src/prj-snap/test.a(radio.o)
+ .data          0x0002229c        0x0 /snap/src/prj-snap/test.a(radio_hal.o)
+ .data          0x0002229c      0x1d8 /snap/src/prj-snap/test.a(si446x_api_lib.o)
+                0x0002229c                Si446xPatchCommands
+ .data          0x00022474        0x0 /snap/src/prj-snap/test.a(spidev.o)
+ .data          0x00022474        0x8 /snap/src/prj-snap/test.a(gpio.o)
+                0x00022474                line_offsets
+                0x00022478                shutdown_line_offsets
+ .data          0x0002247c        0x0 /snap/src/prj-snap/test.a(os_signal.o)
+ .data          0x0002247c        0x0 /snap/src/prj-snap/test.a(csma.o)
+ .data          0x0002247c        0x0 /snap/src/prj-snap/test.a(radio_comm.o)
+ .data          0x0002247c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .data          0x0002247c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
 .tm_clone_table
-                0x00021484        0x0
+                0x0002247c        0x0
  .tm_clone_table
-                0x00021484        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+                0x0002247c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
  .tm_clone_table
-                0x00021484        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+                0x0002247c        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
 
 .data1
  *(.data1)
-                0x00021484                        _edata = .
+                0x0002247c                        _edata = .
                 [!provide]                        PROVIDE (edata = .)
-                0x00021484                        . = .
-                0x00021484                        __bss_start = .
-                0x00021484                        __bss_start__ = .
+                0x0002247c                        . = .
+                0x0002247c                        __bss_start = .
+                0x0002247c                        __bss_start__ = .
 
-.bss            0x00021488     0x6b40
+.bss            0x00022480     0x6934
  *(.dynbss)
- *fill*         0x00021488        0x0 
- .dynbss        0x00021488       0x10 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
-                0x00021488                optarg@@GLIBC_2.4
-                0x00021490                stderr@@GLIBC_2.4
-                0x00021494                stdout@@GLIBC_2.4
+ *fill*         0x00022480        0x0 
+ .dynbss        0x00022480       0x10 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+                0x00022480                optarg@@GLIBC_2.4
+                0x00022488                stderr@@GLIBC_2.4
+                0x0002248c                stdout@@GLIBC_2.4
  *(.bss .bss.* .gnu.linkonce.b.*)
- .bss           0x00021498        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
- .bss           0x00021498        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
- .bss           0x00021498        0x1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
- .bss           0x00021499        0x1 /snap/src/prj-snap/test.a(main.o)
-                0x00021499                disable_conv
- .bss           0x0002149a        0x0 /snap/src/prj-snap/test.a(bridge.o)
- *fill*         0x0002149a        0x2 
- .bss           0x0002149c        0xe /snap/src/prj-snap/test.a(radio_events.o)
- *fill*         0x000214aa        0x2 
- .bss           0x000214ac        0xc /snap/src/prj-snap/test.a(state.o)
-                0x000214ac                global_state
- .bss           0x000214b8        0x0 /snap/src/prj-snap/test.a(timer.o)
- .bss           0x000214b8        0x0 /snap/src/prj-snap/test.a(print_util.o)
- .bss           0x000214b8      0x80d /snap/src/prj-snap/test.a(composite_encoder.o)
-                0x000214b8                alpha_of
-                0x000218b8                index_of
-                0x00021cb8                test_n
-                0x00021cbc                total
-                0x00021cc0                global_rs_error_cnt
- *fill*         0x00021cc5        0x3 
- .bss           0x00021cc8     0x6014 /snap/src/prj-snap/test.a(conv_wrapper.o)
- .bss           0x00027cdc        0x0 /snap/src/prj-snap/test.a(turbo_wrapper.o)
- .bss           0x00027cdc        0x0 /snap/src/prj-snap/test.a(util.o)
- .bss           0x00027cdc      0x210 /snap/src/prj-snap/test.a(radio.o)
- .bss           0x00027eec        0x4 /snap/src/prj-snap/test.a(radio_hal.o)
-                0x00027eec                si4463_spi_fd
- .bss           0x00027ef0       0x24 /snap/src/prj-snap/test.a(si446x_api_lib.o)
-                0x00027ef0                Si446xCmd
-                0x00027f04                Pro2Cmd
- .bss           0x00027f14        0x0 /snap/src/prj-snap/test.a(spidev.o)
- .bss           0x00027f14       0x2c /snap/src/prj-snap/test.a(gpio.o)
-                0x00027f14                line_request_config
-                0x00027f18                line_config
-                0x00027f1c                line_settings
-                0x00027f20                chip
-                0x00027f24                line_request
-                0x00027f28                events
-                0x00027f2c                shutdown_line_request_config
-                0x00027f30                shutdown_line_config
-                0x00027f34                shutdown_line_settings
-                0x00027f38                chip_E
-                0x00027f3c                line_request_E10
- .bss           0x00027f40        0x4 /snap/src/prj-snap/test.a(os_signal.o)
-                0x00027f40                os_interrupted
- .bss           0x00027f44        0x4 /snap/src/prj-snap/test.a(avg.o)
- .bss           0x00027f48        0x0 /snap/src/prj-snap/test.a(csma.o)
- .bss           0x00027f48       0x80 /snap/src/prj-snap/test.a(radio_comm.o)
-                0x00027f48                tx
-                0x00027f88                rx
- .bss           0x00027fc8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
- .bss           0x00027fc8        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+ .bss           0x00022490        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crt1.o
+ .bss           0x00022490        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crti.o
+ .bss           0x00022490        0x1 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtbegin.o
+ .bss           0x00022491        0x1 /snap/src/prj-snap/test.a(main.o)
+                0x00022491                disable_conv
+ .bss           0x00022492        0x0 /snap/src/prj-snap/test.a(bridge.o)
+ *fill*         0x00022492        0x2 
+ .bss           0x00022494        0xe /snap/src/prj-snap/test.a(radio_events.o)
+ *fill*         0x000224a2        0x2 
+ .bss           0x000224a4        0x4 /snap/src/prj-snap/test.a(state.o)
+                0x000224a4                global_state
+ .bss           0x000224a8        0x0 /snap/src/prj-snap/test.a(timer.o)
+ .bss           0x000224a8        0x0 /snap/src/prj-snap/test.a(print_util.o)
+ .bss           0x000224a8      0x80d /snap/src/prj-snap/test.a(composite_encoder.o)
+                0x000224a8                alpha_of
+                0x000228a8                index_of
+                0x00022ca8                test_n
+                0x00022cac                total
+                0x00022cb0                global_rs_error_cnt
+ *fill*         0x00022cb5        0x3 
+ .bss           0x00022cb8     0x6014 /snap/src/prj-snap/test.a(conv_wrapper.o)
+ .bss           0x00028ccc        0x0 /snap/src/prj-snap/test.a(turbo_wrapper.o)
+ .bss           0x00028ccc        0x0 /snap/src/prj-snap/test.a(util.o)
+ .bss           0x00028ccc        0xe /snap/src/prj-snap/test.a(radio.o)
+ *fill*         0x00028cda        0x2 
+ .bss           0x00028cdc        0x4 /snap/src/prj-snap/test.a(radio_hal.o)
+                0x00028cdc                si4463_spi_fd
+ .bss           0x00028ce0       0x24 /snap/src/prj-snap/test.a(si446x_api_lib.o)
+                0x00028ce0                Si446xCmd
+                0x00028cf4                Pro2Cmd
+ .bss           0x00028d04        0x0 /snap/src/prj-snap/test.a(spidev.o)
+ .bss           0x00028d04       0x2c /snap/src/prj-snap/test.a(gpio.o)
+                0x00028d04                line_request_config
+                0x00028d08                line_config
+                0x00028d0c                line_settings
+                0x00028d10                chip
+                0x00028d14                line_request
+                0x00028d18                events
+                0x00028d1c                shutdown_line_request_config
+                0x00028d20                shutdown_line_config
+                0x00028d24                shutdown_line_settings
+                0x00028d28                chip_E
+                0x00028d2c                line_request_E10
+ .bss           0x00028d30        0x4 /snap/src/prj-snap/test.a(os_signal.o)
+                0x00028d30                os_interrupted
+ .bss           0x00028d34        0x0 /snap/src/prj-snap/test.a(csma.o)
+ .bss           0x00028d34       0x80 /snap/src/prj-snap/test.a(radio_comm.o)
+                0x00028d34                tx
+                0x00028d74                rx
+ .bss           0x00028db4        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
+ .bss           0x00028db4        0x0 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  *(COMMON)
-                0x00027fc8                        . = ALIGN ((. != 0x0)?0x4:0x1)
-                0x00027fc8                        _bss_end__ = .
-                0x00027fc8                        __bss_end__ = .
-                0x00027fc8                        . = ALIGN (0x4)
-                0x00027fc8                        . = SEGMENT_START ("ldata-segment", .)
-                0x00027fc8                        . = ALIGN (0x4)
-                0x00027fc8                        __end__ = .
-                0x00027fc8                        _end = .
+                0x00028db4                        . = ALIGN ((. != 0x0)?0x4:0x1)
+                0x00028db4                        _bss_end__ = .
+                0x00028db4                        __bss_end__ = .
+                0x00028db4                        . = ALIGN (0x4)
+                0x00028db4                        . = SEGMENT_START ("ldata-segment", .)
+                0x00028db4                        . = ALIGN (0x4)
+                0x00028db4                        __end__ = .
+                0x00028db4                        _end = .
                 [!provide]                        PROVIDE (end = .)
-                0x00027fc8                        . = DATA_SEGMENT_END (.)
+                0x00028db4                        . = DATA_SEGMENT_END (.)
 
 .stab
  *(.stab)
@@ -930,7 +924,6 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  .comment       0x00000012       0x13 /snap/src/prj-snap/test.a(spidev.o)
  .comment       0x00000012       0x13 /snap/src/prj-snap/test.a(gpio.o)
  .comment       0x00000012       0x13 /snap/src/prj-snap/test.a(os_signal.o)
- .comment       0x00000012       0x13 /snap/src/prj-snap/test.a(avg.o)
  .comment       0x00000012       0x13 /snap/src/prj-snap/test.a(csma.o)
  .comment       0x00000012       0x13 /snap/src/prj-snap/test.a(radio_comm.o)
  .comment       0x00000012       0x13 /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
@@ -976,15 +969,13 @@ LOAD /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
  .ARM.attributes
                 0x000003f8       0x39 /snap/src/prj-snap/test.a(os_signal.o)
  .ARM.attributes
-                0x00000431       0x39 /snap/src/prj-snap/test.a(avg.o)
+                0x00000431       0x39 /snap/src/prj-snap/test.a(csma.o)
  .ARM.attributes
-                0x0000046a       0x39 /snap/src/prj-snap/test.a(csma.o)
+                0x0000046a       0x39 /snap/src/prj-snap/test.a(radio_comm.o)
  .ARM.attributes
-                0x000004a3       0x39 /snap/src/prj-snap/test.a(radio_comm.o)
+                0x000004a3       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
  .ARM.attributes
-                0x000004dc       0x3b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../arm-ostl-linux-gnueabi/12.2.0/crtend.o
- .ARM.attributes
-                0x00000517       0x2b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
+                0x000004de       0x2b /usr/lib/gcc/arm-ostl-linux-gnueabi/12.2.0/../../../crtn.o
 
 .gnu.build.attributes
  *(.gnu.build.attributes .gnu.build.attributes.*)

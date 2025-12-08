@@ -248,10 +248,10 @@ zhashx_t * radio_load_configs(char * config_dir_path, zhashx_t * current_config,
 
 zhashx_t * radio_parse_config(char * path, zhashx_t * current_config, char * regex){
 	printf("INFO radio_parse_config(\"%s\")\n", path);
-	static char line_buf[512];
+	char line_buf[512];
 	char * line = line_buf;
 	FILE * fp;
-	size_t len = 0;
+	size_t len = sizeof(line_buf);
 	int rc;
 	char property[64];
 	char value[256];
@@ -296,7 +296,7 @@ zhashx_t * radio_parse_config(char * path, zhashx_t * current_config, char * reg
 				zhashx_update(to_return, property, new_prop);
 			}
 		}
-		
+		//if (line != NULL){free(line);}
 		zrex_destroy (&rex);
 		rex = zrex_new (RADIO_CONFIG_REGEX);
 		

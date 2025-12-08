@@ -70,8 +70,17 @@ typedef struct beacon_DEFINITION beacon_t;				///<object to hold information in 
 ////////////////////////////////////////////////////////////////////////////////////////////
 extern state_t * global_state; ///<global reference to the state_t, use with caution
 
+typedef enum {
+    INIT,
+	MEDIUM_BUSY,
+	MEDIUM_BUSY_TX_PENDING,
+	MEDIUM_IDLE,
+	MEDIUM_IDLE_TX_PENDING
+} csma_state_t;
+
 typedef struct csma_DEF {
-	bool enabled; 			///<csma is active
+	csma_state_t state;
+	uint8_t busy_threshold;
 	uint8_t tx_probability; ///<the probability to transmit, a value from 0% to 100%
 	uint16_t wait_upper;	///<upper limit in ms on the wait period
 	uint16_t wait_lower; 	///<lower limit in ms on the wait period
@@ -118,6 +127,8 @@ struct state_t_DEFINITION {
 };
 
 state_t * state(composite_encoder_t * encoder, zsock_t * pub);
+
+bool state_get_rssi(state_t * state);
 
 bool state_transmitting(state_t * state);
 bool state_receiving(state_t * state);

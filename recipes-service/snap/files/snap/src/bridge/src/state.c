@@ -29,7 +29,10 @@
 //reporting debug definitions
 #define DEBUG
 //#define OBJECT_DESTROY_DEBUG
-//#define TX_START_DEBUG
+#define INFO_RSSI
+//#define DEBUG_RSSI
+#define TX_START_DEBUG
+//#define TX_QUEUE_DEBUG
 
 state_t * global_state;
 
@@ -66,16 +69,16 @@ state_t * state(composite_encoder_t * encoder, zsock_t * pub){
 	////create a radio frame send queue
 	to_return->send_queue = zlistx_new();
 	if (to_return->send_queue == NULL) {return NULL;}
-	zlistx_set_destructor(to_return->send_queue, (zlistx_destructor_fn*)radio_frame_destroy);
+	zlistx_set_destructor(to_return->send_queue, (zlistx_destructor_fn*)zchunk_destroy);
 	
-	timer_init(&to_return->transmit_send_queue, true,   10, 0);
+	timer_init(&to_return->transmit_send_queue, true,   1, 0);
 	//timer_init(&to_return->transmit_send_queue, true,   to_return->transmit_queue_period_ms, to_return->transmit_queue_variance_ms);
-	csma_init(&to_return->csma, 50, 5, 10); //probabillity to transmit, min backoff ms, max backoff ms
+	csma_init(&to_return->csma, 100, 50, 5, 10); //probabillity to transmit, min backoff ms, max backoff ms
 	
 	to_return->encoder = encoder;
 	to_return->pub = pub;
 	
-	to_return->transmitting = NULL;
+	to_return->transmitting = radio_frame(to_return->encoder->coded_len);
 	to_return->receiving	= radio_frame(to_return->encoder->coded_len);
 	
 	global_state = to_return; //set the global state object, this is ok since this is a singleton class
@@ -96,17 +99,22 @@ bool state_process_receive_frame(state_t * state, zframe_t ** to_rx, uint8_t lat
 	return true;
 }
 
-bool state_transmitting(state_t * state) {return (state->transmitting != NULL);}
+bool state_transmitting(state_t * state) {
+	return radio_frame_active(state->transmitting);
+}
 
 bool state_receiving(state_t * state){
 	return radio_frame_active(state->receiving);
 }
 
 bool state_transceiving(state_t * state){
-	return (radio_frame_active(state->receiving) || (state->transmitting != NULL));
+	return (radio_frame_active(state->receiving) || radio_frame_active(state->transmitting));
 }
 
 bool state_add_frame_to_send_queue(state_t * state, uint8_t * pay, uint32_t len){
+#ifdef TX_QUEUE_DEBUG
+	printf("DEBUG: state_add_frame_to_send_queue(%u)\n", len);
+#endif
 	//printArrHex(pay, len);
 	
 	uint8_t * encoded = composite_encoder_encode(state->encoder, pay, len);
@@ -114,12 +122,8 @@ bool state_add_frame_to_send_queue(state_t * state, uint8_t * pay, uint32_t len)
 		printf("ERROR: state_add_frame_to_send_queue() failed!\n");
 		return false;
 	}
-	radio_frame_t * to_tx = radio_frame(state->encoder->coded_len);
-	memcpy(to_tx->frame_ptr, encoded, state->encoder->coded_len);
 	
-	//printArrHex(to_tx->frame_ptr, to_tx->frame_len);
-	
-	//printf("DEBUG: state_add_frame_to_send_queue(%u)\n", to_tx->frame_len);
+	zchunk_t * to_tx = zchunk_new(encoded, state->encoder->coded_len);
 	zlistx_add_end(state->send_queue, to_tx);
 	return true;
 }
@@ -129,13 +133,15 @@ bool state_peek_next_frame_to_transmit(state_t * state){
 }
 
 radio_frame_t * state_get_next_frame_to_transmit(state_t * state){
-	//printf("DEBUG: state_get_next_frame_to_transmit()\n");
-	radio_frame_t * to_return = zlistx_first(state->send_queue);
-	state->transmitting = to_return;
-	if (to_return != NULL){
-		zlistx_detach_cur(state->send_queue);
-	}
-	return to_return;
+	
+	zchunk_t * chunk = zlistx_first(state->send_queue);
+	if (chunk == NULL){return NULL;}
+	
+	zlistx_detach_cur(state->send_queue);
+	radio_frame_reset(state->transmitting);
+	memcpy(state->transmitting->frame_ptr, zchunk_data(chunk), zchunk_size(chunk)); //state->encoder->coded_len
+	zchunk_destroy(&chunk);
+	return state->transmitting;
 }
 
 void state_finish_receiving(state_t * state){
@@ -147,9 +153,7 @@ void state_abort_transceiving(state_t * state){
 	printf("INFO: state_abort_transceiving()\n");
 	
 	radio_frame_reset(state->receiving);
-	if (state->transmitting != NULL){
-		radio_frame_destroy(&state->transmitting);
-	}
+	radio_frame_reset(state->transmitting);
 	radio_start_rx(state->current_channel, state->receiving->frame_len);
 	//si446x_change_state(SI446X_CMD_REQUEST_DEVICE_STATE_REP_CURR_STATE_MAIN_STATE_ENUM_READY); //change to ready state
 }
@@ -159,21 +163,40 @@ void state_abort_transceiving(state_t * state){
 #define RSSI_THRESHHOLD 10 ///<only transmit if AVG RSSI plus this is lower than this
 
 static void state_tx_now(state_t * state){
-	state->transmitting = state_get_next_frame_to_transmit(state);
-	if (state->transmitting != NULL){
-		if (!radio_frame_transmit_start(state->transmitting, state->current_channel)){
-			printf("ERROR: radio_frame_transmit_start() failed!\n");
-		}
-	} else {
-		printf("ERROR: state_get_next_frame_to_transmit() returned NULL\n");
+	if (state_get_next_frame_to_transmit(state) == NULL){
+		printf("ERROR: state_tx_now() failed\n");
+		return;
 	}
+	if (!radio_frame_transmit_start(state->transmitting, state->current_channel)){
+		printf("ERROR: radio_frame_transmit_start() failed!\n");
+	}
+}
+
+bool state_get_rssi(state_t * state){
+#ifdef INFO_RSSI
+	bool prev_busy = csma_medium_busy(&state->csma);
+#endif
+	uint32_t rssi = radio_get_rssi();
+#ifdef DEBUG_RSSI
+	printf("rssi %u\n", rssi);
+#endif
+#ifdef INFO_RSSI
+	bool busy = csma_feed_rssi(&state->csma, rssi);
+	if ((busy == true) && (prev_busy == false)){
+		printf("MEDIUM BUSY %u\n", rssi);
+	}
+	else if ((busy == false) && (prev_busy == true)){
+		printf("medium not busy %u\n", rssi);
+	}
+#endif
+	return rssi;
 }
 
 void state_run(state_t * state){
 	static int64_t txrx_timer = -1;
 	//static task_timer_t radio_state_check = {false, 250, 0, 0};
 	//static task_timer_t radio_rssi_check  = {false, 5, 0};
-	static uint32_t rssi, avg_rssi;
+	//static uint32_t rssi, avg_rssi;
 
 	if (state_transceiving(state)) {
 		radio_event_callback(state);
@@ -193,39 +216,21 @@ void state_run(state_t * state){
 	//if (timer_run(&radio_rssi_check)){
 	//	radio_print_modem_status(false);
 	//}
+	//return;
 	
-	avg_rssi = exp_moving_avg(radio_get_rssi());
+	//rssi = radio_get_rssi();
+	//avg_rssi = exp_moving_avg(rssi);
+	//printf("%u %u %llu\n", rssi, avg_rssi, zclock_mono());
+	//return;
 	
-	if (csma_enabled(&state->csma)) { //ready to transmit but medium is busy, check it after random backoff then probabalitistically transmit
-		if (csma_run_countdown(&state->csma)){
-			rssi = radio_get_rssi();
-			printf("waiting rssi %u\n", rssi);
-			if (rssi < (avg_rssi+RSSI_THRESHHOLD)){
-				if (csma_run_transmit(&state->csma)){ //transmit, csma will be disabled now
-					state_tx_now(state);
-				}			
-			}
+	state_get_rssi(state);
+	
+	if (state_peek_next_frame_to_transmit(state)){
+		if (csma_run(&state->csma)){ //clear to transmit
+			state_tx_now(state);
 		}
 	}
-	else if (timer_run(&state->transmit_send_queue)) { //csma is not running start a transmission
-		
-		if (!state_peek_next_frame_to_transmit(state)){ //if there is nothing to transmit set back-off to its minimum
-			state->transmit_send_queue.period_ms = state->tx_backoff_min_ms;
-		} else { //there is a frame to transmit
-			rssi = radio_get_rssi();
-			printf("rssi %u\n", rssi);
-			if (rssi < (avg_rssi+RSSI_THRESHHOLD)){
-				state_tx_now(state);
-			} else {
-				csma_reset(&state->csma); //start the csma algorithm
-			}			
-		}
-	}
-	
-	//if (timer_run(&radio_state_check)){
-	//	radio_print_state(false);
-	//}
-	
+
 }
 
 
@@ -239,6 +244,8 @@ void state_destroy(state_t ** to_destroy){
 
 	zlistx_destroy(&(*to_destroy)->si4463_load_order);
 	zhashx_destroy(&(*to_destroy)->radio_config);	
+	radio_frame_destroy(&(*to_destroy)->receiving);
+	radio_frame_destroy(&(*to_destroy)->transmitting);
 
 	free(*to_destroy); //free the state_t from memory
 	*to_destroy = NULL; //set the state_t* to be a NULL pointer
@@ -328,7 +335,7 @@ int radio_frame_bytes_remaining(radio_frame_t * rf){
 
 bool radio_frame_transmit_start(radio_frame_t * frame, uint8_t channel){
 #ifdef TX_START_DEBUG
-	printf("INFO: radio_frame_transmit_start(%u)\n", frame->frame_len);
+	printf("DEBUG: radio_frame_transmit_start(%u)\n", frame->frame_len);
 #endif
 	
 	if (frame->frame_ptr == NULL) {return false;} //nothing to transmit

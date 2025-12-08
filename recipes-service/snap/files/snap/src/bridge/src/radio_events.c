@@ -26,6 +26,7 @@
 #include "radio.h"
 
 //#define RADIO_EVENTS_DEBUG_MORE
+//#define RADIO_RSSI_EVENTS_DEBUG
 //#define RADIO_EVENTS_DEBUG
 //#define RADIO_EVENTS_INFO
 //#define RADIO_PRINT_STATE_CHANGE_INFO 
@@ -138,14 +139,7 @@ bool radio_transmit_complete_callback(state_t * state){
 #ifdef RADIO_EVENTS_DEBUG
 	printf("radio_transmit_complete_callback()\n");
 #endif
-	if (state->transmitting == NULL){
-		//printf("WARNING: state->transmitting is NULL\n");
-		//return false;
-	} else {
-		state->transmitting->frame_position = NULL; //set frame position to null for the transmitting frame
-		radio_frame_destroy(&state->transmitting); //destroy the transmitted radio frame
-	}
-	
+	radio_frame_reset(state->transmitting);
 	timer_reset(&state->transmit_send_queue); 												//reset the timer to transmit another packet
 	return true;	
 }
@@ -189,6 +183,14 @@ bool radio_state_change_callback(state_t * state){
 		if (!radio_start_rx(state->current_channel, state->receiving->frame_len)){return false;}
 	}
 
+	return true;
+}
+
+bool radio_rssi_exceeds_threshhold_callback(state_t * state){
+#ifdef RADIO_RSSI_EVENTS_DEBUG
+	printf("DEBUG: radio_rssi_exceeds_threshhold_callback\n");
+#endif
+	state_get_rssi(state);
 	return true;
 }
 
@@ -353,9 +355,7 @@ bool radio_event_callback(state_t * state) {
 	}
 	
 	if (RSSI){
-		//printf("RSSI\n");
-		//if (state_receiving(state)){printf("rx\n");}
-		//else if (state_transmitting(state)){printf("tx\n");}
+		if (!radio_rssi_exceeds_threshhold_callback(state)){return false;}
 		handled = true;
 	}
 	
