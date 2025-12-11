@@ -18,6 +18,7 @@ SRC_URI +="file://${prj}"
 SRC_URI +="file://${prj}.service"
 SRC_URI +="file://logrotate.d"
 SRC_URI +="file://LICENSE"
+SRC_URI +="file://config.json.default"
 
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 SYSTEMD_SERVICE:${PN} = "${prj}.service"
@@ -45,6 +46,9 @@ do_install(){
        
 	install -d ${D}/${prj}/volatile
         rm ${D}/${prj}/volatile/*.json
+        
+        rm ${D}/${prj}/conf/config.json	
+        install -Dm 644 config.json.default ${D}/${prj}/conf/config.json
 
         rm ${D}/${prj}/conf/callsign.cfg
         rm ${D}/${prj}/conf/addr.cfg

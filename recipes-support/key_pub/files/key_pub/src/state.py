@@ -125,6 +125,8 @@ class State:
 			for key in self.keys_pressed:
 				if (key in self.key_held_actions) and (self.keys_pressed[key].held(self.CHECK_KEYS_S())):
 					self.key_held_actions[key]()
+				else:
+					self.send(key, held=True)
 			#log.info(self.keys_pressed)
 	
 	def read_key_presses(self):
@@ -136,12 +138,16 @@ class State:
 				if (key in self.key_pressed_actions):
 					self.key_pressed_actions[key]()
 					self.check_keys_task.cancel()
+				else:
+					self.send(key, pressed=True)
 			elif (action == 'released'):
 				if (key in self.keys_pressed):
 					self.keys_pressed.pop(key)
 				if (key in self.key_released_actions):
 					self.key_released_actions[key]()
 					self.check_keys_task.cancel()
+				else:
+					self.send(key, released=True)
 			#log.info('%s %s' % (action, key))
 	
 	def handle_sub(self, cmd, msg):

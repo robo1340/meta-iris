@@ -135,6 +135,7 @@ if __name__ == "__main__":
 	parser.add_argument('-q',   '--quick-config', choices=list(QUICK_CONFIG_OPTIONS.keys()), default='', help='configure modem setting to one of several pre-canned options')
 	parser.add_argument('-t',   '--config-type', choices=['modem','general','packet','preamble'], default='modem', help='the config type being set')
 	parser.add_argument('-l',  '--list-configs', action='store_true', help='list available modem configs')
+	parser.add_argument('-lc',  '--list-current-config', action='store_true', help='list current modem configuration')
 	parser.add_argument('-sm',  '--set-config', type=str, default='', help='set the modem config by name')
 	parser.add_argument('-s',   '--set-config-by-match', type=str, default='', help='set the modem config matching comma delimitted strings')
 	parser.add_argument('-nr',  '--no-restart', action='store_true', help='do not restart the snap service after making configuration changes')
@@ -157,7 +158,10 @@ if __name__ == "__main__":
 		os.system('cat /snap/conf/config.ini')
 		print("\nAvailable:")
 		os.system('ls -lh %s' % (MODEM_CONFIGS_PATH,))
-		
+	elif (args['list_current_config']):
+		print("Currently Selected Radio Config")
+		os.system('ls -lh %s' % (MODEM_CONFIG_SELECTED_PATH,))
+		os.system('cat /snap/conf/config.ini')
 	
 	if (args['set_config'] != ''):
 		if (not os.path.isfile(os.path.join(MODEM_CONFIGS_PATH, args['set_config']))):

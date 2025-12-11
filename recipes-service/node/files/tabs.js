@@ -481,15 +481,27 @@ class UserView {
 	
 	static clear_inactive_users(){
 		console.log('clear_inactive_users() currently incomplete');
-		User.load_users(function(users){
-			for (const user of users){
-				var d = new Date(user.last_activity_time);
-				var r = d.getTime();
-				console.log(user.callsign,user.last_activity_time, r, Date.now()-r);
-			}
-			
-		});
 		
+		let items = document.querySelectorAll('#userList td');
+		//items = items[0];
+		//console.log(items);
+		for (let i = items.length - 1; i >= 0; i--) {
+			//for (const prop in items[i]){console.log(prop, items[i][prop]);}
+			//console.log(items[i].className);
+			if (items[i].className == 'user-entry-time'){
+				if (items[i].textContent.includes('INACTIVE')){
+					let addr = parseInt(items[i].id);
+					console.log('deleting', addr);
+					User.remove(addr, function(){
+						//console.log('removed');
+						let row = $('#'+addr+'.user-entry');
+						row.remove()	
+					});
+					//console.log(items[i].attributes);
+					//console.log(items[i].id);
+				}
+			}
+		}	
 	}
 	
 	static tooltip_contents(callsign, last_location_beacon_time, lat, lon){
@@ -551,7 +563,7 @@ class UserView {
 		}
 		if (waypoint_db !== undefined){
 			Waypoint.load(function(waypoints){
-				for (w of waypoints){
+				for (const w of waypoints){
 					WaypointView.update_span(w.addr, 'WAYPOINT ' + state.get_distance(waypoints[w.addr]) + 'm');
 				}
 			});
@@ -874,6 +886,9 @@ class UserInput {
 			if (Number.isNaN(nc.default_hops) == true){
 				View.highlight('default_hops','salmon',2500);
 				throw new Error("default_hops value is not an integer");
+			} else if (nc.default_hops == 0){
+				nc.default_hops = 1;
+				document.getElementById('default_hops').value = nc.default_hops;
 			}
 			
 			console.log('set_hub_config',nc);
@@ -1146,7 +1161,7 @@ class Handlers {
 		
 	}
 	
-	static peer_info_cb(msg){
+	static peer_info_cb(msg, timestamp){
 		//console.log('Handlers.peer_info_cb', msg);
 		User.get(msg.addr, function(user){ //success callback
 			if (user.callsign != msg.callsign){
@@ -1154,7 +1169,7 @@ class Handlers {
 				View.set_tab_pending("chat");
 				User.update(user.addr, msg.callsign, null, null, null, null, function(user_u){
 					UserView.update_span_name(user_u);
-					UserView.update_span_time(user_u.addr, Util.iso_to_time(Util.get_iso_timestamp()));
+					UserView.update_span_time(user_u.addr, Util.iso_to_time(timestamp));
 					markers[user_u.addr]._tooltip._content = UserView.tooltip_contents(user_u.callsign, user_u.last_location_beacon_time, user_u.lat, user_u.lon);
 					Waypoint.get(user_u.addr, function(w){
 						waypoints[w.addr]._tooltip._content = WaypointView.tooltip_text(w,user_u);
@@ -1162,7 +1177,7 @@ class Handlers {
 				});
 			}
 			else if (msg.callsign != state.my_callsign){
-				UserView.update_span_time(user.addr, Util.iso_to_time(Util.get_iso_timestamp()));
+				UserView.update_span_time(user.addr, Util.iso_to_time(timestamp));
 			}
 		},
 		function() { //failed callback

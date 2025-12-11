@@ -8,6 +8,7 @@ import zmq
 import traceback
 import random
 import serial
+import struct
 from dataclasses import dataclass, field
 
 #a simple task scheduler class because I don't want to use Timer to schedule tasks
@@ -46,29 +47,61 @@ class SSC32:
 	def read(self):
 		return self.ser.readline()
 	
-	def move(self, ch : int, pulse : int, time_ms : int = 250):
-		cmd = '#%d P%d T%d' % (ch, pulse, time_ms)
+	def move(self, ch : int, pulse : int, time_ms : int = 250, block=False, block_timeout=3):
+		cmd = '#%d P%d T%d' % (ch, pulse, time_ms) if (time_ms is not None) else '#%d P%d' % (ch, pulse)
 		#log.debug('move "%s"' % (cmd,))
 		self.write(cmd)
+		if (block == True):
+			start = time.monotonic()
+			while ((time.monotonic() - start) < block_timeout):
+				self.write('Q')
+				if (self.read() == b'.'):
+					break
+	
+	def multi_move(self, chs : list, pulses : list, time_ms : int = 250, block=False, block_timeout=3):
+		assert(len(chs) == len(pulses))
+		cmd = ''
+		for ch, pulse in zip(chs, pulses):
+			cmd = cmd + '#%d P%d ' % (ch, pulse)
+		if (time_ms is not None):
+			cmd = cmd + 'T%d' % (time_ms,)
+		self.write(cmd)
+		if (block == True):
+			start = time.monotonic()
+			while ((time.monotonic() - start) < block_timeout):
+				self.write('Q')
+				if (self.read() == b'.'):
+					break
+
+	def read_analog(self):
+		self.write('VA VB VC VD')
+		ad = self.read()
+		if (len(ad) == 4):
+			ad = struct.unpack('<BBBB',ad)
+			return {'VA':ad[0],'VB':ad[1],'VC':ad[2],'VD':ad[3]}
+		return None
 
 class PanTilt:
 	def __init__(self, ssc32, config, servo_time_s=250):
 		self.servo_time_ms = servo_time_s * 1000
 		self.ssc32 = ssc32
 		self.config = config
-		self.panh_pos = 1500
-		self.panv_pos = 1500
 		self.pan_ch = config['pan_ch']
 		self.tilt_ch = config['tilt_ch']
+		self.pan_offset = config['pan_offset']
+		self.tilt_offset = config['tilt_offset']
+		self.panh_pos = 1500
+		self.panv_pos = 1500
+		self.pan_limits = [575, 2075]
+		self.tilt_limits = [1050, 2425]
 
-	def set_position(self, pan, tilt):
-		self.panh_pos = pan
-		self.panv_pos = tilt
-		self.ssc32.move(self.pan_ch, self.panh_pos)
-		self.ssc32.move(self.tilt_ch, self.panv_pos)		
+	def set_position(self, pan, tilt, time_ms=250, block=False, block_timeout=3):
+		self.panh_pos = max(self.pan_limits[0], min(pan+self.pan_offset, self.pan_limits[1]))
+		self.panv_pos = max(self.tilt_limits[0], min(tilt+self.tilt_offset, self.tilt_limits[1]))
+		self.ssc32.multi_move([self.pan_ch,self.tilt_ch], [self.panh_pos, self.panv_pos], time_ms=time_ms, block=block, block_timeout=block_timeout)	
 	
 	def reset(self):
-		self.set_position(1500,1500)
+		self.set_position(1500, 1500)
 
 	def cancel_pan(self):
 		self.ssc32.write('#%d P1500 %c' % (self.pan_ch,27))
@@ -76,29 +109,30 @@ class PanTilt:
 	def cancel_tilt(self):
 		self.ssc32.write('#%d P1500 %c' % (self.tilt_ch,27))
 
-	def panh(self, amt):
-		self.panh_pos = max(575, min(self.panh_pos + amt, 2475))
-		log.debug('panh %d' % (self.panh_pos,))
-		self.ssc32.move(self.pan_ch, self.panh_pos, time_ms=self.servo_time_ms)
+	def panh(self, amt, time_ms=250, block=False, block_timeout=3):
+		self.panh_pos = max(self.pan_limits[0], min(self.panh_pos + amt, self.pan_limits[1]))
+		self.ssc32.move(self.pan_ch, self.panh_pos, time_ms=time_ms, block=block, block_timeout=block_timeout)
 
-	def panv(self, amt):
-		self.panv_pos = max(1050, min(self.panv_pos + amt, 2425))
-		log.debug('panv %d' % (self.panv_pos,))
-		self.ssc32.move(self.tilt_ch, self.panv_pos, time_ms=self.servo_time_ms)
+	def panv(self, amt, time_ms=250, block=False, block_timeout=3):
+		self.panv_pos = max(self.tilt_limits[0], min(self.panv_pos + amt, self.tilt_limits[1]))
+		self.ssc32.move(self.tilt_ch, self.panv_pos, time_ms=time_ms, block=block, block_timeout=block_timeout)
 
 class Rover:
 	def __init__(self, ssc32, config):
 		self.ssc32 = ssc32
+		self.pantilt = None
 		
 		self.config = config
 
-		self.left_ch = self.config['left_ch']
-		self.right_ch = self.config['right_ch']
-		self.left = 1500 + self.config['left_offset_us']
-		self.right = 1500 + self.config['right_offset_us']
+		self.fwd_ch 	= self.config['fwd_ch']
+		self.turn_ch 	= self.config['turn_ch']
+		self.fwd = 1500
+		self.turn = 1500
+		self.left = 1500 + self.config['fwd_offset']
+		self.right = 1500 + self.config['turn_offset']
 
-		self.max_limits 		= [1700,1825,2000]
-		self.min_limits 		= [1300,1175,1000]
+		self.max_limits 		= [1800,1825,2000]
+		self.min_limits 		= [1200,1175,1000]
 		self.increment_amounts 	= [  25,  50,  75]
 
 		self.max_limit = lambda : self.max_limits[0]
@@ -106,14 +140,13 @@ class Rover:
 		self.increment_amount = lambda : self.increment_amounts[0]
 
 		self.initialized = False
-		self.init()
 
-	def set_motors(self,left=1500,right=1500):
-		l = left + self.config['left_offset_us']
-		r= right+ self.config['right_offset_us']
-		l = max(self.min_limit(), min(l, self.max_limit()))
-		r = max(self.min_limit(), min(r, self.max_limit()))
-		self.ssc32.write('#%d P%d #%d P%d' % (self.left_ch, l, self.right_ch, r))
+	def update_motors(self):
+		f = self.fwd + self.config['fwd_offset']
+		t = self.turn+ self.config['turn_offset']
+		f= max(self.min_limit(), min(f, self.max_limit()))
+		t = max(self.min_limit(), min(t, self.max_limit()))
+		self.ssc32.write('#%d P%d #%d P%d' % (self.fwd_ch, f, self.turn_ch, t))
 
 	def check(self):
 		self.ssc32.write('R4')
@@ -137,36 +170,43 @@ class Rover:
 			return
 		
 		self.stop()
+		self.pantilt.reset()
 		self.initialized = True
 		return True
 
 	def stop(self):
 		log.debug('Rover.stop')
-		self.ssc32.write('#%d P0' % (self.left_ch,))
-		self.ssc32.write('#%d P0' % (self.right_ch,))
+		self.ssc32.write('#%d P0' % (self.fwd_ch,))
+		self.ssc32.write('#%d P0' % (self.turn_ch,))
 		#self.ssc32.write('#%d P1500 %c' % (self.left_ch,27))
 		#self.ssc32.write('#%d P1500 %c' % (self.right_ch,27))
-		self.left = 1500
-		self.right = 1500
-		self.set_motors(1500, 1500)
+		self.fwd = 1500
+		self.turn = 1500
+		self.update_motors()
 
 	def turn_left(self,add=0):
 		log.debug('Rover.turn_left')
-		self.left += (self.increment_amount() + add)
-		self.right -= (self.increment_amount() + add)
-		self.set_motors(self.left, self.right)
+		self.turn = 1500 if (self.turn > 1500) else self.turn
+		self.turn -= (self.increment_amount() + add)
+		self.update_motors()
 
 	def turn_right(self,add=0):
 		log.debug('Rover.turn_right')
-		self.left -= (self.increment_amount() + add)
-		self.right += (self.increment_amount() + add)
-		self.set_motors(self.left, self.right)
+		self.turn = 1500 if (self.turn < 1500) else self.turn
+		self.turn += (self.increment_amount() + add)
+		self.update_motors()
 
 	def forward(self, add=0):
 		log.debug('Rover.forward')
-		self.left -= (self.increment_amount() + add)
-		self.right -= (self.increment_amount() + add)
-		self.set_motors(self.left, self.right)
+		self.fwd = 1500 if (self.fwd > 1500) else self.fwd
+		self.fwd -= (self.increment_amount() + add)
+		self.update_motors()
+
+	def backward(self, add=0):
+		log.debug('Rover.backward')
+		self.fwd = 1500 if (self.fwd < 1500) else self.fwd
+		self.fwd += (self.increment_amount() + add)
+		self.update_motors()
 
 	def change_limits(self):
 		prev_max = self.max_limits.pop(0)
@@ -176,12 +216,6 @@ class Rover:
 		self.min_limits.append(prev_min)
 		self.increment_amounts.append(prev_inc)
 		log.info('limits changed to [%d,%d,%d]' % (self.min_limit(), self.max_limit(), self.increment_amount()))	
-
-	def backward(self, add=0):
-		log.debug('Rover.backward')
-		self.left += (self.increment_amount() + add)
-		self.right += (self.increment_amount() + add)
-		self.set_motors(self.left, self.right)
 
 @dataclass
 class KeyPress:
@@ -227,6 +261,8 @@ class State:
 		self.zmq_ct = None
 		self.push = None
 		self.rover = rover
+		self.rover.pantilt = pantilt
+		self.ssc32 = self.rover.ssc32
 		self.pantilt = pantilt
 		self.pantilt.servo_time_ms = self.handle_key_press_update_rate_s * 1000 * 2
 		self.machine_stopped = False
@@ -243,24 +279,29 @@ class State:
 		self.check_task = Task(2, self.rover.check)
 		
 		self.pan_amt = 100
-		self.deadzone_offset = 50
+		self.deadzone_offset_f = 100
+		self.deadzone_offset_b = 100
+		self.deadzone_offset_r = 150
+		self.deadzone_offset_l = 200
+		
+		self.rover.init()
 		
 		def stand():
 			self.rover.stop()
 			self.pantilt.reset()
-			
 		
 		self.key_pressed_actions = {
-			'w' 	: lambda : self.rover.forward(self.deadzone_offset),
-			'a' 	: lambda : self.rover.turn_left(self.deadzone_offset),
-			's' 	: lambda : self.rover.backward(self.deadzone_offset),
-			'd' 	: lambda : self.rover.turn_right(self.deadzone_offset),
+			'w' 	: lambda : self.rover.forward(self.deadzone_offset_f),
+			'a' 	: lambda : self.rover.turn_left(self.deadzone_offset_l),
+			's' 	: lambda : self.rover.backward(self.deadzone_offset_b),
+			'd' 	: lambda : self.rover.turn_right(self.deadzone_offset_r),
 			#'left'	: lambda : self.pantilt.panh(-self.pan_amt),
 			#'right'	: lambda : self.pantilt.panh(self.pan_amt),
 			#'down'	: lambda : self.pantilt.panv(-self.pan_amt),
 			#'up'	: lambda : self.pantilt.panv(self.pan_amt),
 			'space' : lambda : self.rover.change_limits(),
-			'enter' : lambda : stand()
+			'enter' : lambda : stand(),
+			'x'		: lambda : self.scan()
 		}
 		self.key_released_actions = {
 			'w'		: lambda : self.rover.stop(),
@@ -277,11 +318,25 @@ class State:
 			'a' 	: lambda : self.rover.turn_left(),
 			's' 	: lambda : self.rover.backward(),
 			'd' 	: lambda : self.rover.turn_right(),
-			'left'	: lambda : self.pantilt.panh(-self.pan_amt),
-			'right'	: lambda : self.pantilt.panh(self.pan_amt),
-			'down'	: lambda : self.pantilt.panv(-self.pan_amt),
-			'up'	: lambda : self.pantilt.panv(self.pan_amt),
+			'left'	: lambda : self.pantilt.panh(self.pan_amt, time_ms=self.pantilt.servo_time_ms),
+			'right'	: lambda : self.pantilt.panh(-self.pan_amt, time_ms=self.pantilt.servo_time_ms),
+			'down'	: lambda : self.pantilt.panv(-self.pan_amt, time_ms=self.pantilt.servo_time_ms),
+			'up'	: lambda : self.pantilt.panv(self.pan_amt, time_ms=self.pantilt.servo_time_ms),
 		}
+	
+	def scan(self, resolution=100):
+		#log.info('scan')
+		arr = []
+		self.pantilt.set_position(self.pantilt.pan_limits[0], 1500, time_ms=10, block=True)
+		while (self.pantilt.panh_pos < self.pantilt.pan_limits[1]):
+			#log.debug(self.pantilt.panh_pos)
+			ad = self.ssc32.read_analog()
+			if (ad is None):
+				continue
+			arr.append((self.pantilt.panh_pos,ad['VA']))
+			self.pantilt.panh(resolution, time_ms=None, block=True)
+		log.debug(arr)
+		return arr
 	
 	def stop(self):
 		self.stopped = True

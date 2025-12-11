@@ -124,8 +124,10 @@ class User {
 
 	static remove(addr, finished_cb=do_nothing) {
 		if (user_db === undefined){return;}	
-		User.load().delete(addr); 
-		finished_cb();
+		let request = User.load().delete(addr); 
+		request.onsuccess = function() {
+			finished_cb();
+		};
 	}
 	
 	static user_db_cb() {

@@ -195,7 +195,7 @@ bool state_get_rssi(state_t * state){
 void state_run(state_t * state){
 	static int64_t txrx_timer = -1;
 	//static task_timer_t radio_state_check = {false, 250, 0, 0};
-	//static task_timer_t radio_rssi_check  = {false, 5, 0};
+	static task_timer_t radio_rssi_check  = {true, 100, 0, 0};
 	//static uint32_t rssi, avg_rssi;
 
 	if (state_transceiving(state)) {
@@ -223,13 +223,16 @@ void state_run(state_t * state){
 	//printf("%u %u %llu\n", rssi, avg_rssi, zclock_mono());
 	//return;
 	
-	state_get_rssi(state);
+	//state_get_rssi(state);
 	
 	if (state_peek_next_frame_to_transmit(state)){
+		state_get_rssi(state);
 		if (csma_run(&state->csma)){ //clear to transmit
 			state_tx_now(state);
 		}
-	}
+	} else if (timer_run(&radio_rssi_check)){
+		state_get_rssi(state);
+	}		
 
 }
 

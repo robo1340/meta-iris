@@ -23,6 +23,7 @@ print_help() {
   echo "key_pub       | start the key publishing client"
   echo "servo         | take direct control of several servos"
   echo "version       | get software version"
+  echo "callsign      | print my callsign and address"
 }
 
 alias ussh='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null"'
@@ -48,5 +49,15 @@ alias rsnap-config='remote_config_alias() { ussh root@$1 python3 /snap/scripts/s
 
 alias help="print_help"
 alias version='cat /home/version.json'
+alias callsign='cat /hub/conf/callsign.cfg; echo ''; cat /hub/conf/addr.cfg; echo '''
 
 print_help
+
+echo ''
+echo 'my callsign'
+callsign
+
+echo ''
+echo 'my configuration'
+ls -lh /snap/conf/si4463/modem/
+cat /snap/conf/config.ini

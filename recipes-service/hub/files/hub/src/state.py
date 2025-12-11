@@ -149,6 +149,12 @@ class State:
 		self.link_peers = {int(x):Peer.from_dict(y) for x,y in safe_read_json(LINK_PEERS_PATH, silent=True, default={}).items()}
 		#self.peers[1] = Peer(1,'fake')
 		#self.sync_peers()
+		self.peers_to_ignore = []
+		for p in self.config['peers_to_ignore']:
+			if (type(p) is int):
+				self.peers_to_ignore.append(p)
+			elif (type(p) is str) and (p.startswith('0x')):
+				self.peers_to_ignore.append(int(p,base=16))
 		
 		self.rate_limiter = RateLimiter(self.config['topic_rate_limits'], self.config['default_topic_rate_limit_s'])
 		
@@ -179,7 +185,8 @@ class State:
 			return
 		
 		#for testing only
-		if p.link_src in self.config['peers_to_ignore']: #ignore this peer, pretend this message was never received
+		if p.link_src in self.peers_to_ignore: #ignore this peer, pretend this message was never received
+			log.warning('ignoring %s' % (p,))
 			return
 		
 		if (p.link_src not in self.link_peers):
@@ -193,21 +200,29 @@ class State:
 			p.handle_payload(self)
 			if ( ((p.dst == self.my_addr)or(p.dst==self.BROADCAST_ADDR())) and (p.want_ack == True) and (p.src != self.my_addr) ):
 				self.tx_ack(p)
-		else: #packet was not addressed to me
+		if ((p.dst != self.my_addr) or (p.dst == self.BROADCAST_ADDR())): #packet might be retransmitted
 			if (p.src not in self.peers):
 				self.peers[p.src] = Peer(p.src)
 			
 			if (p.unique_id in self.packets_to_retransmit): #this packet has been received before and has now been retransmitted, do not retransmit it here
+				#log.debug('already retransmitting')
 				self.packets_to_retransmit.pop(p.unique_id)
 			elif (p.unique_id in self.packets_retransmitted): #this packet has already been retransmitted by me
+				#log.debug('already retransmitted')
 				pass
 			elif (p.dst == self.my_addr): #this packet was addressed to me
+				#log.debug('addr to me')
 				pass
 			elif (p.unique_id in self.packets_sent): #this packet was originally mine
+				#log.debug('i sent this')
 				pass
 			elif (p.decrement_hops()): #hops still available add to list to retransmit
 				p.link_src = self.my_addr
+				log.info('retransmit %s' % (p,))
 				self.packets_to_retransmit[p.unique_id] = p
+			else:
+				pass
+				#log.debug('no hops remain')
 	
 	def tx_packet_adv(self, **kwargs):
 		#log.info(kwargs);
