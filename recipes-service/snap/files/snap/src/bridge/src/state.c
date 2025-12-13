@@ -42,7 +42,7 @@ state_t * global_state;
 
 static bool state_read_config_settings(state_t * state, char * path);
 
-state_t * state(composite_encoder_t * encoder, zsock_t * pub){
+state_t * state(composite_encoder_t * encoder, zsock_t * pub, uint8_t csma_rssi_threshold){
 	state_t * to_return = (state_t*)malloc(sizeof(state_t));
 	if (to_return == NULL) {return NULL;}
 	
@@ -73,7 +73,7 @@ state_t * state(composite_encoder_t * encoder, zsock_t * pub){
 	
 	timer_init(&to_return->transmit_send_queue, true,   1, 0);
 	//timer_init(&to_return->transmit_send_queue, true,   to_return->transmit_queue_period_ms, to_return->transmit_queue_variance_ms);
-	csma_init(&to_return->csma, 100, 50, 5, 10); //probabillity to transmit, min backoff ms, max backoff ms
+	csma_init(&to_return->csma, csma_rssi_threshold, 50, 5, 10); //probabillity to transmit, min backoff ms, max backoff ms
 	
 	to_return->encoder = encoder;
 	to_return->pub = pub;

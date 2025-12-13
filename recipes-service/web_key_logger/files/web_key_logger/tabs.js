@@ -219,6 +219,7 @@ class UserInput {
 			'dst'	: 0,
 			'src'	: (state.send_keypress_local==true) ? 0 : undefined,
 			'expires' : state.expires,
+			'hops_start' : 1,
 			'pressed' : pressed,
 			'held' : held,
 			'released' : released,

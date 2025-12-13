@@ -126,7 +126,7 @@ struct state_t_DEFINITION {
 	
 };
 
-state_t * state(composite_encoder_t * encoder, zsock_t * pub);
+state_t * state(composite_encoder_t * encoder, zsock_t * pub, uint8_t csma_rssi_threshold);
 
 bool state_get_rssi(state_t * state);
 

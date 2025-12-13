@@ -65,6 +65,7 @@ def create_pub(context, endpoint):
 #create a dealer socket that will be responsible for the req/rep pattern
 def create_responder_socket(context, endpoint):
 	to_return = context.socket(zmq.ROUTER)
+	to_return.linger = 1000
 	#to_return.setsockopt_string(zmq.IDENTITY, 'hub')
 	to_return.bind(endpoint)
 	return to_return

@@ -27,7 +27,7 @@ struct bridge_t_DEFINITION {
 	uint8_t * buf; //buffer the size of an uncoded payload
 };
 
-bridge_t * bridge_create(composite_encoder_t * encoder);
+bridge_t * bridge_create(composite_encoder_t * encoder, uint8_t csma_rssi_threshold);
 
 bool bridge_run(bridge_t * b);
 

@@ -2,3 +2,4 @@ payload=100
 block=20
 disable_reed_solomon=false
 disable_convolutional=false
+csma_rssi_threshold=125

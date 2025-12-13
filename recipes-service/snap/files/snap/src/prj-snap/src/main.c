@@ -29,6 +29,7 @@ int rs_mode = 2;
 bool disable_conv = false;
 int payload_len=100;
 int block_len = 20;
+int csma_rssi_threshold = 125;
 
 static void usage(void){
 	printf("snap radio program\n");
@@ -37,6 +38,7 @@ static void usage(void){
 	printf("--disable-convolutional      -c - disable convolutional encoding\n");
 	printf("--payload -p - specify the uncoded payload length (in bytes)\n");
 	printf("--block   -b   - specify the reed solomon block length (in bytes)\n");
+	printf("--csma-rssi-threshold   -r   - specify threshhold at which the CSMA algorithm considers the channel to be busy (0-255)\n");
 	exit(0);
 }
 
@@ -51,7 +53,8 @@ int main(int argc, char **argv) {
     static struct option long_options[] = {
         // Options that set a flag
         {"disable-reed-solomon", required_argument, NULL, 'n'},
-		{"disable-convolutional ", required_argument, NULL, 'c'},
+		{"disable-convolutional", required_argument, NULL, 'c'},
+		{"csma-rssi-threshold", required_argument, NULL, 'r'},
 		{"help", no_argument, NULL, 'h'},
         //{"brief",   no_argument, &verbose_flag, 0},
         
@@ -93,6 +96,11 @@ int main(int argc, char **argv) {
 					payload_len = atoi(optarg);
 				}
                 break;
+            case 'r':
+                if (optarg != NULL) {
+					csma_rssi_threshold = atoi(optarg);
+				}
+                break;
             case 'b':
                 if (optarg != NULL) {
 					block_len = atoi(optarg);
@@ -124,7 +132,7 @@ int main(int argc, char **argv) {
     fprintf(fptr, "%d", encoder->uncoded_len);
     fclose(fptr);
 	
-	bridge_t * br = bridge_create(encoder);
+	bridge_t * br = bridge_create(encoder, (uint8_t)csma_rssi_threshold);
 	assert(br != NULL);
 	
 	//check radio part info

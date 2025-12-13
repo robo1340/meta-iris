@@ -168,6 +168,7 @@ def handle_set_radio_config(cmd, pay, state):
 		if (typ in ['modem','general','packet','preamble']):
 			os.system('/usr/bin/python3 /snap/scripts/snap_configure.py -t %s -sm %s --no-restart' % (typ, path))
 	write_ini(SNAP_INI_PATH, pay_dict['snap_args'])
+	os.system('sync')
 	state.restart_snap = time.monotonic()
 	return handle_get_radio_config(cmd, '', state)
 

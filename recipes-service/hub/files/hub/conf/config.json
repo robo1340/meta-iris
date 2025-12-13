@@ -2,11 +2,14 @@
   "retransmit_wait_multiplier_s": 0.1,
   "broadcast_addr": 0,
   "peer_timeout_s": 300,
+  "default_hops": 7,
+  "peers_to_ignore": [],
   "peer_info_tx_s": 5,
-  "default_hops": 3,
+  "topic_rate_limit_s": 1,
   "topic_rate_limits": {
-    "key_press": -1
+    "key_press": -1,
+    "peer_info": -1
   },
   "default_topic_rate_limit_s": 1,
-  "peers_to_ignore": [ "0x5dcf" ]
+  "type": "SET_HUB_CONFIG"
 }

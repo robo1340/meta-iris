@@ -339,8 +339,9 @@ class State:
 		#self.send_user_message_task.run()
 		self.retransmit_task()
 		if (self.restart_snap is not None):
-			if (time.monotonic() - self.restart_snap) > 3:
-				os.system('systemctl restart snap')
+			#if (time.monotonic() - self.restart_snap) > 0.1:
+			log.info('!!!restart snap')
+			os.system('systemctl restart snap')
 		
 		
 	def __str__(self):

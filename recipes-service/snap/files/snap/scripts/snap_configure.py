@@ -83,49 +83,56 @@ QUICK_CONFIG_OPTIONS = {
 		'payload'	 : 100,
 		'block'		 : 20,
 		'disable_reed_solomon' : False,
-		'disable_convolutional' : False
+		'disable_convolutional' : False,
+		'csma_rssi_threshold'	: 125
 	},
 	'expanded' : {
 		'set_config' : 'radio_config_Si4463_430M_10kbps.h',
 		'payload'	 : 200,
 		'block'		 : 20,
 		'disable_reed_solomon' : False,
-		'disable_convolutional' : False
+		'disable_convolutional' : False,
+		'csma_rssi_threshold'	: 125
 	},
 	'rc' : {
-		'set_config' : 'radio_config_Si4463_430M_20kbps.h',
+		'set_config' : 'radio_config_Si4463_430M_30kbps.h',
 		'payload'	 : 22,
 		'block'		 : 22,
 		'disable_reed_solomon' : False,
-		'disable_convolutional' : False
+		'disable_convolutional' : True,
+		'csma_rssi_threshold'	: 125
 	},
-	'rc_no_conv' : {
+	'rc_conv' : {
 		'set_config' : 'radio_config_Si4463_430M_20kbps.h',
 		'payload'	 : 22,
 		'block'		 : 22,
 		'disable_reed_solomon' : False,
-		'disable_convolutional' : True	
+		'disable_convolutional' : False,
+		'csma_rssi_threshold'	: 125
 	},
 	'rc_no_reed' : {
 		'set_config' : 'radio_config_Si4463_430M_20kbps.h',
 		'payload'	 : 22,
 		'block'		 : 22,
 		'disable_reed_solomon' : True,
-		'disable_convolutional' : False	
+		'disable_convolutional' : False,
+		'csma_rssi_threshold'	: 125
 	},
 	'rc_no_ecc' : {
 		'set_config' : 'radio_config_Si4463_430M_20kbps.h',
 		'payload'	 : 22,
 		'block'		 : 22,
 		'disable_reed_solomon' : True,
-		'disable_convolutional' : True	
+		'disable_convolutional' : True,
+		'csma_rssi_threshold'	: 125
 	},
 	'default_no_ecc' : {
 		'set_config' : 'radio_config_Si4463_430M_10kbps.h',
 		'payload'	 : 100,
 		'block'		 : 20,
 		'disable_reed_solomon' : True,
-		'disable_convolutional' : True
+		'disable_convolutional' : True,
+		'csma_rssi_threshold'	: 125
 	}
 	
 }
@@ -208,7 +215,7 @@ if __name__ == "__main__":
 				f.write('block=%s\n' % (q['block'],))
 				f.write('disable_reed_solomon=%s\n' % ('true' if q['disable_reed_solomon'] else 'false',))
 				f.write('disable_convolutional=%s\n' % ('true' if q['disable_convolutional'] else 'false',))
-			
+				f.write('csma_rssi_threshold=%s\n' % (q['csma_rssi_threshold'],))
 			config_changed = True		
 		
 

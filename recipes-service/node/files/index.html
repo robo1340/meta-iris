@@ -18,9 +18,7 @@
 			<button class="tablinks" onclick="View.open_tab('chat_button')" id="chat_button">Chat</button>
 			<button class="tablinks" onclick="View.open_tab('map_button')" id="map_button">Map</button>
 			<button class="tablinks" onclick="View.open_tab('settings_button')" id="settings_button">Settings</button>
-			<label class="tablinks" id="rx_msg_cnt">RX: 0</label>
-			
-			
+			<label class="tablinks" id="rx_msg_cnt">RX: 0</label>	
 		</div>
 		<!-- Starting Page Content -->
 		<div id="splash" class="tabcontent">
@@ -90,7 +88,8 @@
 					<option value="true">true</option>
 					<option value="false">false</option>
 				</select><br>
-				
+			<h3>CSMA RSSI Threshold</h3>
+				<input type="text" id="csma_rssi_threshold" placeholder="Enter text here">				
 			<h3>Radio Config General</h3>
 				<select name="radio_general_configs" id="radio_general_configs"></select><br>
 			<h3>Radio Config Packet</h3>

@@ -109,6 +109,7 @@ class State:
 			'expires' 	: self.EXPIRES_MS(),
 			'pressed'	: pressed,
 			'held'		: held,
+			'hops_start': 1, 
 			'released'	: released,
 			'key'		: key
 		}

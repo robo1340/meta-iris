@@ -481,27 +481,15 @@ class UserView {
 	
 	static clear_inactive_users(){
 		console.log('clear_inactive_users() currently incomplete');
-		
-		let items = document.querySelectorAll('#userList td');
-		//items = items[0];
-		//console.log(items);
-		for (let i = items.length - 1; i >= 0; i--) {
-			//for (const prop in items[i]){console.log(prop, items[i][prop]);}
-			//console.log(items[i].className);
-			if (items[i].className == 'user-entry-time'){
-				if (items[i].textContent.includes('INACTIVE')){
-					let addr = parseInt(items[i].id);
-					console.log('deleting', addr);
-					User.remove(addr, function(){
-						//console.log('removed');
-						let row = $('#'+addr+'.user-entry');
-						row.remove()	
-					});
-					//console.log(items[i].attributes);
-					//console.log(items[i].id);
-				}
+		User.load_users(function(users){
+			for (const user of users){
+				var d = new Date(user.last_activity_time);
+				var r = d.getTime();
+				console.log(user.callsign,user.last_activity_time, r, Date.now()-r);
 			}
-		}	
+			
+		});
+		
 	}
 	
 	static tooltip_contents(callsign, last_location_beacon_time, lat, lon){
@@ -563,7 +551,7 @@ class UserView {
 		}
 		if (waypoint_db !== undefined){
 			Waypoint.load(function(waypoints){
-				for (const w of waypoints){
+				for (w of waypoints){
 					WaypointView.update_span(w.addr, 'WAYPOINT ' + state.get_distance(waypoints[w.addr]) + 'm');
 				}
 			});
@@ -836,6 +824,18 @@ class UserInput {
 				View.highlight('block','salmon',2500);
 				throw new Error("block value is not an integer");
 			}
+			x = parseInt(document.getElementById('csma_rssi_threshold').value);
+			if ((x > 255) || (x < 0)){
+				View.highlight('csma_rssi_threshold','salmon',2500);
+				throw new Error("csma_rssi_threshold must be in the range [0,255]");				
+			}
+			else if (Number.isNaN(x) == false){
+				new_rc.snap_args.csma_rssi_threshold = x;
+			} 
+			else {
+				View.highlight('csma_rssi_threshold','salmon',2500);
+				throw new Error("csma_rssi_threshold value is not an integer");
+			}			
 			new_rc.snap_args.disable_reed_solomon = document.getElementById('disable_reed_solomon').value;
 			new_rc.snap_args.disable_convolutional  = document.getElementById('disable_convolutional').value;
 			
@@ -851,7 +851,7 @@ class UserInput {
 					View.highlight("set_radio_config","salmon",2500);
 					document.getElementById('set_radio_config').textContent = document.getElementById('set_radio_config').old_textContent;
 				}
-			}, 10000);
+			}, 15000);
 			
 		}
 		catch(error) {
@@ -886,9 +886,14 @@ class UserInput {
 			if (Number.isNaN(nc.default_hops) == true){
 				View.highlight('default_hops','salmon',2500);
 				throw new Error("default_hops value is not an integer");
-			} else if (nc.default_hops == 0){
+			} 
+			else if (nc.default_hops < 1){
 				nc.default_hops = 1;
 				document.getElementById('default_hops').value = nc.default_hops;
+			}
+			else if (nc.default_hops > 7){
+				nc.default_hops = 7;
+				document.getElementById('default_hops').value = nc.default_hops;			
 			}
 			
 			console.log('set_hub_config',nc);
@@ -1156,12 +1161,12 @@ class Handlers {
 			state.radio_config_set = false;
 			View.highlight("set_radio_config","lime",2500);
 			document.getElementById('set_radio_config').textContent = document.getElementById('set_radio_config').old_textContent;
-			user_input.set_hub_config();
+			user_input.set_hub_config(); //need to do this in case snaps packet length changed
 		}
 		
 	}
 	
-	static peer_info_cb(msg, timestamp){
+	static peer_info_cb(msg){
 		//console.log('Handlers.peer_info_cb', msg);
 		User.get(msg.addr, function(user){ //success callback
 			if (user.callsign != msg.callsign){
@@ -1169,7 +1174,7 @@ class Handlers {
 				View.set_tab_pending("chat");
 				User.update(user.addr, msg.callsign, null, null, null, null, function(user_u){
 					UserView.update_span_name(user_u);
-					UserView.update_span_time(user_u.addr, Util.iso_to_time(timestamp));
+					UserView.update_span_time(user_u.addr, Util.iso_to_time(Util.get_iso_timestamp()));
 					markers[user_u.addr]._tooltip._content = UserView.tooltip_contents(user_u.callsign, user_u.last_location_beacon_time, user_u.lat, user_u.lon);
 					Waypoint.get(user_u.addr, function(w){
 						waypoints[w.addr]._tooltip._content = WaypointView.tooltip_text(w,user_u);
@@ -1177,7 +1182,7 @@ class Handlers {
 				});
 			}
 			else if (msg.callsign != state.my_callsign){
-				UserView.update_span_time(user.addr, Util.iso_to_time(timestamp));
+				UserView.update_span_time(user.addr, Util.iso_to_time(Util.get_iso_timestamp()));
 			}
 		},
 		function() { //failed callback

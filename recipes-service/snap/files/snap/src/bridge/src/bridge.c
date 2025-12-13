@@ -26,7 +26,7 @@
 /////////////////////////// bridge_t definition start////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-bridge_t * bridge_create(composite_encoder_t * encoder){
+bridge_t * bridge_create(composite_encoder_t * encoder, uint8_t csma_rssi_threshold){
 	printf("INFO: bridge_create()\n");
 	if (!gpio_init()){
 		printf("CRITICAL ERROR: gpio_init() failed!\n");
@@ -50,7 +50,7 @@ bridge_t * bridge_create(composite_encoder_t * encoder){
 	memset(br->buf, 0, encoder->uncoded_len);
 	
 	srand(time(NULL));   // seed random number generator
-	br->my_state = state(encoder, br->pub);
+	br->my_state = state(encoder, br->pub, csma_rssi_threshold);
 	if (br->my_state == NULL){return NULL;}
 
 	return br;	
