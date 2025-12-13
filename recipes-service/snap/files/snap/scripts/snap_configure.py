@@ -98,8 +98,8 @@ QUICK_CONFIG_OPTIONS = {
 		'set_config' : 'radio_config_Si4463_430M_30kbps.h',
 		'payload'	 : 22,
 		'block'		 : 22,
-		'disable_reed_solomon' : False,
-		'disable_convolutional' : True,
+		'disable_reed_solomon' : True,
+		'disable_convolutional' : False,
 		'csma_rssi_threshold'	: 125
 	},
 	'rc_conv' : {

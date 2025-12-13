@@ -256,7 +256,7 @@ class KeyPress:
 
 class State:
 	def __init__(self, rover, pantilt, config, args):
-		self.handle_key_press_update_rate_s = 0.25
+		self.handle_key_press_update_rate_s = 0.05
 		
 		self.zmq_ct = None
 		self.push = None
