@@ -119,8 +119,8 @@ class Util {
 
 class State {
 	constructor() {
-		this.key_hold_time_ms 		= Util.get_cookie('key_hold_time_ms', 250, parseInt);
-		this.expires 				= Util.get_cookie('expires', 1000, parseInt);
+		this.key_hold_time_ms 		= Util.get_cookie('key_hold_time_ms', 20, parseInt);
+		this.expires 				= Util.get_cookie('expires', 100, parseInt);
 		//this.my_callsign 			= Util.get_cookie('my_callsign', undefined);
 		this.dst_addr				= Util.get_cookie('dst_addr', 0, parseInt);
 		this.send_keypress_local 	= Util.get_cookie('send_keypress_local','false')=='true';

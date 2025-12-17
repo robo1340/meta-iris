@@ -1,0 +1,9 @@
+/var/log/hexapod3.log {
+	missingok	
+	rotate 4
+	size 100k
+	compress
+	notifempty
+	create 0600 root root
+}
+
