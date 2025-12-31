@@ -163,7 +163,28 @@ class LoadStatus {
 	}
 }
 
+class MyMessagesView {
+	static last_grey = false;
+	
+	static add_prev_message(m){
+		var b = $("<button></button>",{
+			"class": "chat_button_class",
+			"id" : m,
+			"class" : '.past-messages',
+			"text" : m,
+			"style": "background-color:" + (MyMessagesView.last_grey ? "#bbb" : "#eee") + ";list-style-type:none;height: 100%;width: 100%;padding: 0;padding: 4px;text-align: left;transition: 0.3s"});
+		$("#past_messages_list").append(b);
+		document.getElementById(m).onclick = function(e){
+			console.log('clicked',e.currentTarget.id);
+			document.getElementById('new_message').value = e.currentTarget.id;
+		};
+		MyMessagesView.last_grey = !MyMessagesView.last_grey;
+	}
+	
+}
+
 class State {
+	
 	constructor() {
 		this.my_addr 		= Util.get_cookie('my_addr', undefined, parseInt);
 		this.my_callsign 	= Util.get_cookie('my_callsign', undefined);
@@ -181,6 +202,46 @@ class State {
 		this.rx_msg_cnt = 0;
 		this.randomize_locations = Util.get_cookie('randomize_locations','false')=='true';
 		this.location_period_s = Util.get_cookie('location_period_s', 15, parseInt);
+		this.prev_tab = 'chat';
+		this.current_tab = 'splash';
+		this.current_button = 'chat_button';
+		this.prev_button = '';
+		this.prev_messages_saved_max = Util.get_cookie('prev_messages_saved_max', 10, parseInt);
+		let prev_messages = Util.get_cookie('prev_messages_saved', '').split('`');
+		this.prev_messages_saved = {};
+		for (let i=0; i<prev_messages.length; i++){
+			if (prev_messages[i] != ''){
+				this.prev_messages_saved[prev_messages[i]] = i;
+				MyMessagesView.add_prev_message(prev_messages[i]);
+			}
+		}
+	}
+	
+	add_prev_message(m){
+		if (this.prev_messages_saved[m] !== undefined){return;}//already in the dict
+		
+		function get_newest(obj){
+			let k = Object.keys(obj);
+			if (k.length == 0){return 0;}
+			return k.reduce((a, b) => obj[a] > obj[b] ? a : b)	
+		}
+		function get_oldest(obj){
+			let k = Object.keys(obj);
+			if (k.length == 0){return 0;}
+			return k.reduce((a, b) => obj[a] < obj[b] ? a : b)	
+		}
+		
+		this.prev_messages_saved[m] = this.prev_messages_saved[get_newest(this.prev_messages_saved)]+1;
+		MyMessagesView.add_prev_message(m);
+		
+		if (Object.keys(this.prev_messages_saved).length > this.prev_messages_saved_max){
+			let to_delete = get_oldest(this.prev_messages_saved);
+			delete this.prev_messages_saved[to_delete];
+			document.getElementById(to_delete).remove(); 
+		}
+		
+		let x = Object.keys(this.prev_messages_saved).join('`');
+		Cookies.set('prev_messages_saved',x, {expires:COOKIE_EXP});
 	}
 	
 	user_string(){
@@ -220,11 +281,7 @@ class MessageView {
 			//setting position:fixed for this div is important
 			//in adding a scroll bar to it
 			$("#list").scrollTop($("#list")[0].scrollHeight);
-
-
-			//$("#list").scrollTop($("#list").height());
-			//$("#chatBox").scrollTop($("#chatBox").height());
-			//$("div").scrollTop($("div").height());			
+		
 		});
 	}
 
@@ -480,15 +537,28 @@ class UserView {
 	}
 	
 	static clear_inactive_users(){
-		console.log('clear_inactive_users() currently incomplete');
-		User.load_users(function(users){
-			for (const user of users){
-				var d = new Date(user.last_activity_time);
-				var r = d.getTime();
-				console.log(user.callsign,user.last_activity_time, r, Date.now()-r);
+		console.log('clear_inactive_users()');
+
+		let items = document.querySelectorAll('#userList td');
+		//items = items[0];
+		//console.log(items);
+		for (let i = items.length - 1; i >= 0; i--) {
+			//for (const prop in items[i]){console.log(prop, items[i][prop]);}
+			//console.log(items[i].className);
+			if (items[i].className == 'user-entry-time'){
+				if (items[i].textContent.includes('INACTIVE')){
+					let addr = parseInt(items[i].id);
+					console.log('deleting', addr);
+					User.remove(addr, function(){
+						//console.log('removed');
+						let row = $('#'+addr+'.user-entry');
+						row.remove()	
+					});
+					//console.log(items[i].attributes);
+					//console.log(items[i].id);
+				}
 			}
-			
-		});
+		}
 		
 	}
 	
@@ -551,7 +621,7 @@ class UserView {
 		}
 		if (waypoint_db !== undefined){
 			Waypoint.load(function(waypoints){
-				for (w of waypoints){
+				for (let w of waypoints){
 					WaypointView.update_span(w.addr, 'WAYPOINT ' + state.get_distance(waypoints[w.addr]) + 'm');
 				}
 			});
@@ -628,7 +698,6 @@ class Map {
 class View {
 	static message_counter_color = document.getElementById('rx_msg_cnt').style.backgroundColor;
 
-
 	//temporarily highlight a UI element by changing its background color
 	static highlight(id, color, timeout_ms){
 		let ele = document.getElementById(id);
@@ -680,8 +749,21 @@ class View {
 		} catch(error) {console.log(error);}
 	}
 	
-	static open_tab(target) {
+	static open_tab(tabname, target) {
+		if (state !== undefined){
+			state.prev_tab = state.current_tab;
+			state.current_tab = tabname;
+			state.prev_button = state.current_button;
+			state.current_button = target;
+		}
+		//console.log('open_tab',target);
 		var i, tabcontent, tablinks;
+
+		if (target == 'chat'){
+			setTimeout(function(){
+				$("#list").scrollTop($("#list")[0].scrollHeight);
+			},250);
+		}
 
 		// Get all elements with class="tabcontent" and hide them
 		tabcontent = document.getElementsByClassName("tabcontent");
@@ -699,9 +781,9 @@ class View {
 				tablinks[i].className = tablinks[i].className.replace(" active", "");
 			}
 		}
-		target = target.split('_')[0]
-		document.getElementById(target).style.display = "block";
-		if (target == "map"){
+		//target = target.split('_')[0]
+		document.getElementById(tabname).style.display = "block";
+		if (tabname == "map"){
 			map.invalidateSize()
 		}
 	}	
@@ -715,7 +797,7 @@ class UserInput {
 			Cookies.set('load_on_start',$(this).val(), {expires:COOKIE_EXP})
 		});	
 		
-		document.getElementById("send_button").onclick = UserInput.send_msg;
+		document.getElementById("send_button").onclick = UserInput.compose_msg;
 		document.getElementById("clear_messages").onclick = MessageView.clear;
 		document.getElementById("clear_users").onclick = this.clear_users;
 		document.getElementById("clear_inactive_users").onclick = UserView.clear_inactive_users;
@@ -729,6 +811,8 @@ class UserInput {
 		document.getElementById("destination_address").addEventListener('change', this.destination_address); 
 		document.getElementById("randomize_locations").onclick = this.randomize_locations;
 		document.getElementById("location_period_s").addEventListener("input", this.location_period_s);
+		document.getElementById("send_now_button").onclick = UserInput.send_msg;
+		document.getElementById("cancel_now_button").onclick = UserInput.cancel_msg;
 	}
 	
 	clear_users(){
@@ -825,17 +909,12 @@ class UserInput {
 				throw new Error("block value is not an integer");
 			}
 			x = parseInt(document.getElementById('csma_rssi_threshold').value);
-			if ((x > 255) || (x < 0)){
-				View.highlight('csma_rssi_threshold','salmon',2500);
-				throw new Error("csma_rssi_threshold must be in the range [0,255]");				
-			}
-			else if (Number.isNaN(x) == false){
+			if (Number.isNaN(x) == false){
 				new_rc.snap_args.csma_rssi_threshold = x;
-			} 
-			else {
+			} else {
 				View.highlight('csma_rssi_threshold','salmon',2500);
 				throw new Error("csma_rssi_threshold value is not an integer");
-			}			
+			}
 			new_rc.snap_args.disable_reed_solomon = document.getElementById('disable_reed_solomon').value;
 			new_rc.snap_args.disable_convolutional  = document.getElementById('disable_convolutional').value;
 			
@@ -851,7 +930,7 @@ class UserInput {
 					View.highlight("set_radio_config","salmon",2500);
 					document.getElementById('set_radio_config').textContent = document.getElementById('set_radio_config').old_textContent;
 				}
-			}, 15000);
+			}, 10000);
 			
 		}
 		catch(error) {
@@ -886,14 +965,6 @@ class UserInput {
 			if (Number.isNaN(nc.default_hops) == true){
 				View.highlight('default_hops','salmon',2500);
 				throw new Error("default_hops value is not an integer");
-			} 
-			else if (nc.default_hops < 1){
-				nc.default_hops = 1;
-				document.getElementById('default_hops').value = nc.default_hops;
-			}
-			else if (nc.default_hops > 7){
-				nc.default_hops = 7;
-				document.getElementById('default_hops').value = nc.default_hops;			
 			}
 			
 			console.log('set_hub_config',nc);
@@ -917,21 +988,48 @@ class UserInput {
 		}
 	}
 
-	static send_msg() {
+	static send_msg(){
 		try {
-			let msg = prompt("Message:","");
+			let msg = document.getElementById('new_message').value;
 			if ((msg !== null)&&(msg != "")){
-				//console.log("UserInput.send_msg()");
+				state.add_prev_message(msg);
+				console.log('send_msg()', msg);
 				let unique_id = (state.msg_req_ack==true) ? Util.randint(65535) : null;
 				messenger.postMessage(["message",{'src': state.my_addr, 'dst':state.dst_addr, 'msg': msg, 'want_ack':state.msg_req_ack, 'unique_id':unique_id}]);
 				MessageView.add_saved(state.my_addr, msg, unique_id, function(e){
-					state.messages_with_ack_pending[unique_id] = {'msg_db_key':e.target.result,'unique_id':unique_id, 'time':Util.get_iso_timestamp()};
-					//console.log('msg',state.messages_with_ack_pending[unique_id]);
+					if (state.msg_req_ack==true){
+						let ack_id = {'msg_db_key':e.target.result,'unique_id':unique_id, 'time':Util.get_iso_timestamp(), 'tries' : 1};
+						state.messages_with_ack_pending[unique_id] = ack_id;
+						function check_for_response(){
+							if (state.messages_with_ack_pending[unique_id] !== undefined){ //no ack received
+								if (state.messages_with_ack_pending[unique_id]['tries'] < 3){ //maximum retries not met
+									console.log('resend message', unique_id);
+									state.messages_with_ack_pending[unique_id]['tries'] += 1;
+									messenger.postMessage(["message",{'src': state.my_addr, 'dst':state.dst_addr, 'msg': msg, 'want_ack':state.msg_req_ack, 'unique_id':unique_id}]);
+									setTimeout(check_for_response, 5000);
+								} else { //no retries left
+									Handlers.ack_timeout_cb(ack_id);
+								}
+							}
+						}
+						setTimeout(check_for_response, 5000);
+					}
 				});			
 			}
 		}
 		catch (error) {console.log(error);}
+		View.open_tab(state.prev_tab, state.prev_button);
 		return false; //very important to not get redirected
+	}
+	
+	static cancel_msg(){
+		console.log('cancel_msg()');
+		View.open_tab(state.prev_tab, state.prev_button);
+	}
+
+	static compose_msg() {
+		View.open_tab("send","");
+		return false;
 	}
 
 	static set_callsign(){
@@ -965,7 +1063,7 @@ $(document).ready(function() {
 	document.getElementById("instructions").innerHTML = "If you are in a captive portal browser the application will not work, please navigate to https://" + ip + " in chrome or firefox"
 	
 	View.set_tab_buttons(true);
-	View.open_tab("splash");
+	View.open_tab("splash","");
 });
 
 class RadioUtil {
@@ -1132,7 +1230,7 @@ class Handlers {
 	}
 	
 	static get_radio_config_cb(msg){
-		function select_element(id, value) {    
+		function select_element(id, value) {
 			let element = document.getElementById(id);
 			element.value = value;
 		}
@@ -1161,7 +1259,7 @@ class Handlers {
 			state.radio_config_set = false;
 			View.highlight("set_radio_config","lime",2500);
 			document.getElementById('set_radio_config').textContent = document.getElementById('set_radio_config').old_textContent;
-			user_input.set_hub_config(); //need to do this in case snaps packet length changed
+			user_input.set_hub_config();
 		}
 		
 	}
@@ -1242,6 +1340,30 @@ class Handlers {
 				});
 			});
 		}
+	}
+	
+	static ack_timeout_cb(ack){
+		console.log('Handler.ack_timeout_cb',ack);
+		var my_ack_req = state.messages_with_ack_pending[ack.unique_id];
+		if (my_ack_req !== undefined){
+			delete state.messages_with_ack_pending[ack.ack_id];
+			let ADDENDUM = ' ACK TIMEOUT';
+			Message.get(my_ack_req.msg_db_key, function(m){
+				m.msg = m.msg + ADDENDUM;
+				Message.update(my_ack_req.msg_db_key, m.msg, function(m_new){
+					let unique_id = ack.unique_id.toString();
+					let items = document.querySelectorAll('#list li');
+					for (let i = items.length - 1; i >= 0; i--) {
+						//for (const prop in items[i]){console.log(prop, items[i][prop]);}
+						if ((items[i].attributes.unique_id !== undefined) && (items[i].attributes.unique_id !== null) && (items[i].attributes.unique_id.value == unique_id)){
+							items[i].textContent = items[i].textContent + ADDENDUM;
+							View.highlight_element(items[i], 'salmon', 60000);
+							break;
+						}
+					}
+				});
+			});
+		}		
 	}
 	
 	static rx_msg_cnt_cb(pay){

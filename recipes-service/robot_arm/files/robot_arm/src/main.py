@@ -9,6 +9,8 @@ import traceback
 import functools
 from state import State
 from state import SSC32
+from state import Servo
+from state import Arm
 from config import read_config
 import argparse
 
@@ -20,7 +22,7 @@ def configure_logging(verbose=True):
 	formatter = log.Formatter('%(asctime)s %(levelname)s %(message)s')
 	lvl = log.DEBUG if (verbose) else log.INFO
 	
-	path = '/var/log/rover.log'
+	path = '/var/log/robot_arm.log'
 	handler = RotatingFileHandler(path, maxBytes=10*10000, backupCount=5)
 	handler.setFormatter(formatter)
 	
@@ -47,14 +49,84 @@ def create_push(context, endpoint):
 
 if __name__ == "__main__":
 	#1. import config file
-	config = read_config()
+	#config = read_config()
+	
+	config = {
+		'serial_path' 		: '/dev/ttySTM1',
+		'serial_baud'		: 115200,
+		'serial_timeout'	: 0.1,
+		'advertisment_rate' : 15,
+		
+		'arm' : {
+			'pan_servo' : {
+				'angles' : [0,   90,  180],
+				'pws'	 : [2500,1550, 650],
+				'ch'	 : 0,
+				'calibration' : {
+					'angles' : [0,   90],
+					'pws'	 : [2500, 1550],						
+				}
+			},
+			'shoulder_servo' : {
+				'angles' : [0,    90,   120], 
+				'pws'	 : [500, 1550, 2100], #725
+				'ch'	 : 1,
+				'calibration' : {
+					'angles' : [0,90],
+					'pws'	 : [500, 1550],				
+				}
+			},
+			'elbow_servo' : {
+				'angles' : [0, 90, 115],
+				'pws'	 : [500, 1500, 2200], #725
+				'ch'	 : 2,
+				'calibration' : {
+					'angles' : [0,90],
+					'pws'	 : [500, 1500],				
+				}
+			},
+			'wrist_servo' : { 
+				'angles' : [-135, -90, 0],
+				'pws'	 : [500, 1500, 2500], #600
+				'ch'	 : 3,
+				'calibration' : {
+					'angles' : [-90,0],
+					'pws'	 : [1500, 2500],				
+				}
+			},
+			'cuff_servo' : {
+				'angles' : [-90, 0, 90],
+				'pws'	 : [600, 1500, 2500],
+				'ch'	 : 5,
+				'calibration' : {
+					'angles' : [-90,90],
+					'pws'	 : [600, 2500],	#2450			
+				}
+			},
+			'grip_servo' : {
+				'angles' : [0,  45, 90],
+				'pws'	 : [2375, 1500, 1125],
+				'ch'	 : 4,
+				'calibration' : {
+					'angles' : [0,    90],
+					'pws'	 : [2375, 1125],				
+				}
+			}
+		},
+		'base_height_mm' : 73,
+		'shoulder_length_mm' : 144,
+		'elbow_length_mm'	: 184,
+		'wrist_length_mm' : 57.2,
+		'gripper_length_mm' : 57.4
+	}
+	
 	
 	#1.1 parse command line arguments
 	parser = argparse.ArgumentParser(description='execute unittest')
 	parser.add_argument('-F', '--force-output-stdout' , action='store_true', help='log everything to stdout')
 	args = parser.parse_args()
 	command_line_config = args.__dict__
-	
+	 
 	#2. configure logging
 	#configure_logging_commandline(verbose=True)
 	if (command_line_config['force_output_stdout'] == True): #log everything to stdout
@@ -64,7 +136,9 @@ if __name__ == "__main__":
 		#configure_logging(verbose=False)
 
 	ssc32 = SSC32(config['serial_path'], config['serial_baud'], config['serial_timeout'])
-	state = State(config, ssc32)  
+	arm = Arm(ssc32, config['arm'], config['base_height_mm'], config['shoulder_length_mm'], config['elbow_length_mm'], config['wrist_length_mm'], config['gripper_length_mm'])
+	
+	state = State(config, ssc32, arm)
 	
 	#4. create global state object
 	zmq_ctx = zmq.Context()
@@ -77,10 +151,10 @@ if __name__ == "__main__":
 	poller = zmq.Poller()
 	poller.register(subscriber, zmq.POLLIN)
 	
-	log.info('rover entering main loop')
+	log.info('arm entering main loop')
 	while (not state.stopped):
 		try:
-			socks = dict(poller.poll(timeout=100))
+			socks = dict(poller.poll(timeout=25))
 			for sock in socks:
 				if (socks[sock] != zmq.POLLIN):
 					continue
@@ -106,7 +180,7 @@ if __name__ == "__main__":
 			#time.sleep(10)
 			
 	#cleanup
-	log.info('rover Shutting Down')
+	log.info('hexapod Shutting Down')
 	subscriber.close()
 	state.push.close()
 	state.zmq_ctx.term()

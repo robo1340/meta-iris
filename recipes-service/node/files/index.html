@@ -15,10 +15,12 @@
 	</head>
 	<body>
 		<div class="tab">
-			<button class="tablinks" onclick="View.open_tab('chat_button')" id="chat_button">Chat</button>
-			<button class="tablinks" onclick="View.open_tab('map_button')" id="map_button">Map</button>
-			<button class="tablinks" onclick="View.open_tab('settings_button')" id="settings_button">Settings</button>
-			<label class="tablinks" id="rx_msg_cnt">RX: 0</label>	
+			<button class="tablinks" onclick="View.open_tab('chat','chat_button')" id="chat_button">Chat</button>
+			<button class="tablinks" onclick="View.open_tab('map','map_button')" id="map_button">Map</button>
+			<button class="tablinks" onclick="View.open_tab('settings','settings_button')" id="settings_button">Settings</button>
+			<label class="tablinks" id="rx_msg_cnt">RX: 0</label>
+			
+			
 		</div>
 		<!-- Starting Page Content -->
 		<div id="splash" class="tabcontent">
@@ -33,6 +35,17 @@
 			<ul class="chat-box" id="list"></ul>
 			<div id="message_box">
 				<button name="sendMessage" type="button" id="send_button">Send</button>     
+			</div>
+		</div>
+
+		<!-- Send Content -->
+		<div id="send" class="tabcontent">
+			<label id="past-messages-label">Past Messages: </label>
+			<ul class="past-messages-box" id="past_messages_list"></ul>
+			<div id="message_now_box">
+				<input type="text" id="new_message" placeholder="New Message Here" class="chat_button_class">
+				<button name="sendNow" type="button" id="send_now_button" class="chat_button_class">Send</button>
+				<button name="cancelNow" type="button" id="cancel_now_button" class="chat_button_class">Cancel</button>  
 			</div>
 		</div>
 
@@ -78,6 +91,8 @@
 				<input type="text" id="payload" placeholder="Enter text here">
 			<h3>Reed Solomon Block Length</h3>
 				<input type="text" id="block" placeholder="Enter text here">
+			<h3>CSMA RSSI Threshold</h3>
+				<input type="text" id="csma_rssi_threshold" placeholder="Enter text here">
 			<h3>Disable Reed Solomon Encoding</h3>
 				<select name="disable_reed_solomon_encoding" id="disable_reed_solomon">
 					<option value="true">true</option>
@@ -88,8 +103,6 @@
 					<option value="true">true</option>
 					<option value="false">false</option>
 				</select><br>
-			<h3>CSMA RSSI Threshold</h3>
-				<input type="text" id="csma_rssi_threshold" placeholder="Enter text here">				
 			<h3>Radio Config General</h3>
 				<select name="radio_general_configs" id="radio_general_configs"></select><br>
 			<h3>Radio Config Packet</h3>

@@ -11,6 +11,8 @@ import serial
 import struct
 from dataclasses import dataclass, field
 
+from controller import Controller
+
 #a simple task scheduler class because I don't want to use Timer to schedule tasks
 class Task:
 	def __init__(self, period, callback, random_precharge=False, variance_ratio=0):
@@ -82,8 +84,7 @@ class SSC32:
 		return None
 
 class PanTilt:
-	def __init__(self, ssc32, config, servo_time_s=250):
-		self.servo_time_ms = servo_time_s * 1000
+	def __init__(self, ssc32, config):
 		self.ssc32 = ssc32
 		self.config = config
 		self.pan_ch = config['pan_ch']
@@ -95,7 +96,7 @@ class PanTilt:
 		self.pan_limits = [575, 2075]
 		self.tilt_limits = [1050, 2425]
 
-	def set_position(self, pan, tilt, time_ms=250, block=False, block_timeout=3):
+	def set_position(self, pan, tilt, time_ms=None, block=False, block_timeout=3):
 		self.panh_pos = max(self.pan_limits[0], min(pan+self.pan_offset, self.pan_limits[1]))
 		self.panv_pos = max(self.tilt_limits[0], min(tilt+self.tilt_offset, self.tilt_limits[1]))
 		self.ssc32.multi_move([self.pan_ch,self.tilt_ch], [self.panh_pos, self.panv_pos], time_ms=time_ms, block=block, block_timeout=block_timeout)	
@@ -120,7 +121,6 @@ class PanTilt:
 class Rover:
 	def __init__(self, ssc32, config):
 		self.ssc32 = ssc32
-		self.pantilt = None
 		
 		self.config = config
 
@@ -139,40 +139,16 @@ class Rover:
 		self.min_limit = lambda : self.min_limits[0]
 		self.increment_amount = lambda : self.increment_amounts[0]
 
-		self.initialized = False
 
-	def update_motors(self):
+	def update_motors(self, fwd=None, turn=None):
+		if (fwd is not None) and (turn is not None):
+			self.fwd = fwd
+			self.turn = turn
 		f = self.fwd + self.config['fwd_offset']
 		t = self.turn+ self.config['turn_offset']
 		f= max(self.min_limit(), min(f, self.max_limit()))
 		t = max(self.min_limit(), min(t, self.max_limit()))
-		self.ssc32.write('#%d P%d #%d P%d' % (self.fwd_ch, f, self.turn_ch, t))
-
-	def check(self):
-		self.ssc32.write('R4')
-		val = self.ssc32.read()
-		if (val != b''):
-			return True
-		try:
-			val = int(val.decode().rstrip('\r') + '0')
-			if (val == self.ssc32.baud):
-				#log.debug(val)
-				return True
-			else:
-				return False
-		except BaseException as ex:
-			pass
-		self.initialized = False
-		return False		
-
-	def init(self):
-		if (not self.check()):
-			return
-		
-		self.stop()
-		self.pantilt.reset()
-		self.initialized = True
-		return True
+		self.ssc32.write('#%d P%d #%d P%d' % (self.fwd_ch, f, self.turn_ch, t))	
 
 	def stop(self):
 		log.debug('Rover.stop')
@@ -182,30 +158,6 @@ class Rover:
 		#self.ssc32.write('#%d P1500 %c' % (self.right_ch,27))
 		self.fwd = 1500
 		self.turn = 1500
-		self.update_motors()
-
-	def turn_left(self,add=0):
-		log.debug('Rover.turn_left')
-		self.turn = 1500 if (self.turn > 1500) else self.turn
-		self.turn -= (self.increment_amount() + add)
-		self.update_motors()
-
-	def turn_right(self,add=0):
-		log.debug('Rover.turn_right')
-		self.turn = 1500 if (self.turn < 1500) else self.turn
-		self.turn += (self.increment_amount() + add)
-		self.update_motors()
-
-	def forward(self, add=0):
-		log.debug('Rover.forward')
-		self.fwd = 1500 if (self.fwd > 1500) else self.fwd
-		self.fwd -= (self.increment_amount() + add)
-		self.update_motors()
-
-	def backward(self, add=0):
-		log.debug('Rover.backward')
-		self.fwd = 1500 if (self.fwd < 1500) else self.fwd
-		self.fwd += (self.increment_amount() + add)
 		self.update_motors()
 
 	def change_limits(self):
@@ -255,126 +207,93 @@ class KeyPress:
 		)
 
 class State:
-	def __init__(self, rover, pantilt, config, args):
-		self.handle_key_press_update_rate_s = 0.05
-		
+	def __init__(self, config, ssc32):
 		self.zmq_ct = None
 		self.push = None
-		self.rover = rover
-		self.rover.pantilt = pantilt
-		self.ssc32 = self.rover.ssc32
-		self.pantilt = pantilt
-		self.pantilt.servo_time_ms = self.handle_key_press_update_rate_s * 1000 * 2
-		self.machine_stopped = False
 		self.config = config
-		self.args = args
 		self.stopped = False
+		self.initialized = False
+		
+		self.ssc32 = ssc32
+		self.rover = Rover(ssc32, config)
+		self.pantilt = PanTilt(ssc32, config)
 		
 		self.active_keys = {}
 		
 		self.ADVERTISMENT_RATE = lambda : self.config['advertisment_rate']
 		
+		self.last_key_press = time.monotonic()
+		self.check_task = Task(2, self.check)
 		self.advertisment_task = Task(self.ADVERTISMENT_RATE(), self.advertise_self)
-		self.handle_key_press_task = Task(self.handle_key_press_update_rate_s, self.handle_key_presses)
-		self.check_task = Task(2, self.rover.check)
+		self.handle_key_press_task = Task(0.05, self.handle_key_presses)
 		
-		self.pan_amt = 100
-		self.deadzone_offset_f = 100
-		self.deadzone_offset_b = 100
-		self.deadzone_offset_r = 150
-		self.deadzone_offset_l = 200
+		self.controller = Controller(self.ssc32, self.rover, self.pantilt)
+
+		self.check()
+
+	def check(self):
+		self.ssc32.write('R4')
+		val = self.ssc32.read()
+		try:
+			val = int(val.decode().rstrip('\r') + '0')
+			#if (val == self.ssc32.baud):
+			if (not self.initialized):
+				self.initialized = True
+				self.init()
+			return True
+			#else:
+			#	log.warning('no ssc32')
+			#	return False
+		except BaseException as ex:
+			log.error('no ssc32 %s' % (ex,))
+		self.initialized = False
+		return False
 		
-		self.rover.init()
-		
-		def stand():
-			self.rover.stop()
-			self.pantilt.reset()
-		
-		self.key_pressed_actions = {
-			'w' 	: lambda : self.rover.forward(self.deadzone_offset_f),
-			'a' 	: lambda : self.rover.turn_left(self.deadzone_offset_l),
-			's' 	: lambda : self.rover.backward(self.deadzone_offset_b),
-			'd' 	: lambda : self.rover.turn_right(self.deadzone_offset_r),
-			#'left'	: lambda : self.pantilt.panh(-self.pan_amt),
-			#'right'	: lambda : self.pantilt.panh(self.pan_amt),
-			#'down'	: lambda : self.pantilt.panv(-self.pan_amt),
-			#'up'	: lambda : self.pantilt.panv(self.pan_amt),
-			'space' : lambda : self.rover.change_limits(),
-			'enter' : lambda : stand(),
-			'x'		: lambda : self.scan()
-		}
-		self.key_released_actions = {
-			'w'		: lambda : self.rover.stop(),
-			's'		: lambda : self.rover.stop(),
-			'a'		: lambda : self.rover.stop(),
-			'd'		: lambda : self.rover.stop(),
-			'left'	: lambda : self.pantilt.cancel_pan(),#self.pantilt.panh(0),
-			'right'	: lambda : self.pantilt.cancel_pan(),#self.pantilt.panh(0),
-			'down'	: lambda : self.pantilt.cancel_tilt(),#self.pantilt.panv(0),
-			'up'	: lambda : self.pantilt.cancel_tilt(),#self.pantilt.panv(0),
-		}
-		self.key_held_actions = {
-			'w' 	: lambda : self.rover.forward(),
-			'a' 	: lambda : self.rover.turn_left(),
-			's' 	: lambda : self.rover.backward(),
-			'd' 	: lambda : self.rover.turn_right(),
-			'left'	: lambda : self.pantilt.panh(self.pan_amt, time_ms=self.pantilt.servo_time_ms),
-			'right'	: lambda : self.pantilt.panh(-self.pan_amt, time_ms=self.pantilt.servo_time_ms),
-			'down'	: lambda : self.pantilt.panv(-self.pan_amt, time_ms=self.pantilt.servo_time_ms),
-			'up'	: lambda : self.pantilt.panv(self.pan_amt, time_ms=self.pantilt.servo_time_ms),
-		}
-	
-	def scan(self, resolution=100):
-		#log.info('scan')
-		arr = []
-		self.pantilt.set_position(self.pantilt.pan_limits[0], 1500, time_ms=10, block=True)
-		while (self.pantilt.panh_pos < self.pantilt.pan_limits[1]):
-			#log.debug(self.pantilt.panh_pos)
-			ad = self.ssc32.read_analog()
-			if (ad is None):
-				continue
-			arr.append((self.pantilt.panh_pos,ad['VA']))
-			self.pantilt.panh(resolution, time_ms=None, block=True)
-		log.debug(arr)
-		return arr
+	def init(self):
+		log.info('state.init()')
+		self.rover.stop()
+		self.pantilt.reset()
+		return True
 	
 	def stop(self):
 		self.stopped = True
 	
 	def handle_key_presses(self):
+		if (len(self.active_keys) == 0) and (self.last_key_press is not None) and (time.monotonic() > (self.last_key_press+10)):
+			self.last_key_press = None
+			self.controller.handle_idle_long()
 		for key in self.active_keys.values():
 			if (key.expired()) and (key.first_use == True):
 				key.first_use = False
-			elif (key.expired()):
-				log.debug('%s expired' % (key.key,))
+			if(key.expired()):#elif (key.expired()):
+				#log.debug('%s expired' % (key.key,))
 				self.active_keys.pop(key.key)
 				if (len(self.active_keys) == 0):
-					self.rover.stop()
+					self.controller.handle_idle()
 				return
 			
-			if (key.pressed == True) and (key.key in self.key_pressed_actions) and (key.used()==False):
-				log.debug('%s pressed' % (key.key,))
-				self.key_pressed_actions[key.key]()
-			elif (key.held == True) and (key.key in self.key_held_actions):
-				log.debug('%s held' % (key.key,))
-				self.key_held_actions[key.key]()
-			elif (key.released == True) and (key.key in self.key_released_actions) and (key.used()==False):
-				log.debug('%s released' % (key.key,))
-				self.key_released_actions[key.key]()
-
+			self.last_key_press = time.monotonic()
+			if (key.pressed == True):
+				#log.debug('%s pressed' % (key.key,))
+				self.controller.handle_key_pressed(key.key)
+			elif (key.held == True):
+				#log.debug('%s held' % (key.key,))
+				self.controller.handle_key_held(key.key)
+			elif (key.released == True):
+				#log.debug('%s released' % (key.key,))
+				self.controller.handle_key_released(key.key)
 	
 	def handle_sub(self,cmd, msg):
 		if (cmd == 'key_press'):
 			#log.debug('%s, %s' % (cmd, msg))
 			new = KeyPress.from_dict(msg)
 			self.active_keys[msg['key']] = new
-			#log.debug('%s %s%s%s %d' % (self.last_key.key, 'T' if (self.last_key.pressed) else 'F', 'T' if self.last_key.held else 'F', 'T' if self.last_key.released else 'F', int(time.monotonic()*1000)))
 			if (new.pressed == True)or(new.released==True):
 				self.handle_key_press_task.now()
 	
 	def advertise_self(self):
 		to_send = {
-			'type' : 'rover',
+			'type' : 'hexapod',
 			'dst' : 0
 		}
 		#log.debug('state.advertise_self %s' % (to_send,))
@@ -382,8 +301,6 @@ class State:
 	
 	def run(self):
 		self.handle_key_press_task.run()
-		self.advertisment_task.run()
+		self.controller.run()
 		self.check_task.run()
-		if (not self.rover.initialized):
-			self.rover.init()
 
