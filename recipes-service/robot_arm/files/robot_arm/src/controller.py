@@ -16,8 +16,8 @@ class Controller:
 		self.step_finish_time = None
 	
 		self.normal_mode_inputs_idle = {
-			'ws' : self.arm.coords[1],
-			'ad' : self.arm.coords[0],
+			'ws' : self.arm.coords[0],
+			'ad' : self.arm.coords[1],
 			'rf' : self.arm.coords[2],
 			'qe' : self.arm.coords[3],
 			'lr' : self.arm.coords[4],
@@ -49,16 +49,16 @@ class Controller:
 				'4'		: lambda : self.select_mode(YAW_MODE),
 			},
 			NORMAL_MODE : {
-				'w' : lambda : inc_input(self.normal_mode_inputs, 'ws', 2, limits=False, report=True),
-				's' : lambda : inc_input(self.normal_mode_inputs, 'ws', -2, limits=False, report=True),
-				'a' : lambda : inc_input(self.normal_mode_inputs, 'ad', -2, limits=False, report=True),
-				'd' : lambda : inc_input(self.normal_mode_inputs, 'ad', 2, limits=False, report=True),
-				'r'	: lambda : inc_input(self.normal_mode_inputs, 'rf', 2, limits=False, report=True),
-				'f'	: lambda : inc_input(self.normal_mode_inputs, 'rf', -2, limits=False, report=True),
-				'q'	: lambda : inc_input(self.normal_mode_inputs, 'qe', 2, limits=False, report=True),
-				'e'	: lambda : inc_input(self.normal_mode_inputs, 'qe', -2, limits=False, report=True),
-				'left'	: lambda : inc_input(self.normal_mode_inputs, 'lr', 2, limits=False, report=True),
-				'right'	: lambda : inc_input(self.normal_mode_inputs, 'lr', -2, limits=False, report=True)
+				'w' : lambda : inc_input(self.normal_mode_inputs, 'ws', 2, limits=False, report=False),
+				's' : lambda : inc_input(self.normal_mode_inputs, 'ws', -2, limits=False, report=False),
+				'a' : lambda : inc_input(self.normal_mode_inputs, 'ad', -2, limits=False, report=False),
+				'd' : lambda : inc_input(self.normal_mode_inputs, 'ad', 2, limits=False, report=False),
+				'r'	: lambda : inc_input(self.normal_mode_inputs, 'rf', 2, limits=False, report=False),
+				'f'	: lambda : inc_input(self.normal_mode_inputs, 'rf', -2, limits=False, report=False),
+				'q'	: lambda : inc_input(self.normal_mode_inputs, 'qe', 2, limits=False, report=False),
+				'e'	: lambda : inc_input(self.normal_mode_inputs, 'qe', -2, limits=False, report=False),
+				'left'	: lambda : inc_input(self.normal_mode_inputs, 'lr', 2, limits=False, report=False),
+				'right'	: lambda : inc_input(self.normal_mode_inputs, 'lr', -2, limits=False, report=False)
 			}
 		}
 		
@@ -156,8 +156,8 @@ class Controller:
 			self.run_normal_mode(**self.normal_mode_inputs)
 
 	def run_normal_mode(self, ws, ad, rf, qe, lr, time_ms=500):
-		x = ad
-		y = ws
+		x = ws
+		y = ad
 		z = rf
 		w = qe
 		c = lr

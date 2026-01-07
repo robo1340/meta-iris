@@ -68,8 +68,8 @@ if __name__ == "__main__":
 				}
 			},
 			'shoulder_servo' : {
-				'angles' : [0,    90,   120], 
-				'pws'	 : [500, 1550, 2100], #725
+				'angles' : [0,    90,   135], 
+				'pws'	 : [500, 1550, 2375], #725
 				'ch'	 : 1,
 				'calibration' : {
 					'angles' : [0,90],

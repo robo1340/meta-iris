@@ -23,6 +23,9 @@ from math import atan
 from rotation import xRot
 from rotation import yRot
 from rotation import zRot
+from rotation import dh_transform
+from rotation import ypr
+import numpy as np
 
 from dataclasses import dataclass, field
 
@@ -179,25 +182,88 @@ def leg_ik2(x,y,z, sl, el):
 			log.warning(ex)
 			return None	
 
+dh_model = [
+	{},
+	{
+		'joint_angle' 	: 0,
+		'joint_mult' 	: 0,
+		'theta_offset' 	: 0,
+		'alpha' : 0,
+		'd' : 52,
+		'a' : 0
+	},
+	{
+		'joint_angle' 	: 0,
+		'joint_mult' 	: 1,
+		'theta_offset' 	: -90,
+		'alpha' : 90,
+		'd' : 21,
+		'a' : 0
+	},
+	{
+		'joint_angle' 	: 0,
+		'joint_mult' 	: 1,
+		'theta_offset' 	: 0,
+		'alpha' : 0,
+		'd' : 0,
+		'a' : 144
+	},
+	{
+		'joint_angle' 	: 0,
+		'joint_mult' 	: -1,
+		'theta_offset' 	: 0,
+		'alpha' : 0,
+		'd' : 0,
+		'a' : 184
+	},
+	{
+		'joint_angle' 	: 0,
+		'joint_mult' 	: 1, 
+		'theta_offset' 	: 0,
+		'alpha' : 0,
+		'd' : 0,
+		'a' : 57.2+57.4
+	}
+]
+
+np.set_printoptions(suppress=True, precision=2)
+
+
+def get_ypr(mat):
+	pitch = atan2(-mat[0,2], sqrt(mat[0,0]**2 + mat[0,1]**2 ))
+	roll  = atan2(mat[1,2]/cos(pitch), mat[2,2]/cos(pitch))
+	yaw   = atan2(mat[0,1]/cos(pitch), mat[0,0]/cos(pitch))
+	return (degrees(yaw), degrees(pitch), degrees(roll))
+	
 #account for coxa length
-def ik3(bh, sl, el, x, y, z, wrist_offset_wrt_z, cuff_offset_wrt_x):
+def ik3(bh, sl, el, x,y,z, wrist_offset_wrt_z, cuff_offset_wrt_x):
 		try:
+			
+			#log.debug("post wrist invert: x : %d, y : %d, z : %d" % (x,y,z))
 			r = sqrt( (z-bh)**2 + x**2 + y**2 )
 			A2 = acos ( (r**2 + sl**2 - el**2) / (2*r*sl) )
-			A1 = atan2(z-bh, y)
+			A1 = atan2(z-bh, x)
 			shoulder_angle = A1 + A2
 			
 			B1 = acos ( (sl**2 + el**2 - r**2)/(2*sl*el) )
 			elbow_angle = pi - B1
 			
-			pan_angle = atan2(y,x)
+			pan_angle = atan2(x, y)
+			
+			#perform forward kinematics to get the location of the wrist center
+			dh_model[2]['joint_angle'] = degrees(pan_angle)
+			dh_model[3]['joint_angle'] = degrees(shoulder_angle)
+			dh_model[4]['joint_angle'] = degrees(elbow_angle)
+			#dh_model[5]['joint_angle'] = 0
+			
+			#perform forward kinematics up to the end of the elbow where the center of the wrist is
+			#result = np.linalg.multi_dot(  (dh_transform(**dh_model[1]), dh_transform(**dh_model[2]), dh_transform(**dh_model[3]), dh_transform(**dh_model[4])) )		
+			#mat = np.linalg.multi_dot((np.linalg.inv(rot), result[0:3,0:3])) #multiply the inverse of the overall rotation commanded with the rotation of the wrist center
 			
 			#log.info('pan angle %2.1f' % (degrees(pan_angle),))
 			A3 = pi/2 - shoulder_angle
-			wrist_angle = radians(wrist_offset_wrt_z) - A3 - elbow_angle
-			#wrist_angle = pi - A3 - elbow_angle
+			wrist_angle = radians(wrist_offset_wrt_z)+pi - A3 - elbow_angle
 			wrist_angle = -wrist_angle
-			#wrist_angle += pi
 			#log.debug('%2.1f %2.1f %2.1f %2.1f' % (wrist_offset_wrt_z, degrees(A3), degrees(elbow_angle), degrees(wrist_angle)) )
 			
 			cuff_angle = radians(cuff_offset_wrt_x) - pan_angle
@@ -208,7 +274,7 @@ def ik3(bh, sl, el, x, y, z, wrist_offset_wrt_z, cuff_offset_wrt_x):
 			return None	
 
 class Arm:
-	def __init__(self, ssc32, config, base_height_mm=73, shoulder_length_mm=144, elbow_length_mm=184, wrist_length_mm=57.2, gripper_length_mm=57.4, initial_coords=(0, 120, 210, 180, 90)):
+	def __init__(self, ssc32, config, base_height_mm=73, shoulder_length_mm=144, elbow_length_mm=184, wrist_length_mm=57.2, gripper_length_mm=57.4, initial_coords=(184, 0, 144+52+21, 0, 90)):
 		self.ssc32 = ssc32
 		self.pan_servo = Servo.from_dict(config['pan_servo'])
 		self.shoulder_servo = Servo.from_dict(config['shoulder_servo'])
@@ -246,25 +312,46 @@ class Arm:
 		else:
 			x, y, z, w, c = self.coords
 		
-		#log.debug("")
-		log.debug("x : %d, y : %d, z : %d" % (x,y,z))
+		#get the matrix to go backwards through the end affector to get to the center of the wrist
+		#mat = np.linalg.inv(ypr(rotz=0, roty=0, rotx=0, x=57.2+57.4, y=0, z=0))
+		#wrist_center = np.matmul(mat, position)
 		
 		#angles = leg_ik2(x,y,z, self.shoulder_length_mm, self.elbow_length_mm)
-		angles = self.inverse_kinematics(x,y,z,w,c)
+		angles = self.inverse_kinematics(x,y,z, w, c)
 		if (angles is None):
 			return False
 		(pan_angle, shoulder_angle, elbow_angle, wrist_angle, cuff_angle) = angles
 		#log.debug(angles)
 
-		#perform forward kinematics
-		#np.matmul(A, B)
-		#numpy.linalg.multi_dot( (zRot(pan_angle), xRot(shoulder_angle), xRot(elbow_angle), 
-		#zRot(pan_angle)
+		#dh_model[1]['joint_angle'] = 0 fixed joint for the base offset
+		dh_model[2]['joint_angle'] = self.pan_servo.my_limits(pan_angle)
+		dh_model[3]['joint_angle'] = self.shoulder_servo.my_limits(shoulder_angle)
+		dh_model[4]['joint_angle'] = self.shoulder_servo.my_limits(elbow_angle)
+		dh_model[5]['joint_angle'] = wrist_angle
+		#dh_model[6]['joint_angle'] = cuff_angle
 
-		#changes made to accomodate servo configurations
-		#elbow_angle = -elbow_angle
-		#pan_angle -= pi/2
-		#log.debug(angles)
+		result = dh_transform(**dh_model[1])
+		#log.info(result[0:3,3])
+
+		result = np.linalg.multi_dot(  (dh_transform(**dh_model[1]), dh_transform(**dh_model[2]),) )
+		#log.info(result[0:3,3])
+
+		result = np.linalg.multi_dot(  (dh_transform(**dh_model[1]), dh_transform(**dh_model[2]), dh_transform(**dh_model[3])) )
+		#log.info(result[0:3,3])
+		
+		result = np.linalg.multi_dot(  (dh_transform(**dh_model[1]), dh_transform(**dh_model[2]), dh_transform(**dh_model[3]), dh_transform(**dh_model[4])) )
+		actual = result[0:3,3]
+	
+		floats_cmp = lambda x,y,delta=0.1 : (x-y)<delta
+		
+		if (floats_cmp(x,actual[0])==False)or(floats_cmp(y,actual[1])==False)or(floats_cmp(z,actual[2])==False):
+			log.warning('not reachable %s,%s,%s' % (x,y,z))
+			return False
+	
+		result = np.linalg.multi_dot(  (dh_transform(**dh_model[1]), dh_transform(**dh_model[2]), dh_transform(**dh_model[3]), dh_transform(**dh_model[4]), dh_transform(**dh_model[5])) )
+		log.info(result[0:3,3])
+
+
 
 		pan_pw = self.pan_servo.get_pw(pan_angle)
 		elbow_pw = self.elbow_servo.get_pw(elbow_angle)
@@ -272,7 +359,7 @@ class Arm:
 		wrist_pw = self.wrist_servo.get_pw(wrist_angle)
 		cuff_pw = self.cuff_servo.get_pw(cuff_angle)
 		
-		#log.debug('pan pw %d shoulder pw %d elbow pw %d' % (pan_pw, shoulder_pw, elbow_pw))
+		log.debug('pan pw %d shoulder pw %d elbow pw %d' % (pan_pw, shoulder_pw, elbow_pw))
 		if (move == True):
 			self.ssc32.multi_move(self.channels, pulses=[pan_pw, shoulder_pw, elbow_pw, wrist_pw, cuff_pw], time_ms=time_ms, block=False)
 		else:
@@ -374,6 +461,14 @@ class State:
 		
 	def init(self):
 		log.info('state.init()')
+		for ch in self.arm.channels:
+			self.ssc32.move(ch, 1500)
+		time.sleep(1)
+		for ch in self.arm.channels:
+			self.ssc32.move(ch, 1500)
+			
+		for ch in self.arm.channels:
+			self.ssc32.move(ch, 1500)
 		self.arm.set_coordinates_mm()
 	
 	def stop(self):

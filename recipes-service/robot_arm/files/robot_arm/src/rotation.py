@@ -39,3 +39,29 @@ def zRot(theta: float) -> np.ndarray:
                    [-sin(angle), cos(angle), 0],
                    [0, 0, 1]])
     return mat
+
+def dh_transform(joint_angle, joint_mult, theta_offset, alpha, d, a):
+	
+	theta = radians(joint_angle)*joint_mult + radians(theta_offset)
+	#print("%s %s %s %s" % (joint_angle, joint_mult, theta_offset, theta))
+	alpha = radians(alpha)
+	
+	mat = np.array([[cos(theta), -sin(theta)*cos(alpha),  sin(theta)*sin(alpha), a*cos(theta)],
+	                [sin(theta),  cos(theta)*cos(alpha), -cos(theta)*sin(alpha), a*sin(theta)],
+					[         0,             sin(alpha),             cos(alpha),            d],
+					[         0,                      0,                      0,            1]
+				   ])
+	return mat
+	
+def ypr(rotz, roty, rotx, x, y, z):
+	alpha = radians(rotz) #yaw
+	beta  = radians(roty) #pitch
+	gamma = radians(rotx) #roll
+	
+	mat = np.array([[cos(alpha)*cos(beta), cos(alpha)*sin(beta)*sin(gamma) - sin(alpha)*cos(gamma), cos(alpha)*sin(beta)*cos(gamma) + sin(alpha)*sin(gamma), x],
+	                [sin(alpha)*cos(beta), sin(alpha)*sin(beta)*sin(gamma) + cos(alpha)*cos(gamma), sin(alpha)*sin(beta)*cos(gamma) - cos(alpha)*sin(gamma), y],
+					[          -sin(beta),                                    cos(beta)*sin(gamma),                                    cos(beta)*cos(gamma), z],
+					[                   0,                                                       0,                                                       0, 1]
+				   ])
+	return mat	
+	
