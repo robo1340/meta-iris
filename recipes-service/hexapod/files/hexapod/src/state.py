@@ -8,7 +8,25 @@ import zmq
 import traceback
 import random
 import serial
+import itertools
+
+from math import acos
+from math import sin
+from math import cos
+from math import radians
+from math import degrees
+from math import atan2
+from math import sqrt
+from math import pi
+from math import atan
+
 from dataclasses import dataclass, field
+
+from controller import Controller
+
+
+import numpy as np
+
 
 #a simple task scheduler class because I don't want to use Timer to schedule tasks
 class Task:
@@ -29,151 +47,42 @@ class Task:
 			self.last_update = time.monotonic()
 			if (self.variance_ratio > 0):
 				self.last_update += random.uniform(-1*self.period*self.variance_ratio, self.period*self.variance_ratio)
-			self.callback()
+			self.callback()	
 
-class SSC32:
-	def __init__(self, path, baud, timeout):
-		self.path = path
-		self.baud = baud
-		self.timeout = timeout
-		log.info("%s %s %s" % (path, baud, timeout))
-		self.ser = serial.Serial(self.path,self.baud,timeout=self.timeout)
-	
-	def write(self, b : str):
-		cmd = (b + '\r').encode()
-		self.ser.write(cmd)
-	
-	def read(self):
-		return self.ser.readline()
-	
-	def move(self, ch : int, pulse : int, time_ms : int = 250):
-		cmd = '#%d P%d T%d' % (ch, pulse, time_ms)
-		#log.debug('move "%s"' % (cmd,))
-		self.write(cmd)
-
-class Hexapod:
+class PanTilt:
 	def __init__(self, ssc32, config):
 		self.ssc32 = ssc32
-		#self.ssc32.write('LH1000 LM1400 LL1800 RH2000 RM1600 RL1200 VS3000')
-		#self.ssc32.write('LF1700 LR1300 RF1300 RR1700 HT1000')
-		
 		self.config = config
-		self.increment_amount = 20
-		self.base_speed = config['base_speed']
-		self.max_speed = config['max_speed']
-		self.speed = self.base_speed
+		self.pan_ch = config['pan_ch']
+		self.tilt_ch = config['tilt_ch']
+		self.pan_offset = config['pan_offset']
+		self.tilt_offset = config['tilt_offset']
 		self.panh_pos = 1500
 		self.panv_pos = 1500
-		
-		self.initialized = False
-		self.init()
+		self.pan_limits = [575, 2075]
+		self.tilt_limits = [1050, 2425]
 
-	def check(self):
-		self.ssc32.write('R4')
-		val = self.ssc32.read()
-		if (val != b''):
-			return True
-		try:
-			val = int(val.decode().rstrip('\r') + '0')
-			if (val == self.ssc32.baud):
-				#log.debug(val)
-				return True
-			else:
-				log.warning('no ssc32')
-				return False
-		except BaseException as ex:
-			log.warning('no ssc32')
-			pass
-			#log.warning(ex)
-		self.initialized = False
-		return False		
-
-	def init(self):
-		if (not self.check()):
-			return
-		
-		log.info('Hexapod.init()')
-		LH = self.config['LH']     
-		LM = self.config['LM']     
-		LL = self.config['LL']   
-		RH = self.config['RH']      
-		RM = self.config['RM']      
-		RL = self.config['RL']    
-		
-		self.ssc32.write('LH%d LM%d LL%d RH%d RM%d RL%d VS3000' % (LH, LM, LL, RH, RM, RL))
-		#self.ssc32.write('LH1400 LM1500 LL1800 RH2000 RM1600 RL1200 VS3000')
-		self.ssc32.write('LF1700 LR1300 RF1300 RR1700 HT1000')
-		
-		for servo,pos in self.config['offsets'].items():
-			servo = int(servo)
-			self.ssc32.write('#%dPO%d' % (servo,pos))
-		self.initialized = True
-		self.stand()
-		return True
-
-
-	def panh(self, amt):
-		self.panh_pos = max(575, min(self.panh_pos + amt, 2475))
-		#log.debug('panh %d' % (self.panh_pos,))
-		self.ssc32.move(25, self.panh_pos, time_ms=500)
-
-	def panv(self, amt):
-		self.panv_pos = max(1250, min(self.panv_pos + amt, 2425))
-		#log.debug('panv %d' % (self.panv_pos,))
-		self.ssc32.move(24, self.panv_pos, time_ms=500)
-
-	def stand(self):
-		log.info('stand')
-		L = self.config['LL']
-		R = self.config['RL']
-		n = 1500
-		#self.ssc32.write('#0 P%dS1000 #2 P%dS1000 #4 P%dS1000 #16 P%dS1000 #18 P%dS1000 #20 P%dS1000 #1 P%dS1000 #3 P%dS1000 #5 P%dS1000 #17 P%dS1000 #19 P%dS1000 #21 P%dS1000 T1500' % (R, R, R, L, L, L, n, n, n, n, n, n))
-		self.ssc32.write('#0 P%d #2 P%d #4 P%d #16 P%d #18 P%d #20 P%d #1 P%d #3 P%d #5 P%d #17 P%d #19 P%d #21 P%d T1000' % (R, R, R, L, L, L, n, n, n, n, n, n))
-		#for ch in [0,1,2,3,4,5,16,17,18,19,20,21,24,25]:
-		for ch in [24,25]:
-			self.ssc32.move(ch, 1500)
-
-	def lower_legs(self):
-		log.info('lower_legs')
-		L = self.config['LL']
-		R = self.config['RL']
-		n = 1500
-		self.ssc32.write('#0 P%d #2 P%d #4 P%d #16 P%d #18 P%d #20 P%d T500' % (R, R, R, L, L, L))
-
-
-	def increment_speed(self):
-		self.speed = min(self.speed+self.increment_amount, self.max_speed)
-		log.debug('increment_speed %d' % (self.speed,))
-		self.ssc32.write('XS %d' % (self.speed,))
+	def set_position(self, pan, tilt, time_ms=None, block=False, block_timeout=3):
+		self.panh_pos = max(self.pan_limits[0], min(pan+self.pan_offset, self.pan_limits[1]))
+		self.panv_pos = max(self.tilt_limits[0], min(tilt+self.tilt_offset, self.tilt_limits[1]))
+		self.ssc32.multi_move([self.pan_ch,self.tilt_ch], [self.panh_pos, self.panv_pos], time_ms=time_ms, block=block, block_timeout=block_timeout)	
 	
-	def decrement_speed(self):
-		self.speed = max(self.speed-self.increment_amount, 0)
-		log.debug('decrement_speed %d' % (self.speed,))
-		self.ssc32.write('XS %d' % (self.speed,))
+	def reset(self):
+		self.set_position(1500, 1500)
+
+	def cancel_pan(self):
+		self.ssc32.write('#%d P1500 %c' % (self.pan_ch,27))
 		
-	def reset_speed(self):
-		#log.debug('reset_speed')
-		self.speed = self.base_speed
-		self.ssc32.write('XS %d' % (self.speed,))
-	
-	def toggle_speed(self):
-		self.speed = 100 if (self.speed == 200) else 200
-	
-	def move(self, left, right, speed=None):
-		if (speed is None):
-			speed = self.speed
-		cmd = 'XL %d XR %d XS %d' % (left, right, speed)
-		#log.debug('Hexapod.move(%s)' % (cmd,))
-		self.ssc32.write(cmd)
-	
-	def stop_sequencer(self):
-		self.ssc32.write('XSTOP')
-		
-	def stop(self):
-		log.info('stop')
-		self.stop_sequencer()
-		self.speed = self.base_speed
-		self.lower_legs()
+	def cancel_tilt(self):
+		self.ssc32.write('#%d P1500 %c' % (self.tilt_ch,27))
+
+	def panh(self, amt, time_ms=250, block=False, block_timeout=3):
+		self.panh_pos = max(self.pan_limits[0], min(self.panh_pos + amt, self.pan_limits[1]))
+		self.ssc32.move(self.pan_ch, self.panh_pos, time_ms=time_ms, block=block, block_timeout=block_timeout)
+
+	def panv(self, amt, time_ms=250, block=False, block_timeout=3):
+		self.panv_pos = max(self.tilt_limits[0], min(self.panv_pos + amt, self.tilt_limits[1]))
+		self.ssc32.move(self.tilt_ch, self.panv_pos, time_ms=time_ms, block=block, block_timeout=block_timeout)
 
 @dataclass
 class KeyPress:
@@ -212,87 +121,98 @@ class KeyPress:
 			expires = d['expires']/1000 + time.monotonic()
 		)
 
+np.set_printoptions(suppress=True, precision=2)
+
+
+def get_ypr(mat):
+	pitch = atan2(-mat[0,2], sqrt(mat[0,0]**2 + mat[0,1]**2 ))
+	roll  = atan2(mat[1,2]/cos(pitch), mat[2,2]/cos(pitch))
+	yaw   = atan2(mat[0,1]/cos(pitch), mat[0,0]/cos(pitch))
+	return (degrees(yaw), degrees(pitch), degrees(roll))
 
 class State:
-	def __init__(self, hexapod, config, args):
+	def __init__(self, config, args, ssc32):
 		self.zmq_ct = None
 		self.push = None
-		self.hexapod = hexapod
-		self.hex_stopped = False
 		self.config = config
 		self.args = args
 		self.stopped = False
+		self.initialized = False
+		
+		self.ssc32 = ssc32
 		
 		self.active_keys = {}
 		
 		self.ADVERTISMENT_RATE = lambda : self.config['advertisment_rate']
 		
+		self.last_key_press = time.monotonic()
+		self.check_task = Task(2, self.check)
 		self.advertisment_task = Task(self.ADVERTISMENT_RATE(), self.advertise_self)
-		self.handle_key_press_task = Task(0.25, self.handle_key_presses)
-		self.check_task = Task(2, self.hexapod.check)
+		self.handle_key_press_task = Task(0.05, self.handle_key_presses)
 		
-		self.pan_amt = 75
+		self.pantilt = PanTilt(self.ssc32, config['pantilt'])
 		
-		self.key_pressed_actions = {
-			'w' 	: lambda : self.hexapod.move(100,100),
-			'a' 	: lambda : self.hexapod.move(-100,100),
-			's' 	: lambda : self.hexapod.move(-100,-100),
-			'd' 	: lambda : self.hexapod.move(100,-100),
-			'left'	: lambda : self.hexapod.panh(-self.pan_amt),
-			'right'	: lambda : self.hexapod.panh(self.pan_amt),
-			'down'	: lambda : self.hexapod.panv(-self.pan_amt),
-			'up'	: lambda : self.hexapod.panv(self.pan_amt),
-			'space' : lambda : self.hexapod.toggle_speed(),
-			'enter' : lambda : self.hexapod.stand()
-		}
-		self.key_released_actions = {
-			'w'		: lambda : self.hexapod.stop_sequencer(),
-			's'		: lambda : self.hexapod.stop_sequencer(),
-			'a'		: lambda : self.hexapod.stop_sequencer(),
-			'd'		: lambda : self.hexapod.stop_sequencer(),
-			'left'	: lambda : self.hexapod.panh(0),
-			'right'	: lambda : self.hexapod.panh(0),
-			'down'	: lambda : self.hexapod.panv(0),
-			'up'	: lambda : self.hexapod.panv(0),
-		}
-		self.key_held_actions = {
-			'w'		: lambda : self.hexapod.increment_speed(),
-			's'		: lambda : self.hexapod.increment_speed(),	
-			'a'		: lambda : self.hexapod.increment_speed(),
-			'd'		: lambda : self.hexapod.increment_speed(),
-			'left'	: lambda : self.hexapod.panh(-self.pan_amt),
-			'right'	: lambda : self.hexapod.panh(self.pan_amt),
-			'down'	: lambda : self.hexapod.panv(-self.pan_amt),
-			'up'	: lambda : self.hexapod.panv(self.pan_amt),
-		}
+		self.controller = Controller(self.ssc32, self.pantilt)
+
+		self.check()
+
+	def check(self):
+		self.ssc32.write('R4')
+		val = self.ssc32.read()
+		try:
+			val = int(val.decode().rstrip('\r') + '0')
+			if (val == self.ssc32.baud):
+				if (not self.initialized):
+					self.initialized = True
+					self.init()
+				return True
+			else:
+				log.warning('no ssc32')
+				return False
+		except BaseException as ex:
+			log.error('no ssc32')
+			pass
+			#log.warning(ex)
+		self.initialized = False
+		return False
+		
+	def init(self):
+		log.info('state.init()')
+		self.controller.sit()
+		self.controller.stand()
+		self.pantilt.reset()
 	
 	def stop(self):
 		self.stopped = True
 	
 	def handle_key_presses(self):
+		if (len(self.active_keys) == 0) and (self.last_key_press is not None) and (time.monotonic() > (self.last_key_press+100)):
+			self.last_key_press = None
+			self.controller.handle_idle_long()
 		for key in self.active_keys.values():
 			if (key.expired()) and (key.first_use == True):
 				key.first_use = False
-			elif (key.expired()):
-				log.debug('%s expired' % (key.key,))
+			if(key.expired()):#elif (key.expired()):
+				#log.debug('%s expired' % (key.key,))
 				self.active_keys.pop(key.key)
 				if (len(self.active_keys) == 0):
-					self.hexapod.stop()
+					self.controller.handle_idle()
 				return
 			
-			if (key.pressed == True) and (key.key in self.key_pressed_actions) and (key.used()==False):
-				log.debug('%s pressed' % (key.key,))
-				self.key_pressed_actions[key.key]()
-			elif (key.held == True) and (key.key in self.key_held_actions):
-				log.debug('%s held' % (key.key,))
-				self.key_held_actions[key.key]()
-			elif (key.released == True) and (key.key in self.key_released_actions) and (key.used()==False):
-				log.debug('%s released' % (key.key,))
-				self.key_released_actions[key.key]()
+			self.last_key_press = time.monotonic()
+			if (key.pressed == True):
+				#log.debug('%s pressed' % (key.key,))
+				self.controller.handle_key_pressed(key.key)
+			elif (key.held == True):
+				#log.debug('%s held' % (key.key,))
+				self.controller.handle_key_held(key.key)
+			elif (key.released == True):
+				#log.debug('%s released' % (key.key,))
+				self.controller.handle_key_released(key.key)
 	
 	def handle_sub(self,cmd, msg):
 		if (cmd == 'key_press'):
-			log.debug('%s, %s' % (cmd, msg))
+			#log.debug('%s, %s' % (cmd, msg))
 			new = KeyPress.from_dict(msg)
 			self.active_keys[msg['key']] = new
 			if (new.pressed == True)or(new.released==True):
@@ -307,9 +227,16 @@ class State:
 		self.push.send_json(to_send)
 	
 	def run(self):
-		self.handle_key_press_task.run()
-		self.advertisment_task.run()
+		self.handle_key_press_task.run()	
+		self.controller.run()
 		self.check_task.run()
-		if (not self.hexapod.initialized):
-			self.hexapod.init()
+
+if __name__ == "__main__":
+	log.basicConfig(level=log.DEBUG)
+	coords = (105, -10, -106)
+	log.info(coords)
+	angles = ik3(coords)
+	log.info(angles)
+	
+	
 

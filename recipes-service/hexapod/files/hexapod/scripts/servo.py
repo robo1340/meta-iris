@@ -132,7 +132,7 @@ if __name__=="__main__":
 	configure_logging_commandline(verbose=True)
 	parser = argparse.ArgumentParser(description='execute unittest')
 	#parser.add_argument('-F', '--force-output-stdout' , action='store_true', help='log everything to stdout')
-	parser.add_argument('-s',  '--servos', type=str, default='0,1,2,3,4,5,16,17,18,19,20,21,22,23', help='comma delimited list of servo channels')
+	parser.add_argument('-s',  '--servos', type=str, default='0,1,2,16,17,18,4,5,6,20,21,22,12,13,14,28,29,30', help='comma delimited list of servo channels')
 	parser.add_argument('-i',  '--increment', type=int, default=25, help='')
 	argss = parser.parse_args()
 	args = argss.__dict__
