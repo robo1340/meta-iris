@@ -23,18 +23,8 @@ def equation_19(c, v, uc, C):
 	return [dcdt, dvdt]
 
 def normalize_angle_negative_pi_to_pi(angle):
-	"""
-	Normalizes an angle in radians to the range [-pi, pi].
-	"""
-	# Use the modulo operator to bring the angle into the range [0, 2*pi)
-	# The '+ math.pi' offset helps handle negative input angles correctly with Python's % operator
 	angle = (angle + pi) % tau
-	
-	# Subtract math.pi to shift the range from [0, 2*pi) to [-pi, pi)
-	# Note: This implementation technically results in the range [-pi, pi), 
-	# meaning -pi is included, but pi is the upper bound that is not included.
-	angle -= pi
-	return angle
+	return angle - pi
 
 def clamp(val, max_val, min_val):
 	return max(min(val, max_val), min_val)
@@ -70,7 +60,7 @@ phi_tripod=np.array([[0,  1,  0,  1,  0,  1],
 
 ###################################################################################################################### 
 class Leg:
-	def __init__(self, legs, ind, ua=10, A=50, uc=10, C=0, v=5):
+	def __init__(self, legs, ind, ua=10, A=45, uc=10, C=0, v=5):
 		self.legs = legs
 		self.ind = ind
 		self.name = 'leg%d' % (ind,)
@@ -200,7 +190,7 @@ class Legs:
 		#   |    |
 		# L5|----|L6
 		
-		#self.legs = [self.leg1, self.leg2, self.leg3, self.leg4, self.leg5, self.leg6]
+		#order the legs in the list in a clockwise fashion
 		self.legs = [self.leg2, self.leg4, self.leg6, self.leg5, self.leg3, self.leg1]
 
 
@@ -220,6 +210,13 @@ class Legs:
 		for leg in self.legs:
 			leg.A = a if (a > 5) else 0
 			leg.H = 90 if (a > 0) else 0
+	
+	def set_speed(self, v):
+		if (v != self.v):
+			print('speed changed from %s to %s' % (self.v, v))
+		self.v = v
+		for leg in self.legs:
+			leg.v = v
 	
 	def set_yaw(self, yaw_degrees):
 		self.yaw = radians(yaw_degrees)

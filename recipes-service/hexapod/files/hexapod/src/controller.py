@@ -21,8 +21,8 @@ def rescale(v, max_val, min_val):
 
 class Controller:
 	def __init__(self, ssc32, pantilt):
-		self.modes = [WALK_MODE, MOVE_LEGS_MODE, DANCE_MODE]
-		self.mode = DANCE_MODE
+		self.modes = [WALK_MODE, DANCE_MODE, MOVE_LEGS_MODE]
+		self.mode = WALK_MODE
 
 		self.ssc32 = ssc32
 		self.pantilt = pantilt
@@ -53,20 +53,6 @@ class Controller:
 		}
 		self.move_legs_inputs = self.move_legs_inputs_idle.copy()
 		
-		self.dance_mode_inputs_idle = {
-			'ws' : 0,
-			'ad' : 0,
-			'qe' : 0,
-			'rf' : 0,
-		}
-		self.dance_mode_inputs = self.dance_mode_inputs_idle.copy()
-		
-		self.yaw_mode_inputs_idle = {
-			'ws' : 0,
-			'ad' : 0,
-		}
-		self.yaw_mode_inputs = self.yaw_mode_inputs_idle.copy()
-		
 		def set_input(d,key,val):
 			d[key] = val
 		
@@ -95,12 +81,12 @@ class Controller:
 			ALL_MODES : {
 				'enter' : self.cycle_modes,
 				'1'		: lambda : self.select_mode(WALK_MODE),
-				'2'		: lambda : self.select_mode(MOVE_LEGS_MODE),
-				'3'		: lambda : self.select_mode(DANCE_MODE),
+				'2'		: lambda : self.select_mode(DANCE_MODE),
+				'3'		: lambda : self.select_mode(MOVE_LEGS_MODE),
 			},
 			WALK_MODE : {
-				'w' : lambda : inc_input(self.walk_mode_inputs, 'ws', 10, limits=True, min_val=0, max_val=75),
-				's' : lambda : inc_input(self.walk_mode_inputs, 'ws', -10, limits=True, min_val=0, max_val=75),
+				'w' : lambda : inc_input(self.walk_mode_inputs, 'ws', 10, limits=True, min_val=0, max_val=70),
+				's' : lambda : inc_input(self.walk_mode_inputs, 'ws', -10, limits=True, min_val=0, max_val=70),
 				'a' : lambda : inc_input(self.walk_mode_inputs, 'ad', -1, limits=True),
 				'd' : lambda : inc_input(self.walk_mode_inputs, 'ad', 1, limits=True),
 				'q'	: lambda : inc_input(self.walk_mode_inputs, 'qe', -5, limits=True, min_val=-90, max_val=90),
@@ -129,16 +115,7 @@ class Controller:
 				'r' : lambda : inc_input(self.move_legs_inputs, 'z', 5, report=True),
 				'f' : lambda : inc_input(self.move_legs_inputs, 'z', -5, report=True),
 			},
-			DANCE_MODE : {
-				'w' : lambda : inc_input(self.dance_mode_inputs, 'ws', 0.5, limits=True, min_val=-10, max_val=10),
-				's' : lambda : inc_input(self.dance_mode_inputs, 'ws', -0.5, limits=True, min_val=-10, max_val=10),
-				'a' : lambda : inc_input(self.dance_mode_inputs, 'ad', -0.5, limits=True, min_val=-10, max_val=10),
-				'd' : lambda : inc_input(self.dance_mode_inputs, 'ad', 0.5, limits=True, min_val=-10, max_val=10),	
-				'q' : lambda : inc_input(self.dance_mode_inputs, 'qe', -0.5, limits=True, min_val=-10, max_val=10),
-				'e' : lambda : inc_input(self.dance_mode_inputs, 'qe', 0.5, limits=True, min_val=-10, max_val=10),
-				'r' : lambda : inc_input(self.dance_mode_inputs, 'rf', 0.5, limits=True, min_val=-10, max_val=10),
-				'f' : lambda : inc_input(self.dance_mode_inputs, 'rf', -0.5, limits=True, min_val=-10, max_val=10),				
-			},
+			DANCE_MODE : {},
 			PASSIVE_MODE : {},
 		}
 		
@@ -159,16 +136,7 @@ class Controller:
 				'e' : self.key_pressed_actions[WALK_MODE]['e'],
 			},
 			MOVE_LEGS_MODE : {},
-			DANCE_MODE : {
-				'w' : self.key_pressed_actions[DANCE_MODE]['w'],
-				's' : self.key_pressed_actions[DANCE_MODE]['s'],
-				'a' : self.key_pressed_actions[DANCE_MODE]['a'],
-				'd' : self.key_pressed_actions[DANCE_MODE]['d'],	
-				'q' : self.key_pressed_actions[DANCE_MODE]['q'],
-				'e' : self.key_pressed_actions[DANCE_MODE]['e'],
-				'r' : self.key_pressed_actions[DANCE_MODE]['r'],
-				'f' : self.key_pressed_actions[DANCE_MODE]['f'],					
-			},
+			DANCE_MODE : {},
 			PASSIVE_MODE : {},
 		}
 		
@@ -222,7 +190,6 @@ class Controller:
 			self.walk_mode_inputs['up_down'] = up_down
 			self.run_walk(**self.walk_mode_inputs, idle=True)
 		elif (self.mode == DANCE_MODE):
-			self.dance_mode_inputs = self.dance_mode_inputs_idle.copy()
 			self.run_dance_mode(**self.dance_mode_inputs, time_ms=500)
 	
 	def handle_idle_long(self):
@@ -301,23 +268,8 @@ class Controller:
 							  [x,y,z,1]])
 		angles = self.model.set_leg_positions(positions, corner_leg_rotation_offset=0)
 		self.step_finish_time = self.ssc32.move_legs(angles, time_ms=500)
-		
-	def run_walk(self, ws, ad, qe, step_height, step_depth,  gait, up_down, left_right,idle=False, time_ms=100, speed=500):
-		log.info('run_walk(ws=%d,qe=%d)' % (ws,qe))
-		self.cpg.set_A(ws)
-		#self.cpg.set_yaw(qe)
-		self.cpg.set_yaw(180)
-		self.cpg.new_gait(gait)
-		
-		leg_coords_inc = self.cpg.update()
-		#log.info(leg_coords_inc[0:2,0:3])
-		angles = self.model.set_leg_positions(self.model.leg_coords_local + leg_coords_inc)
-		#log.info(angles)
-		self.step_finish_time = self.ssc32.move_legs(angles, time_ms=time_ms, speed=speed) # get the serial message from the angles
-
-
-	def run_dance_mode(self, ws, ad, qe, rf, time_ms=100):# right_left_d, down_up_d):
-		
+	
+	def set_body_orientation(self):
 		yaw 	= rescale(safe_lookup(self.ui_inputs, 'yaw', default=0.5), 10, -10)
 		pitch 	= rescale(safe_lookup(self.ui_inputs, 'pitch', default=0.5), 10, -10)
 		roll 	= rescale(safe_lookup(self.ui_inputs, 'roll', default=0.5), 10, -10)
@@ -326,6 +278,28 @@ class Controller:
 		tz 		= rescale(safe_lookup(self.ui_inputs, 'tz', default=0.5), 20, -20)
 
 		self.model.set_body(yaw=yaw, pitch=pitch, roll=roll, tx=tx, ty=ty, tz=tz)
+	
+	def set_cpg_parameters(self):
+		speed = rescale(safe_lookup(self.ui_inputs, 'speed', default=0.5), 1, 0.1)
+		self.cpg.set_speed(speed)
+	
+	def run_walk(self, ws, ad, qe, step_height, step_depth,  gait, up_down, left_right,idle=False, time_ms=100, speed=1000):
+		#log.info('run_walk(ws=%d,qe=%d)' % (ws,qe))
+		self.set_body_orientation()
+		self.set_cpg_parameters()
+		self.cpg.set_A(ws)
+		#self.cpg.set_yaw(qe)
+		self.cpg.set_yaw(0)
+		self.cpg.new_gait(gait)
+		
+		leg_coords_inc = self.cpg.update()
+		angles = self.model.set_leg_positions(self.model.leg_coords_local + leg_coords_inc)
+		#log.info(angles)
+		self.step_finish_time = self.ssc32.move_legs(angles, time_ms=time_ms, speed=speed) # get the serial message from the angles
+
+
+	def run_dance_mode(self, time_ms=100):
+		self.set_body_orientation()
 
 		leg_coords = np.array([ [70, 0, -80, 1],
 								[70, 0, -80, 1],
