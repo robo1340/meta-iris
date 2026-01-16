@@ -8,18 +8,21 @@ import logging as log
 from body import Model
 from control_pattern_generator import Legs
 from control_pattern_generator import GAIT_CONFIGS
+from util import safe_lookup
 
 ALL_MODES		= 'all_modes'
 WALK_MODE 		= 'walk'
 MOVE_LEGS_MODE 	= 'move_legs'
 DANCE_MODE		= 'dance_mode'
-YAW_MODE		= 'yaw_mode'
 PASSIVE_MODE    = 'passive_mode'
+
+def rescale(v, max_val, min_val):
+	return (max_val-min_val)*v + min_val
 
 class Controller:
 	def __init__(self, ssc32, pantilt):
-		self.modes = [WALK_MODE, MOVE_LEGS_MODE, DANCE_MODE, YAW_MODE]
-		self.mode = WALK_MODE
+		self.modes = [WALK_MODE, MOVE_LEGS_MODE, DANCE_MODE]
+		self.mode = DANCE_MODE
 
 		self.ssc32 = ssc32
 		self.pantilt = pantilt
@@ -27,6 +30,8 @@ class Controller:
 		self.cpg = Legs(selected_gait_name='tripod')
 		
 		self.step_finish_time = None
+		
+		self.ui_inputs = {}
 	
 		self.walk_mode_inputs_idle = {
 			'ws' : 0,
@@ -92,7 +97,6 @@ class Controller:
 				'1'		: lambda : self.select_mode(WALK_MODE),
 				'2'		: lambda : self.select_mode(MOVE_LEGS_MODE),
 				'3'		: lambda : self.select_mode(DANCE_MODE),
-				'4'		: lambda : self.select_mode(YAW_MODE),
 			},
 			WALK_MODE : {
 				'w' : lambda : inc_input(self.walk_mode_inputs, 'ws', 10, limits=True, min_val=0, max_val=75),
@@ -135,12 +139,6 @@ class Controller:
 				'r' : lambda : inc_input(self.dance_mode_inputs, 'rf', 0.5, limits=True, min_val=-10, max_val=10),
 				'f' : lambda : inc_input(self.dance_mode_inputs, 'rf', -0.5, limits=True, min_val=-10, max_val=10),				
 			},
-			YAW_MODE : {
-				'w' : lambda : inc_input(self.yaw_mode_inputs, 'ws', 0.1, limits=True),
-				's' : lambda : inc_input(self.yaw_mode_inputs, 'ws', -0.1, limits=True),
-				'a' : lambda : inc_input(self.yaw_mode_inputs, 'ad', -0.05, limits=True),
-				'd' : lambda : inc_input(self.yaw_mode_inputs, 'ad', 0.05, limits=True),				
-			},
 			PASSIVE_MODE : {},
 		}
 		
@@ -171,12 +169,6 @@ class Controller:
 				'r' : self.key_pressed_actions[DANCE_MODE]['r'],
 				'f' : self.key_pressed_actions[DANCE_MODE]['f'],					
 			},
-			YAW_MODE : {
-				'w' : self.key_pressed_actions[YAW_MODE]['w'],
-				's' : self.key_pressed_actions[YAW_MODE]['s'],
-				'a' : self.key_pressed_actions[YAW_MODE]['a'],
-				'd' : self.key_pressed_actions[YAW_MODE]['d'],		
-			},
 			PASSIVE_MODE : {},
 		}
 		
@@ -190,9 +182,13 @@ class Controller:
 			WALK_MODE : {},
 			MOVE_LEGS_MODE : {},
 			DANCE_MODE : {},
-			YAW_MODE : {},
 			PASSIVE_MODE : {},
 		}
+
+	def update_ui_inputs(self, id, value):
+		#log.info('%s=%f' % (id, value))
+		self.ui_inputs[id] = value
+		
 
 	def handle_key_pressed(self, key : str):
 		if (key in self.key_pressed_actions[ALL_MODES]):
@@ -228,9 +224,6 @@ class Controller:
 		elif (self.mode == DANCE_MODE):
 			self.dance_mode_inputs = self.dance_mode_inputs_idle.copy()
 			self.run_dance_mode(**self.dance_mode_inputs, time_ms=500)
-		elif (self.mode == YAW_MODE):
-			self.yaw_mode_inputs = self.yaw_mode_inputs_idle.copy()
-			self.run_yaw_mode(**self.yaw_mode_inputs, time_ms=500)
 	
 	def handle_idle_long(self):
 		log.info('controller.handle_idle_long()')
@@ -272,8 +265,6 @@ class Controller:
 			self.start_leg = leg_position_relative(body_model=self.body_model, **self.move_legs_inputs)
 		elif (self.mode == DANCE_MODE):
 			self.run_dance_mode(**self.dance_mode_inputs, time_ms=500)
-		elif (self.mode == YAW_MODE):
-			self.run_yaw_mode(**self.yaw_mode_inputs, time_ms=500)
 
 	def run(self, *args, **kwargs):
 		def run_move_positions():
@@ -295,8 +286,6 @@ class Controller:
 			self.run_move_legs(**self.move_legs_inputs)
 		elif (self.mode == DANCE_MODE):
 			self.run_dance_mode(**self.dance_mode_inputs)
-		elif (self.mode == YAW_MODE):
-			self.run_yaw_mode(**self.yaw_mode_inputs)
 
 	def run_move_legs(self, x, y, z, selected_leg, time_ms=500):
 		# L1|----|L2
@@ -328,18 +317,23 @@ class Controller:
 
 
 	def run_dance_mode(self, ws, ad, qe, rf, time_ms=100):# right_left_d, down_up_d):
-		log.info('run_dance_mode(%2.1f %2.1f %2.1f %2.1f %d)' % (ws, ad, qe, rf, time.monotonic()*1000.0))
 		
-		self.model.set_body(yaw=0, pitch=rf, roll=qe, tx=ws, ty=ad, tz=0)
-		#self.model.set_body(yaw=0, pitch=10, roll=0, tx=0, ty=0, tz=0)
-		angles = self.model.set_leg_positions(self.model.leg_coords_local)
+		yaw 	= rescale(safe_lookup(self.ui_inputs, 'yaw', default=0.5), 10, -10)
+		pitch 	= rescale(safe_lookup(self.ui_inputs, 'pitch', default=0.5), 10, -10)
+		roll 	= rescale(safe_lookup(self.ui_inputs, 'roll', default=0.5), 10, -10)
+		tx 		= rescale(safe_lookup(self.ui_inputs, 'tx', default=0.5), 20, -20)
+		ty 		= rescale(safe_lookup(self.ui_inputs, 'ty', default=0.5), 20, -20)
+		tz 		= rescale(safe_lookup(self.ui_inputs, 'tz', default=0.5), 20, -20)
+
+		self.model.set_body(yaw=yaw, pitch=pitch, roll=roll, tx=tx, ty=ty, tz=tz)
+
+		leg_coords = np.array([ [70, 0, -80, 1],
+								[70, 0, -80, 1],
+								[70, 0, -80, 1],
+								[70, 0, -80, 1],
+								[70, 0, -80, 1],
+								[70, 0, -80, 1]
+								])
+		angles = self.model.set_leg_positions(leg_coords)
 		
 		self.step_finish_time = self.ssc32.move_legs(angles, time_ms=time_ms) # get the serial message from the angles
-
-	def run_yaw_mode(self, ws, ad, time_ms=100):
-		#log.info('run_yaw_mode(%2.2f %2.2f, %d)' % (ws, ad, time_ms))
-		yaw = ad * self.max_body_turn
-		Tz = ws * self.max_body_shift_z
-		self.body_model = bodyPos(pitch=0, roll=0, yaw=yaw, Tx=0, Ty=0, Tz=Tz)
-		self.start_leg = self.neutral_leg_position(0)
-		self.step_finish_time = self.ssc32.move_legs(self.start_leg, time_ms=time_ms) # get the serial message from the angles

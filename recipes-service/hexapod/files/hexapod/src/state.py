@@ -217,6 +217,8 @@ class State:
 			self.active_keys[msg['key']] = new
 			if (new.pressed == True)or(new.released==True):
 				self.handle_key_press_task.now()
+		elif (cmd == 'ui_control'):
+			self.controller.update_ui_inputs(msg['id'], msg['value'])
 	
 	def advertise_self(self):
 		to_send = {

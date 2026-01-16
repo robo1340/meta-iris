@@ -62,6 +62,7 @@ TYPE_BEACON 	= 0x08
 TYPE_KEY_PRESS  = 0x09
 TYPE_HEXAPOD  	= 0x0A
 TYPE_ROVER  	= 0x0B
+TYPE_UI_CONTROL	= 0x0C
 
 FORMAT_STRUCT 		= 0x00
 FORMAT_STRING 		= 0x01
@@ -87,7 +88,8 @@ type_to_string = {
 	TYPE_BEACON 	: 'beacon',
 	TYPE_KEY_PRESS	: 'key_press',
 	TYPE_HEXAPOD	: 'hexapod',
-	TYPE_ROVER		: 'rover'
+	TYPE_ROVER		: 'rover',
+	TYPE_UI_CONTROL : 'ui_control'
 }
 string_to_type = {value: key for key, value in type_to_string.items()}
 
@@ -184,6 +186,7 @@ beacon_handler		= TLV_Handler(TYPE_BEACON,   FORMAT_STRUCT)
 key_press_handler	= TLV_Handler(TYPE_KEY_PRESS, FORMAT_STRUCT, dict_template={'expires':0,'pressed':1,'held':2,'released':3,'key':4}, value_unpacker=lambda length, val : struct.unpack('<H???%ds' % (length-5,),val), value_packer=lambda arr : struct.pack('<H???', *arr[:-1])+arr[-1].encode())
 hexapod_handler		= TLV_Handler(TYPE_HEXAPOD, FORMAT_STRUCT, dict_template={}, value_unpacker=lambda length, val : b'', value_packer=lambda arr : b'')
 rover_handler		= TLV_Handler(TYPE_ROVER, FORMAT_STRUCT, dict_template={}, value_unpacker=lambda length, val : b'', value_packer=lambda arr : b'')
+ui_control_handler 	= TLV_Handler(TYPE_UI_CONTROL, FORMAT_STRUCT, dict_template={'value':0,'id':1}, value_unpacker=lambda length, val : struct.unpack('<f%ds' % (length-5,),val), value_packer=lambda arr : struct.pack('<f', arr[-2])+arr[-1].encode())
 
 tlv_handlers = {
 	TYPE_ACK 		: ack_handler,
@@ -196,7 +199,8 @@ tlv_handlers = {
 	TYPE_BEACON 	: beacon_handler,
 	TYPE_KEY_PRESS	: key_press_handler,
 	TYPE_HEXAPOD	: hexapod_handler,
-	TYPE_ROVER		: rover_handler
+	TYPE_ROVER		: rover_handler,
+	TYPE_UI_CONTROL : ui_control_handler
 }
 tlv_handlers_by_string = tlv_handlers.copy()
 for old,new in type_to_string.items(): 

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Web Key Logger</title>
+		<!-- <meta charset="utf-8" /> -->	
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="/bootstrap.min.css">
+		<link rel="stylesheet" href="/slider.css">
+		<link rel="stylesheet" href="/node_modules/leaflet/dist/leaflet.css" />
+		<link rel="stylesheet" href="/tabs.css">
+		<script src="/socket.io/socket.io.js"></script>
+		<!-- <script src="/jquery.min.js" type='text/javascript'></script> -->
+		<script src="/node_modules/js-cookie/dist/js.cookie.min.js" type='text/javascript'></script>
+		<!-- <script type="text/javascript"  src="/node_modules/leaflet/dist/leaflet.js"></script> -->
+		<!-- <script type="text/javascript"  src="/node_modules/leaflet.vectorgrid/dist/Leaflet.VectorGrid.bundled.min.js"></script> -->
+	</head>
+	<body>
+		<div class="tab">
+			<button class="tablinks" onclick="View.open_tab('settings_button')" id="settings_button">Settings</button>
+		</div>
+
+		<!-- Settings Content -->
+		<div id="settings" class="tabcontent">
+		
+			<h3>Translation Tx</h3>
+			<div class="slidecontainer"><input type="range" min="0" max="100" value="50" class="slider" id="tx"></div>
+			
+			<h3>Translation Ty</h3>
+			<div class="slidecontainer"><input type="range" min="0" max="100" value="50" class="slider" id="ty"></div>
+			
+			<h3>Translation Tz</h3>
+			<div class="slidecontainer"><input type="range" min="0" max="100" value="50" class="slider" id="tz"></div>
+			
+			<h3>Rotate Pitch</h3>
+			<div class="slidecontainer"><input type="range" min="0" max="100" value="50" class="slider" id="pitch"></div>
+			
+			<h3>Rotate Roll</h3>
+			<div class="slidecontainer"><input type="range" min="0" max="100" value="50" class="slider" id="roll"></div>
+			
+			<h3>Rotate Yaw</h3>
+			<div class="slidecontainer"><input type="range" min="0" max="100" value="50" class="slider" id="yaw"></div>
+		
+			<input type="radio" id="send_keypress_local" name="send_keypress_local" value="send_keypress_local">
+			<label for="send_keypress_local"> Send Key Presses Locally</label><br>
+			
+			<h3>Expiration Milliseoncds</h3>
+			<input type="text" id="expires" placeholder="Enter text here">
+			
+			<h3>Hold Update Rate</h3>
+			<input type="text" id="key_hold_time_ms" placeholder="Enter text here">
+			
+			<!-- <button  class="general_button" id="refresh_address_list">Refresh Address List</button> <br> -->
+			<h3>Destination Address</h3>
+			<select name="dst_addr" id="dst_addr">
+				<option value="0">Broadcast (0x0000)</option>
+			</select><br>
+			
+			
+		</div>
+		<script src="/tabs.js" type='text/javascript'></script>
+	</body>
+</html>
