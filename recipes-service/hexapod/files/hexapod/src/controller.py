@@ -85,10 +85,10 @@ class Controller:
 				'3'		: lambda : self.select_mode(MOVE_LEGS_MODE),
 			},
 			WALK_MODE : {
-				'w' : lambda : inc_input(self.walk_mode_inputs, 'ws', 10, limits=True, min_val=0, max_val=70),
-				's' : lambda : inc_input(self.walk_mode_inputs, 'ws', -10, limits=True, min_val=0, max_val=70),
-				'a' : lambda : inc_input(self.walk_mode_inputs, 'ad', -1, limits=True),
-				'd' : lambda : inc_input(self.walk_mode_inputs, 'ad', 1, limits=True),
+				'w' : lambda : inc_input(self.walk_mode_inputs, 'ws', 1, limits=True, min_val=0, max_val=1),
+				's' : lambda : inc_input(self.walk_mode_inputs, 'ws', -1, limits=True, min_val=0, max_val=1),
+				'a' : lambda : inc_input(self.walk_mode_inputs, 'ad', -1, limits=True, min_val=0, max_val=1),
+				'd' : lambda : inc_input(self.walk_mode_inputs, 'ad', 1, limits=True, min_val=0, max_val=1),
 				'q'	: lambda : inc_input(self.walk_mode_inputs, 'qe', -5, limits=True, min_val=-90, max_val=90),
 				'e'	: lambda : inc_input(self.walk_mode_inputs, 'qe', 5, limits=True, min_val=-90, max_val=90),
 				
@@ -279,21 +279,29 @@ class Controller:
 
 		self.model.set_body(yaw=yaw, pitch=pitch, roll=roll, tx=tx, ty=ty, tz=tz)
 	
-	def set_cpg_parameters(self):
-		speed = rescale(safe_lookup(self.ui_inputs, 'speed', default=0.5), 1, 0.1)
-		self.cpg.set_speed(speed)
-	
 	def run_walk(self, ws, ad, qe, step_height, step_depth,  gait, up_down, left_right,idle=False, time_ms=100, speed=1000):
 		#log.info('run_walk(ws=%d,qe=%d)' % (ws,qe))
 		self.set_body_orientation()
-		self.set_cpg_parameters()
-		self.cpg.set_A(ws)
-		#self.cpg.set_yaw(qe)
+		
+		length = rescale(safe_lookup(self.ui_inputs, 'stride_length', default=0.5), 70, 0)
+		height_ratio = safe_lookup(self.ui_inputs, 'step_height', default=0.5)
+		walk_speed = rescale(safe_lookup(self.ui_inputs, 'speed', default=0.5), 1, 0.1)
+		
+		#log.info(length)
+		#log.info(height_ratio)
+		#log.info(speed)
+		
+		if (ws == 0):
+			length = 0
+			height_ratio = 0
+		
+		self.cpg.set_step_parameters(length, height_ratio, walk_speed)
+		
 		self.cpg.set_yaw(0)
 		self.cpg.new_gait(gait)
 		
 		leg_coords_inc = self.cpg.update()
-		angles = self.model.set_leg_positions(self.model.leg_coords_local + leg_coords_inc)
+		angles = self.model.set_leg_positions(self.model.leg_coords_local, gait_offset=leg_coords_inc)
 		#log.info(angles)
 		self.step_finish_time = self.ssc32.move_legs(angles, time_ms=time_ms, speed=speed) # get the serial message from the angles
 

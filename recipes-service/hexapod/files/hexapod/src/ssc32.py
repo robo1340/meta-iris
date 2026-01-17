@@ -194,29 +194,7 @@ class Hexapod_SSC32(SSC32):
 			#log.info(angles)
 			temp_angles = np.copy(angles)
 			
-			#temp_angles[0, 0] = (temp_angles[0, 0] + 360) % 360.0
-			#temp_angles[2, 0] = (temp_angles[2, 0] + 360) % 360.0
-			#temp_angles[4, 0] = (temp_angles[4, 0] + 360) % 360.0
-			
-			#log.info(temp_angles)
-			
-			#log.info('----')
-			#log.info(temp_angles)
-			#log.info(temp_angles[:,0])
-			
-			#log.info(temp_angles[3:6,0])
-			#temp_angles[0:3, 2] = - temp_angles[0:3, 2]
-			#log.info(temp_angles)
-			#temp_angles[3:6, 0] = (temp_angles[3:6, 0] + 360) % 360.0
-			#temp_angles[3:6, 1] = - temp_angles[3:6, 1]
-			#log.info(temp_angles)
-			#adjustment = np.array([[-90-180, 0, -90],
-			#					   [-90,     0, -90],
-			#					   [-90-180, 0, -90],
-			#					   [-90,     0, -90],
-			#					   [-90-180, 0, -90],
-			#					   [-90,     0, -90]])
-			
+			#negate the angles for the servos on the left side
 			temp_angles[0,0] *= -1
 			temp_angles[2,0] *= -1
 			temp_angles[4,0] *= -1

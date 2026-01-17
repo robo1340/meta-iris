@@ -68,7 +68,7 @@ class Leg:
 		self.A = A
 		self.uc = uc
 		self.C = C
-		self.H = 90
+		self.H = 80 #maximum height of the leg that is physically achievable
 		self.a = 0
 		self.av = 0
 		self.c = 0
@@ -122,8 +122,11 @@ class Leg:
 	def eq21(self):
 		'''step height'''
 		if (self.r > (self.c + self.a*sin(self.legs.selected_gait))): #swing phase
-			#H = 90 #maximum height of the leg that is physically achievable
-			h = ((self.a+self.c)/(2*self.a))*self.H
+			if (self.a < 0.0001):
+				h = 0
+			else:
+				h = ((self.a+self.c)/(2*self.a))*self.H
+			#log.info('step_height %f %f %f' % (self.a, self.c, h))
 			return (self.eq20()**2)*h
 		else: #stance phase
 			return 0
@@ -131,16 +134,20 @@ class Leg:
 	def eq22_1(self):
 		if (self.a == 0):
 			self.a = 0.0000000001
-		num = asin((self.r-self.c)/self.a) - self.legs.selected_gait
+		#num = asin((self.r-self.c)/self.a) - self.legs.selected_gait
+		num = asin(sin(self.theta)) - self.legs.selected_gait
 		den = (pi/2) - self.legs.selected_gait
-		return -1 + clamp(num/den, 1, 0)
+		#return -1 + clamp(num/den, 1, 0)
+		return -1 + num/den
 
 	def eq22_2(self):
 		if (self.a == 0):
 			self.a = 0.0000000001
-		num = self.legs.selected_gait - asin((self.r-self.c)/self.a)
+		#num = self.legs.selected_gait - asin((self.r-self.c)/self.a)
+		num = -asin(sin(self.theta)) + self.legs.selected_gait
 		den = (pi/2) + self.legs.selected_gait
-		return -1 + clamp(num/den, 1, 0)
+		#return -1 + clamp(num/den, 1, 0)
+		return -1 + num/den
 
 	def eq23(self):
 		'''horizontal displacement'''
@@ -174,15 +181,17 @@ GAIT_CONFIGS = {
 class Legs:
 	def __init__(self, alpha=1, selected_gait_name='wave'):
 		self.alpha = alpha
-		self.v=0.25 #frequency of the cpg oscillators
+		self.speed=0.25 #frequency of the cpg oscillators
+		self.length = 50
+		self.height_ratio = 0.5
 		self.last_update = time.monotonic()
 		self.yaw = 0
-		self.leg1 = Leg(self,1, v=self.v)
-		self.leg2 = Leg(self,2, v=self.v)
-		self.leg3 = Leg(self,3, v=self.v)
-		self.leg4 = Leg(self,4, v=self.v)
-		self.leg5 = Leg(self,5, v=self.v)
-		self.leg6 = Leg(self,6, v=self.v)
+		self.leg1 = Leg(self,1, v=self.speed)
+		self.leg2 = Leg(self,2, v=self.speed)
+		self.leg3 = Leg(self,3, v=self.speed)
+		self.leg4 = Leg(self,4, v=self.speed)
+		self.leg5 = Leg(self,5, v=self.speed)
+		self.leg6 = Leg(self,6, v=self.speed)
 
 		# L1|----|L2
 		#   |    |
@@ -204,19 +213,37 @@ class Legs:
 		self.gait_transition_time = None #time to transition between gaits
 		self.gait_transition_time_remaining = None
 
+		self.set_step_parameters(self.length, self.height_ratio, self.speed)
+
 		print(self)
 
-	def set_A(self, a):
+	##@param height_ratio a value between 0 and 1
+	def set_step_parameters(self, length, height_ratio, speed):
+		#height_ratio = clamp(height_ratio, 1, 0)
+		
+		if (speed != self.speed):
+			print('speed changed from %s to %s' % (self.speed, speed))
+		if (length != self.length):
+			print('length changed from %s to %s' % (self.length, length))
+		if (height_ratio != self.height_ratio):
+			print('height ratio changed from %s to %s' % (self.height_ratio, height_ratio))
+		
+		self.speed = speed
+		self.length = length
+		self.height_ratio = height_ratio
+		
+		
+		
+		#find value of A and C to satisfy the desired length and height
 		for leg in self.legs:
-			leg.A = a if (a > 5) else 0
-			leg.H = 90 if (a > 0) else 0
-	
-	def set_speed(self, v):
-		if (v != self.v):
-			print('speed changed from %s to %s' % (self.v, v))
-		self.v = v
-		for leg in self.legs:
-			leg.v = v
+			leg.A = length if (length > 5) else 0
+			leg.C = height_ratio*2*leg.A - leg.A   
+			leg.speed = speed
+			#log.info('here')
+			#log.info(leg.A)
+			#log.info(leg.C)
+			#log.info(leg.speed)
+			#log.info(self.height_ratio)
 	
 	def set_yaw(self, yaw_degrees):
 		self.yaw = radians(yaw_degrees)
@@ -233,9 +260,8 @@ class Legs:
 		self.prev_selected_gait = self.selected_gait
 		self.new_phi = GAIT_CONFIGS[self.selected_gait_name]['phase_shift_matrix']
 		self.new_selected_gait = GAIT_CONFIGS[self.selected_gait_name]['gait_phi']
-		self.gait_transition_time = 1/self.v #set transition time to the period of the oscillators
+		self.gait_transition_time = 1/self.speed #set transition time to the period of the oscillators
 		self.gait_transition_time_remaining = self.gait_transition_time
-		
 	
 	def update(self, t=None, history=None):
 		if (t is None):

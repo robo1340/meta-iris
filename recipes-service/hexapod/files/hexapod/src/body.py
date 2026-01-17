@@ -62,6 +62,15 @@ def float_equal(a,b,delta=0.001):
 
 
 def ik3(coords, coax: float = 29, femur: float = 76, tibia: float = 106) -> List[float]:
+	#                 Y
+	#                 ^
+	#   Z             |
+	# X<-. L1|----|L2 .->X
+	#    |   |    |   Z
+	#    V L3|    |L4
+	#    Y   |    |
+	#      L5|----|L6
+	
 	try:
 		x,y,z = coords
 		coxa_angle = degrees(atan2(y, x))
@@ -139,6 +148,64 @@ class Model:
 								])
 		return self.set_leg_positions(leg_coords)
 
+
+	def set_leg_positions(self, neutral_leg_coords: np.ndarray, gait_offset: np.ndarray=None, width_mm=107, length_mm=214, corner_leg_rotation_offset=20) -> np.ndarray:
+		if (self.leg_coords_local is None):
+			self.leg_coords_local = neutral_leg_coords.copy()
+		leg_coords = self.leg_coords_local.copy()
+		# L1|----|L2
+		#   |    |
+		# L3|    |L4
+		#   |    |
+		# L5|----|L6
+		
+		#apply corner leg rotations if they are being used
+		rotate = lambda c : ypr(0,0,c,0,0,0)
+		c=corner_leg_rotation_offset
+		leg_coords[0] = np.matmul(rotate(-c), leg_coords[0])
+		leg_coords[1] = np.matmul(rotate(c), leg_coords[1])
+		leg_coords[4] = np.matmul(rotate(c), leg_coords[4])
+		leg_coords[5] = np.matmul(rotate(-c), leg_coords[5])
+		
+		leg1_tf = ypr(0,0,180, -width_mm/2, length_mm/2, 0) 
+		leg2_tf = ypr(0,0,0,    width_mm/2, length_mm/2, 0)
+		leg3_tf = ypr(0,0,180, -width_mm/2, 0, 0)
+		leg4_tf = ypr(0,0,0,    width_mm/2, 0, 0)
+		leg5_tf = ypr(0,0,180, -width_mm/2, -length_mm/2, 0)
+		leg6_tf = ypr(0,0,0,    width_mm/2, -length_mm/2, 0)
+		tfs = [leg1_tf, leg2_tf, leg3_tf, leg4_tf, leg5_tf, leg6_tf]
+		
+		if (gait_offset is not None):#add the gait offsets
+			leg_coords = leg_coords + gait_offset
+		#log.info('wrt local')
+		#log.info(leg_coords)
+		
+		#get the leg positions with respect to the body
+		for i in range(6):
+			leg_coords[i] = np.matmul(tfs[i], leg_coords[i])
+		#log.info('wrt body')
+		#log.info(leg_coords)
+		
+		#apply the body rotation
+		for i in range(6):
+			leg_coords[i] = np.matmul(self.body_ypr, leg_coords[i])
+		#log.info('wrt world frame')
+		#log.info(leg_coords)
+		
+		#get the leg position with respect to the local coordinate frames again
+		for i in range(6):
+			leg_coords[i] = np.matmul(inv(tfs[i]), leg_coords[i])
+		#log.info('wrt local')
+		#log.info(leg_coords)
+		
+
+		
+		self.leg_positions = leg_coords
+		#log.info('leg_positions')
+		#log.info(self.leg_positions)
+		return recalculateLegAngles(self.leg_positions)
+
+	'''
 	def set_leg_positions(self, leg_coords: np.ndarray, width_mm=107, length_mm=214, corner_leg_rotation_offset=20) -> np.ndarray:
 		if (self.leg_coords_local is None):
 			self.leg_coords_local = leg_coords.copy()
@@ -163,34 +230,6 @@ class Model:
 		leg5_tf = ypr(0,0,180, -width_mm/2, -length_mm/2, 0)
 		leg6_tf = ypr(0,0,0,    width_mm/2, -length_mm/2, 0)
 		tfs = [leg1_tf, leg2_tf, leg3_tf, leg4_tf, leg5_tf, leg6_tf]
-		
-		
-		'''
-		#leg1 = ypr(0,0,0, leg_coords[0,0], leg_coords[0,1], leg_coords[0,2])
-		leg1 = leg_coords[3]
-		tf = leg4_tf
-		
-		log.info('wrt local')
-		log.info(leg1[0:3])
-		#log.info(leg1[0:3,3])
-		
-		leg1 = np.matmul(inv(tf), leg1)
-		
-		log.info('wrt body')
-		log.info(leg1[0:3])
-		#log.info(leg1[0:3,3])
-		
-		leg1 = np.matmul(self.body_ypr, leg1)
-		log.info('apply body rotation')
-		log.info(leg1[0:3])
-		#log.info(leg1[0:3,3])
-		
-		leg1 = np.matmul(tf, leg1)
-		
-		log.info('wrt local')
-		log.info(leg1[0:3])
-		#log.info(leg1[0:3,3])
-		'''
 		
 		
 		#log.info('wrt local')
@@ -220,7 +259,7 @@ class Model:
 		#log.info('leg_positions')
 		#log.info(self.leg_positions)
 		return recalculateLegAngles(self.leg_positions)
-		
+		'''
 		
 
 if __name__ == "__main__":
