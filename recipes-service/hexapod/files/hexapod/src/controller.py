@@ -25,7 +25,7 @@ def rescale(v, max_val, min_val):
 
 class Controller:
 	def __init__(self, ssc32, pantilt, servo_dicts):
-		self.modes = [WALK_MODE, DANCE_MODE, MOVE_LEGS_MODE]
+		self.modes = [WALK_MODE, DANCE_MODE, MOVE_LEGS_MODE, PASSIVE_MODE]
 		self.mode = WALK_MODE
 
 		self.ssc32 = ssc32
@@ -90,6 +90,7 @@ class Controller:
 				'1'		: lambda : self.select_mode(WALK_MODE),
 				'2'		: lambda : self.select_mode(DANCE_MODE),
 				'3'		: lambda : self.select_mode(MOVE_LEGS_MODE),
+				'4'		: lambda : self.select_mode(PASSIVE_MODE),
 			},
 			WALK_MODE : {
 				'w' : lambda : set_input(self.walk_mode_inputs, 'w', 1),
@@ -186,7 +187,6 @@ class Controller:
 	def handle_idle_long(self):
 		log.info('controller.handle_idle_long()')
 		self.select_mode(PASSIVE_MODE)
-		self.sit()
 
 	def stand(self): # setup the starting robot positions
 		log.info('stand()')
@@ -195,6 +195,7 @@ class Controller:
 
 	def sit(self):
 		log.info('sit()')
+		#self.model.set_body(yaw=0, pitch=0, roll=0, tx=0, ty=0, tz=0)
 		angles = self.model.init_leg_positions(start_x_offset=60, start_height=25, corner_leg_rotation_offset=0)
 		self.step_finish_time = self.ssc32.move_legs(angles, time_ms=500, block=True)
 
@@ -213,6 +214,8 @@ class Controller:
 			self.run_move_legs(**self.move_legs_inputs)
 		elif (self.mode == DANCE_MODE):
 			self.run_dance_mode(**self.dance_mode_inputs, time_ms=500)
+		elif (self.mode == PASSIVE_MODE):
+			self.sit()
 
 	def run(self, *args, **kwargs):
 		def run_move_positions():
@@ -260,7 +263,7 @@ class Controller:
 		tz 		= rescale(safe_lookup(self.ui_inputs, 'tz', default=0.5), 30, -30)
 		self.model.set_body(yaw=yaw, pitch=pitch, roll=roll, tx=tx, ty=ty, tz=tz)
 	
-	def run_walk(self, w, s, a, d, q, e, gait, time_ms=100, speed=1000):
+	def run_walk(self, w, s, a, d, q, e, gait, time_ms=100, speed=None):
 		#log.info('run_walk(ws=%d,qe=%d)' % (ws,qe))
 		self.set_body_orientation()
 		
@@ -273,13 +276,7 @@ class Controller:
 		
 		length = rescale(safe_lookup(self.ui_inputs, 'stride_length', default=0.5), 70, 0)
 		height_ratio = safe_lookup(self.ui_inputs, 'step_height', default=0.5)
-		walk_speed = rescale(safe_lookup(self.ui_inputs, 'speed', default=0.5), 1, 0.1)
-		
-		#log.info(length)
-		#log.info(height_ratio)
-		#log.info(speed)
-		
-		
+		walk_speed = rescale(safe_lookup(self.ui_inputs, 'speed', default=0.5), 1.2, 0.2)
 		
 		if (mag==0) and (rotate_walk==0):
 			length = 0
@@ -293,33 +290,15 @@ class Controller:
 		self.cpg.set_yaw(angle)
 		self.cpg.new_gait(gait)
 		
+		if(rotate_walk!=0):
+			self.cpg.set_turn('right' if (rotate_walk>0) else 'left')
+		else:
+			self.cpg.set_turn(None)
+		
 		leg_coords_inc = self.cpg.update()
-		#leg_coords_inc[0][1] *= -1
-		#leg_coords_inc[2][1] *= -1
-		#leg_coords_inc[4][1] *= -1
 		
-		#log.info('%s %s' % (q,e))
-		'''
-		if(mag==0) and (rotate_walk!=0):
-			if (rotate_walk>0):
-				#leg_coords_inc[0][1] *= -1
-				#leg_coords_inc[3][1] *= -1
-				#leg_coords_inc[4][1] *= -1
-				
-				leg_coords_inc[0][1] *= -1
-				leg_coords_inc[2][1] *= -1
-				leg_coords_inc[4][1] *= -1
-				
-			if (rotate_walk<0):
-				#leg_coords_inc[1][1] *= -1
-				#leg_coords_inc[2][1] *= -1
-				#leg_coords_inc[5][1] *= -1	
-
-				leg_coords_inc[1][1] *= -1
-				leg_coords_inc[3][1] *= -1
-				leg_coords_inc[5][1] *= -1	
-		'''
-		
+		#log.info('leg_coords_increment')
+		#log.info(leg_coords_inc[1])
 		
 		angles = self.model.set_leg_positions(self.model.leg_coords_local, gait_offset=leg_coords_inc, corner_leg_rotation_offset=self.corner_rot())
 		#log.info(angles)

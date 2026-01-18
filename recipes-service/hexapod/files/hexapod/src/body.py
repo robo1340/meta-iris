@@ -9,7 +9,8 @@ from rotation import ypr
 
 COXA_LENGTH = 29
 FEMUR_LENGTH = 76
-TIBIA_LENGTH = 101
+#TIBIA_LENGTH = 101
+TIBIA_LENGTH = 106
 
 dh_model = [
 	{ #coxa
@@ -97,7 +98,7 @@ def ik3(coords,  servo_dict : dict, coxa=COXA_LENGTH, femur=FEMUR_LENGTH, tibia=
 		if (not float_equal(x, xf)) or (not float_equal(y, yf)) or (not float_equal(z, zf)):
 			log.debug('%s not reachable' % (coords,))
 			#log.debug('%s not reachable | actual %s' % (coords,[xf,yf,zf]))
-			return None
+			#return None
 		return [coxa_angle, femur_angle, tibia_angle]
 	except ValueError as ex:
 		log.error(ex)

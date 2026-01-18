@@ -193,7 +193,7 @@ class Legs:
 		self.leg4 = Leg(self,4, v=self.speed)
 		self.leg5 = Leg(self,5, v=self.speed)
 		self.leg6 = Leg(self,6, v=self.speed)
-
+		self.turn = None
 		# L1|----|L2
 		#   |    |
 		# L3|    |L4
@@ -237,10 +237,13 @@ class Legs:
 		for leg in self.legs:
 			leg.A = length if (length > 5) else 0
 			leg.C = height_ratio*2*leg.A - leg.A   
-			leg.speed = speed
+			leg.v = speed
 	
 	def set_yaw(self, yaw_degrees):
 		self.yaw = radians(yaw_degrees)
+
+	def set_turn(self, turn):
+		self.turn = turn
 
 	def __str__(self):
 		return 'Legs(%s)' % (self.selected_gait_name,)
@@ -287,12 +290,21 @@ class Legs:
 					
 			u = leg.eq23()
 			
-			#do nothing to u to turn left
-			#negate all u to turn right
-			#negate left legs to go forward and back
-			u = -u
-			#if (i%2==1): #legs on left side
+			#if ((i%2)==1):
 			#	u = -u
+			
+			if (self.turn is None): #to go forward or back negate discplacment for left legs
+				if ((i%2)==1): #legs on left side
+					#log.info('forward/back')
+					u = -u
+			elif (self.turn == 'left'): #to turn left do nothing to discplacment
+				#log.info(turn)
+				pass
+			elif (self.turn == 'right'): #to turn right negate the discplacment for all legs
+				#log.info(turn)
+				u = -u
+			else:
+				log.error('error')
 			
 			x = sin(self.yaw) * u
 			y = cos(self.yaw) * u
