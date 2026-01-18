@@ -1,27 +1,3 @@
-"""
-Driver functions to communicate with the Lynxmotion SSC-32U.
-
-Functions to communicate with the Lynxmotion SSC-32U to drive the 18 servos of
-the hexapod. These functions format commands based on the user manual for the
-controller board.
-
-Functions
----------
-angleToPW:
-	Convert an angle to the pulse width to command that angle.
-anglesToSerial:
-	Takes the hexapods servo angles and converts them to a serial command.
-connect:
-	Connect to the input COM port.
-disconnect:
-	Disconnects from the serial port.
-sendData:
-	Sends the commands for the servos to the Lynxmotion SSC-32U.
-
-Notes
------
-As of right now, this product may have been discontinued.
-"""
 import serial
 from serial import SerialException
 import numpy as np
@@ -29,9 +5,8 @@ from typing import Any, Optional
 import logging as log
 import time
 
-'''
 class Servo:
-	def __init__(self, ch, angles : list, pws : list, calibration : dict):
+	def __init__(self, ch, angles : list, pws : list, calibration : list):
 		self.ch = ch
 		self.angles = angles
 		self.pws = pws
@@ -43,64 +18,17 @@ class Servo:
 			return max(lower, min(x, upper))
 	
 		self.my_limits = lambda angle : limits(angle, self.lower_angle, self.upper_angle)
-		
-		(self.m, self.b) = self.calibrate(calibration)
-	
-	def calibrate(self, calibration):
-		low_angle = calibration['angles'][0]
-		hi_angle  = calibration['angles'][1]
-		
-		low_pw = calibration['pws'][0]
-		hi_pw  = calibration['pws'][1]
-		m = (hi_pw - low_pw)/(hi_angle - low_angle)
-		b = hi_pw - m*hi_angle	
-		return (m, b)
-	
-	def limits(self):
-		return (self.lower_angle, self.upper_angle)
-	
-	def get_pw(self, desired_angle):
-		desired_angle = self.my_limits(desired_angle)
-		return int(self.m * desired_angle + self.b)
-	
-	@staticmethod
-	def from_dict(d):
-		return Servo(ch=d['ch'], angles=d['angles'], pws=d['pws'], calibration=d['calibration'])
-'''
 
-
-class Servo:
-	def __init__(self, ch, angles : list, pws : list, calibration : dict):
-		self.ch = ch
-		self.angles = angles
-		self.pws = pws
-		self.lower_angle = angles[0]
-		#self.center_angle = angles[1]
-		self.upper_angle = angles[2]
-		#self.lower_pw = pws[0]
-		#self.center_pw = pws[1]
-		#self.upper_pw = pws[2]
-		self.current_angle = angles[1]
-
-		def limits(x, lower, upper):
-			return max(lower, min(x, upper))
-	
-		self.my_limits = lambda angle : limits(angle, self.lower_angle, self.upper_angle)
-		
-		(self.m, self.b) = self.calibrate(calibration)
-	
-	def calibrate(self, calibration):
-		low_angle = calibration['angles'][0]
-		hi_angle  = calibration['angles'][1]
-		
-		low_pw = calibration['pws'][0]
-		hi_pw  = calibration['pws'][1]
-		m = (hi_pw - low_pw)/(hi_angle - low_angle)
-		b = hi_pw - m*hi_angle	
-		return (m, b)
-	
-	def limits(self):
-		return (self.lower_angle, self.upper_angle)
+		def calibrate():
+			low_angle = self.angles[calibration[0]]
+			hi_angle  = self.angles[calibration[1]]
+			
+			low_pw = self.pws[calibration[0]]
+			hi_pw  = self.pws[calibration[1]]
+			m = (hi_pw - low_pw)/(hi_angle - low_angle)
+			b = hi_pw - m*hi_angle	
+			return (m, b)
+		(self.m, self.b) = calibrate()
 	
 	def get_pw(self, desired_angle):
 		desired_angle = self.my_limits(desired_angle)
@@ -183,9 +111,12 @@ class SSC32:
 		return None
 
 class Hexapod_SSC32(SSC32):
-	def __init__(self, path, baud, timeout, leg_servos):
+	def __init__(self, path, baud, timeout, servo_dicts):
 		super().__init__(path, baud, timeout)
-		self.leg_servos = leg_servos
+		self.leg_servos = []
+		for i in range(0,6):
+			for joint in ['coxa','femur','tibia']:
+				self.leg_servos.append(servo_dicts[i][joint])
 
 	def move_legs(self, angles: np.ndarray, speed: Optional[int] = None, time_ms: Optional[int] = None, block=False):
 		if (angles is None):
@@ -194,11 +125,7 @@ class Hexapod_SSC32(SSC32):
 			#log.info(angles)
 			temp_angles = np.copy(angles)
 			
-			#negate the angles for the servos on the left side
-			temp_angles[0,0] *= -1
-			temp_angles[2,0] *= -1
-			temp_angles[4,0] *= -1
-			
+			#subtract 90 degrees from all coxa and tibia angles
 			adjustment = np.array([[-90, 0, -90],
 								   [-90, 0, -90],
 								   [-90, 0, -90],

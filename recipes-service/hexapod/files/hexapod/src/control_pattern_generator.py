@@ -1,5 +1,6 @@
-import numpy as np
 #import matplotlib.pyplot as plt
+
+import numpy as np
 from math import sin
 from math import cos
 from math import atan
@@ -60,7 +61,7 @@ phi_tripod=np.array([[0,  1,  0,  1,  0,  1],
 
 ###################################################################################################################### 
 class Leg:
-	def __init__(self, legs, ind, ua=10, A=45, uc=10, C=0, v=5):
+	def __init__(self, legs, ind, ua=40, A=45, uc=40, C=0, v=5):
 		self.legs = legs
 		self.ind = ind
 		self.name = 'leg%d' % (ind,)
@@ -215,35 +216,28 @@ class Legs:
 
 		self.set_step_parameters(self.length, self.height_ratio, self.speed)
 
-		print(self)
+		log.info(self)
 
 	##@param height_ratio a value between 0 and 1
 	def set_step_parameters(self, length, height_ratio, speed):
 		#height_ratio = clamp(height_ratio, 1, 0)
 		
 		if (speed != self.speed):
-			print('speed changed from %s to %s' % (self.speed, speed))
+			log.info('speed changed from %s to %s' % (self.speed, speed))
 		if (length != self.length):
-			print('length changed from %s to %s' % (self.length, length))
+			log.info('length changed from %s to %s' % (self.length, length))
 		if (height_ratio != self.height_ratio):
-			print('height ratio changed from %s to %s' % (self.height_ratio, height_ratio))
+			log.info('height ratio changed from %s to %s' % (self.height_ratio, height_ratio))
 		
 		self.speed = speed
 		self.length = length
 		self.height_ratio = height_ratio
-		
-		
 		
 		#find value of A and C to satisfy the desired length and height
 		for leg in self.legs:
 			leg.A = length if (length > 5) else 0
 			leg.C = height_ratio*2*leg.A - leg.A   
 			leg.speed = speed
-			#log.info('here')
-			#log.info(leg.A)
-			#log.info(leg.C)
-			#log.info(leg.speed)
-			#log.info(self.height_ratio)
 	
 	def set_yaw(self, yaw_degrees):
 		self.yaw = radians(yaw_degrees)
@@ -254,7 +248,7 @@ class Legs:
 	def new_gait(self, selected_gait_name):
 		if (selected_gait_name == self.selected_gait_name):
 			return
-		#print('transition from gait %s to %s' % (self.selected_gait_name, selected_gait_name))
+		log.info('transition from gait %s to %s' % (self.selected_gait_name, selected_gait_name))
 		self.selected_gait_name = selected_gait_name
 		self.prev_phi = self.phi
 		self.prev_selected_gait = self.selected_gait
@@ -290,16 +284,16 @@ class Legs:
 	
 			B1 = leg.eq22_1()
 			B2 = leg.eq22_2()
-			
-			# L1|----|L2
-			#   |    |
-			# L3|    |L4
-			#   |    |
-			# L5|----|L6			
+					
 			u = leg.eq23()
-			if (i==1) or (i==3) or (i==5):
-				u = -u
-	
+			
+			#do nothing to u to turn left
+			#negate all u to turn right
+			#negate left legs to go forward and back
+			u = -u
+			#if (i%2==1): #legs on left side
+			#	u = -u
+			
 			x = sin(self.yaw) * u
 			y = cos(self.yaw) * u
 

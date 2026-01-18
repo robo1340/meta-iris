@@ -1,5 +1,5 @@
 [Unit]
-Description=starts the hexapod service
+Description=starts the 3DOF hexapod service
 After=network.target var-volatile.mount wifi_reset.service snap.service
 
 [Install]

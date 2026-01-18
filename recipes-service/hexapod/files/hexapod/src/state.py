@@ -131,7 +131,7 @@ def get_ypr(mat):
 	return (degrees(yaw), degrees(pitch), degrees(roll))
 
 class State:
-	def __init__(self, config, args, ssc32):
+	def __init__(self, config, args, ssc32, servo_dicts):
 		self.zmq_ct = None
 		self.push = None
 		self.config = config
@@ -152,7 +152,7 @@ class State:
 		
 		self.pantilt = PanTilt(self.ssc32, config['pantilt'])
 		
-		self.controller = Controller(self.ssc32, self.pantilt)
+		self.controller = Controller(self.ssc32, self.pantilt, servo_dicts)
 
 		self.check()
 
@@ -186,7 +186,7 @@ class State:
 		self.stopped = True
 	
 	def handle_key_presses(self):
-		if (len(self.active_keys) == 0) and (self.last_key_press is not None) and (time.monotonic() > (self.last_key_press+100)):
+		if (len(self.active_keys) == 0) and (self.last_key_press is not None) and (time.monotonic() > (self.last_key_press+30)):
 			self.last_key_press = None
 			self.controller.handle_idle_long()
 		for key in self.active_keys.values():
@@ -232,13 +232,6 @@ class State:
 		self.handle_key_press_task.run()	
 		self.controller.run()
 		self.check_task.run()
-
-if __name__ == "__main__":
-	log.basicConfig(level=log.DEBUG)
-	coords = (105, -10, -106)
-	log.info(coords)
-	angles = ik3(coords)
-	log.info(angles)
 	
 	
 
