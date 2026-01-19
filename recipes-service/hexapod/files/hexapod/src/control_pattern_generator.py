@@ -139,7 +139,7 @@ class Leg:
 		num = asin(sin(self.theta)) - self.legs.selected_gait
 		den = (pi/2) - self.legs.selected_gait
 		#return -1 + clamp(num/den, 1, 0)
-		return -1 + num/den
+		return -1 + (num/den)**3
 
 	def eq22_2(self):
 		if (self.a == 0):
@@ -148,7 +148,7 @@ class Leg:
 		num = -asin(sin(self.theta)) + self.legs.selected_gait
 		den = (pi/2) + self.legs.selected_gait
 		#return -1 + clamp(num/den, 1, 0)
-		return -1 + num/den
+		return -1 + (num/den)**3
 
 	def eq23(self):
 		'''horizontal displacement'''
