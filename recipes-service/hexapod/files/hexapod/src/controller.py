@@ -196,7 +196,7 @@ class Controller:
 	def sit(self):
 		log.info('sit()')
 		#self.model.set_body(yaw=0, pitch=0, roll=0, tx=0, ty=0, tz=0)
-		angles = self.model.init_leg_positions(start_x_offset=60, start_height=25, corner_leg_rotation_offset=0)
+		angles = self.model.init_leg_positions(start_x_offset=90, start_height=25, corner_leg_rotation_offset=0)
 		self.step_finish_time = self.ssc32.move_legs(angles, time_ms=500, block=True)
 
 	def cycle_modes(self):

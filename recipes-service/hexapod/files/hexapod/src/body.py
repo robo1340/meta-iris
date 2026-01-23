@@ -7,7 +7,7 @@ import logging as log
 from typing import List
 from rotation import ypr
 
-COXA_LENGTH = 29
+COXA_LENGTH = 26
 FEMUR_LENGTH = 76
 #TIBIA_LENGTH = 101
 TIBIA_LENGTH = 106
@@ -42,7 +42,7 @@ dh_model = [
 def float_equal(a,b,delta=0.001):
 	return (a-b) < delta
 
-
+'''
 def ik3(coords,  servo_dict : dict, coxa=COXA_LENGTH, femur=FEMUR_LENGTH, tibia=TIBIA_LENGTH) -> List[float]:
 	#directions of the local coordinate frames for each leg
 	#    Y            Y
@@ -61,6 +61,9 @@ def ik3(coords,  servo_dict : dict, coxa=COXA_LENGTH, femur=FEMUR_LENGTH, tibia=
 		#log.debug('%2.2f %2.2f %2.2f' % (x,y,z))
 		#log.debug(coxa_angle)
 		leg_rotated = np.matmul(inv(coax_rot), np.array([[x, y, z]]).T)
+		leg_rotated[0] -= 36
+		
+		
 		femur_angle = degrees(acos((tibia ** 2 - femur ** 2 - leg_rotated[2] ** 2
 									- (leg_rotated[0] - coxa) ** 2) /
 								   (-2 * femur * (sqrt(leg_rotated[2] ** 2 +
@@ -95,10 +98,72 @@ def ik3(coords,  servo_dict : dict, coxa=COXA_LENGTH, femur=FEMUR_LENGTH, tibia=
 		yf = result[0,3]
 		zf = result[2,3]
 		
+		#if (not float_equal(x, xf)) or (not float_equal(y, yf)) or (not float_equal(z, zf)):
+		#	log.debug('%s not reachable' % (coords,))
+		#	#log.debug('%s not reachable | actual %s' % (coords,[xf,yf,zf]))
+		#	#return None
+		return [coxa_angle, femur_angle, tibia_angle]
+	except ValueError as ex:
+		log.error(ex)
+		return None
+'''
+
+def ik3(coords,  servo_dict : dict, coxa=COXA_LENGTH, femur=FEMUR_LENGTH, tibia=TIBIA_LENGTH) -> List[float]:
+	#directions of the local coordinate frames for each leg
+	#    Y            Y
+	#    ^            ^
+	#    |            |
+	# X<-. L1|----|L2 .->X
+	#    Z   |    |   Z
+	#      L3|    |L4
+	#        |    |
+	#      L5|----|L6
+	
+	try:
+		x,y,z = coords
+		coxa_angle = degrees(atan2(y, x))
+		coax_rot = zRot(-coxa_angle)
+		#log.debug('%2.2f %2.2f %2.2f' % (x,y,z))
+		#log.debug(coxa_angle)
+		leg_rotated = np.matmul(inv(coax_rot), np.array([[x, y, z]]).T)
+		xr, _, zr = leg_rotated
+		xr-=coxa
+		
+		num = (tibia**2 - femur**2 - zr**2 - xr**2)
+		den = (-2*femur*(sqrt(zr**2 + xr**2)))
+		femur_angle = degrees(acos(num/den)) - degrees(atan2(-zr,xr))
+		
+		num = (zr**2 + xr**2 - femur**2 - tibia**2)
+		den = (-2*femur*tibia)
+		tibia_angle = degrees(acos(num/den)) - 90
+
+		if abs(coxa_angle) <= 1e-10:
+			coxa_angle = 0
+
+		if abs(femur_angle) <= 1e-10:
+			femur_angle = 0
+
+		if abs(tibia_angle) <= 1e-10:
+			tibia_angle = 0
+
+		dh_model[0]['joint_angle'] = servo_dict['coxa'].my_limits(coxa_angle-90)+90
+		dh_model[1]['joint_angle'] = servo_dict['femur'].my_limits(femur_angle)
+		dh_model[2]['joint_angle'] = servo_dict['tibia'].my_limits(tibia_angle-90)+90
+		
+		#dh_model[0]['joint_angle'] = coxa_angle
+		#dh_model[1]['joint_angle'] = femur_angle
+		#dh_model[2]['joint_angle'] = tibia_angle
+		
+		result = np.linalg.multi_dot( (dh_transform(**dh_model[0]), dh_transform(**dh_model[1]), dh_transform(**dh_model[2])) )
+		
+		xf = -result[1,3]
+		yf = result[0,3]
+		zf = result[2,3]
+		
 		if (not float_equal(x, xf)) or (not float_equal(y, yf)) or (not float_equal(z, zf)):
 			log.debug('%s not reachable' % (coords,))
-			#log.debug('%s not reachable | actual %s' % (coords,[xf,yf,zf]))
-			#return None
+		#	#log.debug('%s not reachable | actual %s' % (coords,[xf,yf,zf]))
+		#	#return None
 		return [coxa_angle, femur_angle, tibia_angle]
 	except ValueError as ex:
 		log.error(ex)
