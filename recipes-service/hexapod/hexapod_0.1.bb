@@ -10,7 +10,7 @@ inherit systemd
 
 # Create dependency to library packages
 RDEPENDS:${PN} += " python3-pyzmq python3-pyserial "
-RDEPENDS:${PN} += " hub  "
+RDEPENDS:${PN} += " hub hexapod-controller  "
 DEPENDS = " "
 
 #src uri's for the source code and .service conf file

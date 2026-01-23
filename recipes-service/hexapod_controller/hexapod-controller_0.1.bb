@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2ba5c6e4c336f3d9e4d191d4a74fb91c"
 RM_WORK_EXCLUDE += "${PN}"
 
 # project name
-prj="web_key_logger"
+prj="hexapod_controller"
 
 inherit systemd
 

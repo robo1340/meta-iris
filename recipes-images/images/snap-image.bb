@@ -55,7 +55,7 @@ IMAGE_INSTALL:append = " linux-firmware-ath9k "
 IMAGE_INSTALL:append = " nodejs frr libmicrohttpd random-mac wifi gps " 
 
 IMAGE_INSTALL:append = " snap hub node web-key-logger " 
-IMAGE_INSTALL:append = " hexapod3 rover key-pub " 
+IMAGE_INSTALL:append = " hexapod rover key-pub " 
 #IMAGE_INSTALL:append = " hexapod " 
 IMAGE_INSTALL:append = " python3-numpy " 
 #IMAGE_INSTALL:append = " bridge " 
